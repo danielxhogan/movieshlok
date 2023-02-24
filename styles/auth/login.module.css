@@ -1,0 +1,41 @@
+.login-form {
+  border: 1px solid grey;
+  box-shadow: 5px 5px #888888;
+  border-radius: 10px;
+  padding: 25px;
+  width: 400px;
+  margin: auto;
+  margin-top: 10%;
+}
+
+.login-form h1 {
+  font-size: 2rem;
+  margin-bottom: 25px;
+}
+
+.login-form input {
+  margin-bottom: 20px;
+}
+
+.login-form p {
+  color: grey;
+  margin-top: 25px;
+}
+
+.show-error {
+  display: block;
+  color: red !important;
+}
+
+.dont-show-error {
+  display: block;
+  visibility: hidden;
+}
+
+.login-form p span {
+  color: black;
+}
+
+.login-form p span:hover {
+  cursor: pointer;
+}
