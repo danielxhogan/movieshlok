@@ -1,9 +1,10 @@
 import styles from "../../styles/auth/register.module.css";
+import logo from "../../public/logo.png";
 
 import axios from "axios";
-
 import { FormEvent, useState } from "react";
 import { Input, Link, Button } from '@chakra-ui/react';
+import Image from "next/image";
 
 const GRAPHQL_API_URL = "http://localhost/graphql";
 
@@ -17,6 +18,12 @@ export default function RegisterPage() {
 
   async function onSubmitLoginForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      setError(true);
+      setErrorMessage("passwords don't match");
+      return;
+    }
 
     const response = await axios({
       url: GRAPHQL_API_URL,
@@ -57,30 +64,41 @@ export default function RegisterPage() {
       }
 
     } else {
+      const username = response.data.data.registerUser.user.username;
+
+      localStorage.setItem("username", username);
       localStorage.setItem("authToken", response.data.data.registerUser.user.jwtAuthToken);
       localStorage.setItem("refreshToken", response.data.data.registerUser.user.jwtRefreshToken);
-      localStorage.setItem("username", response.data.data.registerUser.user.username);
 
-      const preAuthHref = localStorage.getItem("preAuthHref");
-      if (preAuthHref) {
-        localStorage.removeItem("preAuthHref");
-        window.location.href = preAuthHref;
+      let postAuthHref = localStorage.getItem("postAuthHref");
+      
+      if (postAuthHref) {
+        localStorage.removeItem("postAuthHref");
+
+        if(postAuthHref.startsWith("/u")) {
+          postAuthHref = postAuthHref.replace("null", username);
+        }
+        window.location.href = postAuthHref;
+
       } else {
-        window.location.href = "http://localhost"
+        const username = localStorage.getItem("username");
+        const profile_url = `/u/${username}/profile`;
+        window.location.href = profile_url;
       }
     }
   }
 
   function onClickLoginButton() {
-    const preAuthHref = localStorage.getItem("preAuthHref");
-    if (!preAuthHref) {
-      localStorage.setItem("preAuthHref", window.location.href);
+    const postAuthHref = localStorage.getItem("postAuthHref");
+    if (!postAuthHref) {
+      localStorage.setItem("postAuthHref", window.location.href);
     }
     window.location.href = "/auth/login";
   }
 
   return <>
     <form className={styles["login-form"]} onSubmit={onSubmitLoginForm}>
+      <Image src={logo} alt="logo" width={400} />
       <h1>Register</h1>
       <Input
         type="email"

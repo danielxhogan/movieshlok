@@ -1,9 +1,10 @@
 import styles from "../../styles/auth/login.module.css";
+import logo from "../../public/logo.png";
 
 import axios from "axios";
-
 import { FormEvent, useState } from "react";
 import { Input, Link, Button } from '@chakra-ui/react';
+import Image from "next/image";
 
 const GRAPHQL_API_URL = "http://localhost/graphql";
 
@@ -43,30 +44,40 @@ export default function LoginPage() {
     if (response.data && response.data.errors) {
       setError(true);
     } else {
+      const username = response.data.data.login.user.username;
+
+      localStorage.setItem("username", username);
       localStorage.setItem("authToken", response.data.data.login.authToken);
       localStorage.setItem("refreshToken", response.data.data.login.refreshToken);
-      localStorage.setItem("username", response.data.data.login.user.username);
 
-      const preAuthHref = localStorage.getItem("preAuthHref");
-      if (preAuthHref) {
-        localStorage.removeItem("preAuthHref");
-        window.location.href = preAuthHref;
+      let postAuthHref = localStorage.getItem("postAuthHref");
+
+      if (postAuthHref) {
+        localStorage.removeItem("postAuthHref");
+
+        if(postAuthHref.startsWith("/u")) {
+          postAuthHref = postAuthHref.replace("null", username);
+        }
+        window.location.href = postAuthHref;
+
       } else {
-        window.location.href = "http://localhost"
+        const profile_url = `/u/${username}/profile`;
+        window.location.href = profile_url;
       }
     }
   }
 
   function onClickRegisterButton() {
-    const preAuthHref = localStorage.getItem("preAuthHref");
-    if (!preAuthHref) {
-      localStorage.setItem("preAuthHref", window.location.href);
+    const postAuthHref = localStorage.getItem("postAuthHref");
+    if (!postAuthHref) {
+      localStorage.setItem("postAuthHref", window.location.href);
     }
     window.location.href = "/auth/register";
   }
 
   return <>
     <form className={styles["login-form"]} onSubmit={onSubmitLoginForm}>
+      <Image src={logo} alt="logo" width={400} />
       <h1>Login</h1>
       <Input
         type="text"
