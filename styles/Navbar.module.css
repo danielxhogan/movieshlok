@@ -46,6 +46,10 @@
   display: none;
 }
 
+.bell:hover {
+  cursor: pointer;
+}
+
 .auth-menu {
   margin-top: 20px;
   font-family: 'Audiowide', cursive;

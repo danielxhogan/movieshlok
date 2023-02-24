@@ -4,6 +4,7 @@ import logo from "@/public/logo.png";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
+import Link from "next/link";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
   Button,
@@ -29,6 +30,9 @@ export default function Navbar() {
 
   useEffect(() => {
     setUsername(localStorage.getItem("username"));
+    // document.cookie = `username=${localStorage.getItem("username")}`;
+    // document.cookie = `authToken=${localStorage.getItem("authToken")}`;
+    // document.cookie = `refreshToken=${localStorage.getItem("refreshToken")}`;
   }, [])
 
   function onClickAuthenticatedLink(link: String) {
@@ -65,7 +69,19 @@ export default function Navbar() {
     }
   }
 
+  function onClickNotificationBell() {
+    window.location.href = "/auth/notifications";
+  }
+
   function onClickAccountDetails() {
+    console.log("accountdetails");
+    console.log(document.cookie);
+
+    // document.cookie = `username=${localStorage.getItem("username")}`;
+    // document.cookie = `authToken=${localStorage.getItem("authToken")}`;
+    // document.cookie = `refreshToken=${localStorage.getItem("refreshToken")}`;
+
+    window.location.href = "/auth/account-details";
 
   }
 
@@ -73,6 +89,10 @@ export default function Navbar() {
     localStorage.removeItem("username");
     localStorage.removeItem("authToken");
     localStorage.removeItem("refreshToken");
+
+    // document.cookie = "username=";
+    // document.cookie = "authToken=";
+    // document.cookie = "refreshToken=";
 
     window.location.reload();
   }
@@ -197,6 +217,10 @@ export default function Navbar() {
             className={`fa-solid fa-magnifying-glass fa-xl ${styles["mag-glass"]}`}
             onClick={() => { window.location.href = "/m/search"; }}>
           </i>
+          <i
+            className={`fa-regular fa-bell fa-xl ${styles["bell"]}`}
+            onClick={onClickNotificationBell}>
+          </i>
           <Menu>
             <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
             { username }
@@ -230,11 +254,14 @@ export default function Navbar() {
                 </MenuItem>
                 <MenuDivider />
               </div>
-              <MenuItem
-                command="Account Details"
-                className={styles["link"]}
-                onClick={() => onClickAccountDetails()}>
-              </MenuItem>
+              {/* <Link href="/auth/account-details"> */}
+                <MenuItem
+                  command="Account Details"
+                  className={styles["link"]}
+                  onClick={() => onClickAccountDetails()}
+                  >
+                </MenuItem>
+              {/* </Link> */}
               <MenuItem
                 command="Logout"
                 className={styles["link"]}

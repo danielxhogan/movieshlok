@@ -50,6 +50,10 @@ export default function LoginPage() {
       localStorage.setItem("authToken", response.data.data.login.authToken);
       localStorage.setItem("refreshToken", response.data.data.login.refreshToken);
 
+      document.cookie = `username=${username}`;
+      document.cookie = `authToken=${response.data.data.login.authToken}`;
+      document.cookie = `refreshToken=${response.data.data.login.refreshToken}`;
+
       let postAuthHref = localStorage.getItem("postAuthHref");
 
       if (postAuthHref) {
