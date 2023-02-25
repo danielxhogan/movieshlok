@@ -70,6 +70,10 @@ export default function RegisterPage() {
       localStorage.setItem("authToken", response.data.data.registerUser.user.jwtAuthToken);
       localStorage.setItem("refreshToken", response.data.data.registerUser.user.jwtRefreshToken);
 
+      document.cookie = `username=${username}`;
+      document.cookie = `authToken=${response.data.data.login.authToken}`;
+      document.cookie = `refreshToken=${response.data.data.login.refreshToken}`;
+
       let postAuthHref = localStorage.getItem("postAuthHref");
       
       if (postAuthHref) {
@@ -81,7 +85,6 @@ export default function RegisterPage() {
         window.location.href = postAuthHref;
 
       } else {
-        const username = localStorage.getItem("username");
         const profile_url = `/u/${username}/profile`;
         window.location.href = profile_url;
       }

@@ -26,6 +26,10 @@ export default function Navbar() {
 
   useEffect(() => {
     setUsername(localStorage.getItem("username"));
+
+    document.cookie = `username=${localStorage.getItem("username")}`;
+    document.cookie = `authToken=${localStorage.getItem("authToken")}`;
+    document.cookie = `refreshToken=${localStorage.getItem("refreshToken")}`;
   }, [])
 
   function onClickAuthenticatedLink(link: String) {
@@ -70,7 +74,6 @@ export default function Navbar() {
     console.log(document.cookie);
 
     window.location.href = "/auth/account-details";
-
   }
 
   function onClickLogOut() {

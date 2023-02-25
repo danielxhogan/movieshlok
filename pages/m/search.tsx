@@ -16,27 +16,29 @@ enum FilterResults {
   CAST_AND_CREW
 }
 
+type Result = {
+  id: number;
+  popularity: number;
+  media_type?: string;    // only multi
+  title?: string;         // only movie
+  poster_path?: string;   // only movie
+  overview?: string;      // only movie
+  release_date?: string;  // only movie
+  vote_count?: number;    // only movie
+  name?: string;          // only person
+  profile_path?: string;  // only person
+}
+
 type Props = {
   previousQuery?: string;
   previousFilter?: string;
   searchResults?: {
-    results: [
-      {
-        title: string;
-        media_type: string;
-      }
-    ]
+    results: [Result]
   };
 }
 
 export default function SearchPage(props: Props) {
-  if (props.searchResults && props.searchResults.results) {
-    for(let i=0; i<props.searchResults.results.length; i++) {
-      console.log(`searchResults: ${props.searchResults.results[i].title}`);
-    }
-  }
-
-  let filterStartValue = null;
+  let filterStartValue: FilterResults | null = null;
 
   if (props.previousFilter) {
     switch (props.previousFilter) {
@@ -53,10 +55,46 @@ export default function SearchPage(props: Props) {
     e.preventDefault();
 
     if (searchQuery !== "") {
-      console.log(`searchQuery: ${searchQuery}`);
-      const href = `/m/search?q=${searchQuery}`;
-      console.log(`href: ${href}`);
       window.location.href = `/m/search?q=${searchQuery}&f=${filter}`;
+    }
+  }
+
+  function makeMovieResult(result: Result) {
+    return <div key={result.id}>
+      <br /><h1>{ result.id }</h1><br />
+      <h2>{ result.title }</h2><br />
+      <h3>{ result.media_type }</h3><br />
+      <span>{ result.poster_path }</span><br />
+      <span>{ result.overview }</span><br />
+      <span>{ result.popularity }</span><br />
+      <span>{ result.vote_count }</span><br />
+      <span>{ result.release_date }</span><br />
+    </div>
+  }
+
+  function makePersonResult(result: Result) {
+    return <div key={result.id}>
+      <br /><h1>{ result.id }</h1><br />
+      <h2>{ result.name }</h2><br />
+      <h3>{ result.media_type }</h3><br />
+      <span>{ result.profile_path }</span><br />
+      <span>{ result.popularity }</span><br />
+    </div>
+  }
+
+  function makeSearchResult(result: Result) {
+    switch (filterStartValue) {
+
+      case FilterResults.ALL:
+        switch (result.media_type) {
+          case "movie": { return makeMovieResult(result); }
+          case "person": { return makePersonResult(result); }
+        }
+        break;
+
+      case FilterResults.MOVIES: { return makeMovieResult(result); }
+
+      case FilterResults.CAST_AND_CREW: { return makePersonResult(result); }
     }
   }
 
@@ -80,7 +118,7 @@ export default function SearchPage(props: Props) {
 
       <div className={styles["content"]}>
         <div className={styles["results"]}>
-
+          { props.searchResults?.results.map(result => makeSearchResult(result)) }
         </div>
 
         <div className={styles["filter"]}>
@@ -122,40 +160,71 @@ export default function SearchPage(props: Props) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const query = context.query.q;
   const filter = context.query.f;
+  let response = null;
 
   if (query) {
-    console.log(`query: ${query}`);
+    switch (filter) {
+      case "0":
+        console.log(`query: ${query}`);
 
-    const response = await axios({
-      url: `${process.env.TMDB_BASE_URL}/search/multi`,
-      method: "GET",
-      params: {
-        "api_key": `${process.env.TMDB_API_KEY}`,
-        "query": query
-      }
-    });
+        response = await axios({
+          url: `${process.env.TMDB_BASE_URL}/search/multi`,
+          method: "GET",
+          params: {
+            "api_key": `${process.env.TMDB_API_KEY}`,
+            "query": query
+          }
+        });
+        break;
 
+      case "1":
+        response = await axios({
+          url: `${process.env.TMDB_BASE_URL}/search/movie`,
+          method: "GET",
+          params: {
+            "api_key": `${process.env.TMDB_API_KEY}`,
+            "query": query
+          }
+        });
+        break;
 
-    return {
-      props: {
-        previousQuery: query,
-        previousFilter: filter,
-        searchResults: response.data
-      }
+      case "2":
+        response = await axios({
+          url: `${process.env.TMDB_BASE_URL}/search/person`,
+          method: "GET",
+          params: {
+            "api_key": `${process.env.TMDB_API_KEY}`,
+            "query": query
+          }
+        });
+        break;
     }
+
+    if (response && response.statusText === "OK") {
+      response.data.results.sort((result1: {popularity: number;}, result2: {popularity: number;}) => {
+        if (result1.popularity < result2.popularity) { return  1; }
+        if (result1.popularity > result2.popularity) { return -1; }
+        return 0;
+      });
+
+      return {
+        props: {
+          previousQuery: query,
+          previousFilter: filter,
+          searchResults: response.data
+        }
+      }
+    } else {
+      return {
+        props: {}
+      }
+
+    }
+
   } else {
 
     return {
       props: {}
     }
   }
-
-  // if (response.data.page) {
-  //   console.log(`TMDB response: ${response.data.page}`);
-  //   console.log(`TMDB response: ${response.data.results}`);
-  //   console.log(`TMDB response: ${response.data.results[0].title}`);
-  //   console.log(`TMDB response: ${response.status}`);
-
-  // }
-
 }
