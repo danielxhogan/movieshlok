@@ -1,0 +1,28 @@
+.search-page {
+  width: 80%;
+  margin: 30px auto;
+}
+
+.content {
+  display: flex;
+  margin-top: 20px;
+}
+
+.results {
+  width: 75%;
+}
+
+.filter {
+  font-family: 'Audiowide', cursive;
+  border: 1px solid black;
+  box-shadow: 5px 5px #888888;
+  width: 25%;
+  padding: 10px;
+}
+
+
+.filter-buttons {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+}

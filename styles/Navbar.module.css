@@ -46,6 +46,10 @@
   display: none;
 }
 
+.bell {
+  margin-right: 10px;
+}
+
 .bell:hover {
   cursor: pointer;
 }
