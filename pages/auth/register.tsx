@@ -100,7 +100,7 @@ export default function RegisterPage() {
   }
 
   return <>
-    <form className={styles["login-form"]} onSubmit={onSubmitLoginForm}>
+    <form className={styles["register-form"]} onSubmit={onSubmitLoginForm}>
       <Image src={logo} alt="logo" width={400} />
       <h1>Register</h1>
       <Input

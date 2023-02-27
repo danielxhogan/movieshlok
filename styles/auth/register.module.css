@@ -1,23 +1,28 @@
-.login-form {
+.register-form {
   border: 1px solid grey;
   box-shadow: 5px 5px #888888;
   border-radius: 10px;
   padding: 25px;
-  width: 400px;
-  margin: auto;
-  margin-top: 10%;
+  max-width: 400px;
+  margin: 10% auto 0;
 }
 
-.login-form h1 {
+@media only screen and (max-width: 440px) {
+  .register-form {
+    margin: 10% 20px 0;
+  }
+}
+
+.register-form h1 {
   font-size: 2rem;
   margin: 25px 0;
 }
 
-.login-form input {
+.register-form input {
   margin-bottom: 20px;
 }
 
-.login-form p {
+.register-form p {
   color: grey;
   margin-top: 25px;
 }
@@ -32,10 +37,10 @@
   visibility: hidden;
 }
 
-.login-form p span {
+.register-form p span {
   color: black;
 }
 
-.login-form p span:hover {
+.register-form p span:hover {
   cursor: pointer;
 }

@@ -1,5 +1,8 @@
 import styles from "@/styles/components/Pagination.module.css";
-import { FilterResults } from "@/pages/m/search";
+import { FilterResults } from "@/pages/search";
+
+import { Link } from "@chakra-ui/react";
+import NextLink from "next/link";
 
 export enum Api {
   TMDB,
@@ -32,7 +35,6 @@ export default function Pagination(props: Props) {
       case Api.TMDB:
         currentPage_number = parseInt(props.currentPage);
         totalPages_number = parseInt(props.totalPages);
-        console.log(totalPages_number);
 
         const linksArray = [];
         let startI;
@@ -57,20 +59,20 @@ export default function Pagination(props: Props) {
 
         for (let i=startI; i<endI; i++) {
           linksArray.push(
-            <span
-              key={i}
-              className={
-                (i+1) === currentPage_number
-                ?
-                `${styles["current-page"]} ${styles["page-button"]}`
-                :
-                `${styles["page-button"]}`}
-              onClick={() => { window.location.href = `/m/search?q=${props.searchQuery}&f=${props.filter}&p=${i+1}`; }}
-                >
+            <Link key={i} as={NextLink} href={`/search?q=${props.searchQuery}&f=${props.filter}&p=${i+1}`}>
+              <span
+                className={
+                  (i+1) === currentPage_number
+                  ?
+                  `${styles["current-page"]} ${styles["page-button"]}`
+                  :
+                  `${styles["page-button"]}`}
+                  >
 
-              { i + 1 }
+                { i + 1 }
 
-            </span>
+              </span>
+            </Link>
           )
         }
         return linksArray;
@@ -81,28 +83,69 @@ export default function Pagination(props: Props) {
     }
   }
 
+  function makeLeftArrows() {
+    switch (props.api) {
+
+      case Api.TMDB:
+        const previousPageNumber = parseInt(props.currentPage) - 1;
+
+        return (
+          <span className={styles["left-buttons"]}>
+            <Link as={NextLink} href={`/search?q=${props.searchQuery}&f=${props.filter}&p=1`}>
+              <span className={styles["icon-span"]}>
+                <i className="fa-solid fa-chevron-left"></i>
+                <i className="fa-solid fa-chevron-left"></i>
+              </span>
+            </Link>
+            <Link as={NextLink} href={`/search?q=${props.searchQuery}&f=${props.filter}&p=${previousPageNumber}`}>
+              <span className={styles["icon-span"]}>
+                <i className="fa-solid fa-chevron-left"></i>
+              </span>
+            </Link>
+          </span>
+
+        )
+        break;
+
+      case Api.WPGRAPHQL:
+        break;
+    }
+  }
+
+  function makeRightArrows() {
+    switch (props.api) {
+
+      case Api.TMDB:
+        const nextPageNumber = parseInt(props.currentPage) + 1;
+
+        return (
+          <span className={styles["right-buttons"]}>
+            <Link as={NextLink} href={`/search?q=${props.searchQuery}&f=${props.filter}&p=${nextPageNumber}`}>
+              <span className={styles["icon-span"]}>
+                <i className="fa-solid fa-chevron-right"></i>
+              </span>
+            </Link>
+            <Link as={NextLink} href={`/search?q=${props.searchQuery}&f=${props.filter}&p=${props.totalPages}`}>
+              <span className={styles["icon-span"]}>
+                <i className="fa-solid fa-chevron-right"></i>
+                <i className="fa-solid fa-chevron-right"></i>
+              </span>
+            </Link>
+          </span>
+
+        )
+        break;
+
+      case Api.WPGRAPHQL:
+        break;
+    }
+  }
 
   return <div className={styles["pagination"]}>
-    <span className={styles["left-buttons"]}>
-      <span className={styles["icon-span"]}>
-        <i className="fa-solid fa-chevron-left"></i>
-        <i className="fa-solid fa-chevron-left"></i>
-      </span>
-      <span className={styles["icon-span"]}>
-        <i className="fa-solid fa-chevron-left"></i>
-      </span>
-    </span>
+    { makeLeftArrows() }
 
     { makeLinks() }
 
-    <span className={styles["right-buttons"]}>
-      <span className={styles["icon-span"]}>
-        <i className="fa-solid fa-chevron-right"></i>
-      </span>
-      <span className={styles["icon-span"]}>
-        <i className="fa-solid fa-chevron-right"></i>
-        <i className="fa-solid fa-chevron-right"></i>
-      </span>
-    </span>
+    { makeRightArrows() }
   </div>
 }

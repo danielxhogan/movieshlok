@@ -3,9 +3,14 @@
   box-shadow: 5px 5px #888888;
   border-radius: 10px;
   padding: 25px;
-  width: 400px;
-  margin: auto;
-  margin-top: 10%;
+  max-width: 400px;
+  margin: 10% auto 0;
+}
+
+@media only screen and (max-width: 440px) {
+  .login-form {
+    margin: 10% 20px 0;
+  }
 }
 
 .login-form h1 {

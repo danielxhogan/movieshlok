@@ -4,8 +4,9 @@ import Navbar from "@/components/Navbar";
 import Pagination, { Api } from "@/components/Pagination";
 
 import { FormEvent, useState } from "react";
-import { InputGroup, InputLeftElement, Input, Divider, Button } from "@chakra-ui/react";
+import { InputGroup, InputLeftElement, Input, Divider, Button, Link } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
+import NextLink from "next/link";
 import Image from "next/image";
 
 import { GetServerSideProps } from "next";
@@ -21,6 +22,12 @@ export enum FilterResults {
   CAST_AND_CREW
 }
 
+type KnownFor = {
+  id: number;
+  title: string;
+  media_type: string;
+}
+
 type Result = {
   id: number;
   popularity: number;
@@ -33,6 +40,7 @@ type Result = {
   vote_count?: number;    // only movie
   name?: string;          // only person
   profile_path?: string;  // only person
+  known_for: KnownFor[];
 }
 
 type Props = {
@@ -59,19 +67,11 @@ export default function SearchPage(props: Props) {
   const [ filter, setFilter ] = useState(filterStartValue ? filterStartValue : FilterResults.ALL);
   const [ searchQuery, setSearchQuery ] = useState(props.previousQuery ? props.previousQuery : "");
 
-  function onClickFilterButton(newFilter: FilterResults) {
-    setFilter(newFilter);
-
-    if (searchQuery !== "") {
-      window.location.href = `/m/search?q=${searchQuery}&f=${newFilter}&p=1`;
-    }
-  }
-
   function onSubmitSearchForm(e: FormEvent<HTMLFormElement>, page: string = "1") {
     e.preventDefault();
 
     if (searchQuery !== "") {
-      window.location.href = `/m/search?q=${searchQuery}&f=${filter}&p=${page}`;
+      window.location.href = `/search?q=${searchQuery}&f=${filter}&p=${page}`;
     }
   }
 
@@ -101,35 +101,83 @@ export default function SearchPage(props: Props) {
 
   function makeMovieResult(result: Result) {
     const date = result.release_date ? reformatDate(result.release_date) : result.release_date;
+
     return <div key={result.id} className={styles["search-result"]}>
-      <h2>{ result.title }</h2><br />
-      {result.poster_path &&
-        <Image
-          src={`${TMDB_IMAGE_URL}/w92${result.poster_path}`}
-          alt="movie poster"
-          width={75}
-          height={225}
-        />
-      }
-      <br />
-      <span>{ result.overview }</span><br /><br />
-      <span>Average score: { result.vote_average }</span><br />
-      <span>Votes: { result.vote_count }</span><br />
-      <span>Release date: { date }</span><br />
+      <Link as={NextLink} href={`/details/movie/${result.id}`}>
+        <h2>{ result.title }</h2><br />
+      </Link>
+
+      <div className={styles["movie-result-content"]}>
+
+        <Link as={NextLink} href={`/details/movie/${result.id}`}>
+          { result.poster_path &&
+            <Image
+              src={`${TMDB_IMAGE_URL}/w92${result.poster_path}`}
+              className={styles["movie-poster-image"]}
+              width={75}
+              height={225}
+              alt="movie poster"
+            />
+          }
+        </Link>
+
+        <div className={styles["movie-details"]}>
+          <span>{ result.overview }</span><br /><br />
+          <span>Average score: { result.vote_average }</span><br />
+          <span>Votes: { result.vote_count }</span><br />
+          <span>Release date: { date }</span><br />
+        </div>
+
+      </div>
     </div>
+  }
+
+  function makeKnownFor(knownFor: KnownFor[]) {
+    const knownForText = knownFor.map(( movie, idx ) => {
+      if (idx >= 10 || movie.media_type !== "movie") { return; }
+      else {
+        return (
+        <Link key={movie.id} as={NextLink} href={`/details/movie/${movie.id}`}>
+          <Button
+            colorScheme="teal"
+            size="sm"
+            variant="outline"
+            className={styles["know-for-item"]}>
+            {movie.title} 
+          </Button>
+        </Link>
+        )
+      }
+    });
+
+    return knownForText;
   }
 
   function makePersonResult(result: Result) {
     return <div key={result.id} className={styles["search-result"]}>
-      <h2>{ result.name }</h2><br />
-      {result.profile_path &&
-        <Image
-          src={`${TMDB_IMAGE_URL}/w185${result.profile_path}`}
-          alt="movie poster"
-          width={75}
-          height={225}
-        />
-      }
+      <Link as={NextLink} href={`/details/person/${result.id}`}>
+        <h2>{ result.name }</h2><br />
+      </Link>
+
+      <div className={styles["person-result-content"]}>
+
+        <Link as={NextLink} href={`/details/person/${result.id}`}>
+          { result.profile_path &&
+            <Image
+              src={`${TMDB_IMAGE_URL}/w185${result.profile_path}`}
+              className={styles["cast-crew-profile"]}
+              width={75}
+              height={225}
+              alt="cast & crew profile"
+            />
+          }
+        </Link>
+
+        <div className={styles["known-for"]}>
+          { makeKnownFor(result.known_for) }
+        </div>
+
+      </div>
       <br />
     </div>
   }
@@ -172,6 +220,44 @@ export default function SearchPage(props: Props) {
       <div className={styles["content"]}>
         <div className={styles["results"]}>
 
+          <div className={styles["vertical-filter"]}>
+            <h3>show results for:</h3>
+
+            <Link as={NextLink} href={`/search?q=${searchQuery}&f=${FilterResults.ALL}&p=1`}>
+              <Button
+                colorScheme='teal'
+                variant={filter === FilterResults.ALL ? "solid" : "ghost"}
+                className={styles["filter-button"]}
+                onClick={() => setFilter(FilterResults.ALL)}
+                justifyContent="left">
+                ALL
+              </Button>
+            </Link>
+
+            <Link as={NextLink} href={`/search?q=${searchQuery}&f=${FilterResults.MOVIES}&p=1`}>
+              <Button
+                colorScheme='teal'
+                variant={filter === FilterResults.MOVIES ? "solid" : "ghost"}
+                className={styles["filter-button"]}
+                onClick={() => setFilter(FilterResults.MOVIES)}
+                justifyContent="left">
+                MOVIES
+              </Button>
+            </Link>
+
+            <Link as={NextLink} href={`/search?q=${searchQuery}&f=${FilterResults.CAST_AND_CREW}&p=1`}>
+              <Button
+                colorScheme='teal'
+                variant={filter === FilterResults.CAST_AND_CREW ? "solid" : "ghost"}
+                className={styles["filter-button"]}
+                onClick={() => setFilter(FilterResults.CAST_AND_CREW)}
+                justifyContent="left">
+                CAST & CREW
+              </Button>
+            </Link>
+
+          </div>
+
           { props.searchResults && props.previousPage &&
             <Pagination
               api={Api.TMDB}
@@ -183,6 +269,17 @@ export default function SearchPage(props: Props) {
           }
 
           { props.searchResults?.results.map(result => makeSearchResult(result)) }
+
+          { props.searchResults && props.previousPage &&
+            <Pagination
+              api={Api.TMDB}
+              currentPage={props.previousPage}
+              totalPages={props.searchResults.total_pages}
+              searchQuery={searchQuery}
+              filter={filter}
+            />
+          }
+
         </div>
 
         <div className={styles["filter"]}>
@@ -190,29 +287,38 @@ export default function SearchPage(props: Props) {
           <Divider />
 
           <div className={styles["filter-buttons"]}>
-            <Button
-              colorScheme='teal'
-              variant={filter === FilterResults.ALL ? "solid" : "ghost"}
-              onClick={() => onClickFilterButton(FilterResults.ALL)}
-              justifyContent="left">
-              ALL
-            </Button>
+            <Link as={NextLink} href={`/search?q=${searchQuery}&f=${FilterResults.ALL}&p=1`}>
+              <Button
+                colorScheme='teal'
+                variant={filter === FilterResults.ALL ? "solid" : "ghost"}
+                className={styles["filter-button"]}
+                onClick={() => setFilter(FilterResults.ALL)}
+                justifyContent="left">
+                ALL
+              </Button>
+            </Link>
 
-            <Button
-              colorScheme='teal'
-              variant={filter === FilterResults.MOVIES ? "solid" : "ghost"}
-              onClick={() => onClickFilterButton(FilterResults.MOVIES)}
-              justifyContent="left">
-              MOVIES
-            </Button>
+            <Link as={NextLink} href={`/search?q=${searchQuery}&f=${FilterResults.MOVIES}&p=1`}>
+              <Button
+                colorScheme='teal'
+                variant={filter === FilterResults.MOVIES ? "solid" : "ghost"}
+                className={styles["filter-button"]}
+                onClick={() => setFilter(FilterResults.MOVIES)}
+                justifyContent="left">
+                MOVIES
+              </Button>
+            </Link>
 
-            <Button
-              colorScheme='teal'
-              variant={filter === FilterResults.CAST_AND_CREW ? "solid" : "ghost"}
-              onClick={() => onClickFilterButton(FilterResults.CAST_AND_CREW)}
-              justifyContent="left">
-              CAST & CREW
-            </Button>
+            <Link as={NextLink} href={`/search?q=${searchQuery}&f=${FilterResults.CAST_AND_CREW}&p=1`}>
+              <Button
+                colorScheme='teal'
+                variant={filter === FilterResults.CAST_AND_CREW ? "solid" : "ghost"}
+                className={styles["filter-button"]}
+                onClick={() => setFilter(FilterResults.CAST_AND_CREW)}
+                justifyContent="left">
+                CAST & CREW
+              </Button>
+            </Link>
           </div>
 
         </div>
@@ -274,9 +380,20 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       }
     } else {
       return {
-        props: {}
+        props: {
+          previousQuery: query,
+          previousFilter: filter,
+          previousPage: page,
+        }
       }
     }
+  } else if(filter) {
+    return {
+      props: {
+        previousFilter: filter
+      }
+    }
+
   } else {
 
     return {

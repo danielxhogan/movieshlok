@@ -11,13 +11,18 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "image.tmdb.org",
+        pathname: "/t/p/w185/*"
+      },
+      {
+        protocol: "https",
+        hostname: "image.tmdb.org",
         pathname: "/t/p/w92/*"
       },
       {
         protocol: "https",
         hostname: "image.tmdb.org",
-        pathname: "/t/p/w185/*"
-      }
+        pathname: "/t/p/w154/*"
+      },
     ]
   }
 }

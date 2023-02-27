@@ -13,6 +13,7 @@
   padding: 20px;
 }
 
+
 .search-result {
   border-top: 1px solid black;
   padding: 20px;
@@ -22,9 +23,45 @@
   font-size: 1.5rem;
 }
 
+.movie-result-content {
+  display: flex;
+  gap: 15px;
+  justify-content: space-between;
+}
+
+.movie-poster-image {
+  width: 100px;
+  height: auto;
+}
+
+.movie-details {
+  width: 80%;
+}
+
+.person-result-content {
+  display: flex;
+  gap: 15px;
+}
+
+.cast-crew-profile {
+  width: auto;
+  height: auto;
+}
+
+.known-for {
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.known-for-item {
+  padding-bottom: 10px;
+}
+
 
 .filter {
-  height: 200px;
+  height: 220px;
   font-family: 'Audiowide', cursive;
   border: 1px solid black;
   box-shadow: 5px 5px #888888;
@@ -36,5 +73,74 @@
 .filter-buttons {
   display: flex;
   flex-direction: column;
+  gap: 15px;
   margin-top: 20px;
+}
+
+.filter-buttons a:hover {
+  text-decoration: none;
+}
+
+.filter-button {
+  width: 100%;
+}
+
+.vertical-filter {
+  display: none;
+}
+
+@media only screen and (max-width: 1050px) {
+  .filter {
+    display: none;
+  }
+
+  .vertical-filter {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 5px;
+    font-family: 'Audiowide', cursive;
+    margin-bottom: 40px;
+  }
+
+  .vertical-filter a:hover {
+    text-decoration: none;
+  }
+
+  .content {
+    flex-direction: column;
+  }
+
+  .results {
+    width: 100%;
+  }
+}
+
+@media only screen and (max-width: 800px) {
+  .vertical-filter {
+    flex-direction: column;
+  }
+}
+
+@media only screen and (max-width: 670px) {
+  .search-page {
+    width: 95%;
+  }
+}
+
+@media only screen and (max-width: 670px) {
+  .movie-result-content {
+    flex-direction: column;
+  }
+
+  .person-result-content {
+    flex-direction: column;
+  }
+}
+
+@media only screen and (max-width: 450px) {
+  .results {
+    padding: 0;
+  }
+
 }

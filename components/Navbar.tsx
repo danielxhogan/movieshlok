@@ -1,8 +1,7 @@
-import styles from "@/styles/Navbar.module.css";
+import styles from "@/styles/components/Navbar.module.css";
 import logo from "@/public/logo.png";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
@@ -12,7 +11,11 @@ import {
   MenuList,
   MenuItem,
   MenuDivider,
+  Link
 } from '@chakra-ui/react'
+
+import NextLink from "next/link";
+import Image from "next/image";
 
 const WORDPRESS_URL = "http://localhost";
 
@@ -65,17 +68,6 @@ export default function Navbar() {
     }
   }
 
-  function onClickNotificationBell() {
-    window.location.href = "/auth/notifications";
-  }
-
-  function onClickAccountDetails() {
-    console.log("accountdetails");
-    console.log(document.cookie);
-
-    window.location.href = "/auth/account-details";
-  }
-
   function onClickLogOut() {
     localStorage.removeItem("username");
     localStorage.removeItem("authToken");
@@ -119,17 +111,21 @@ export default function Navbar() {
           Calendar
         </div>
 
-        <div
-          className={styles["link"]}
-          onClick={() => { window.location.href = "/m/search"; }}>
-          Search
-        </div>
+        <Link as={NextLink} href="/search">
+          <div
+            className={styles["link"]}
+            >
+            Search
+          </div>
+        </Link>
 
-        <div
-          className={styles["link"]}
-          onClick={() => { window.location.href = `${WORDPRESS_URL}/blog`; }}>
-          Blog
-        </div>
+        <Link as={NextLink} href={`${WORDPRESS_URL}/blog`}>
+          <div
+            className={styles["link"]}
+            >
+            Blog
+          </div>
+        </Link>
       </div>
 
       <div className={styles["account"]}>
@@ -149,10 +145,14 @@ export default function Navbar() {
           </div>
 
           <div className={styles["no-auth-menu"]}>
-            <i
-              className={`fa-solid fa-magnifying-glass fa-xl ${styles["mag-glass"]}`}
-              onClick={() => { window.location.href = "/m/search"; }}>
-            </i>
+            <Link as={NextLink} href="/search">
+              <i
+                className={`fa-solid fa-magnifying-glass fa-xl ${styles["mag-glass"]}`}
+                // onClick={() => { window.location.href = "/m/search"; }}
+                >
+              </i>
+            </Link>
+
             <Menu >
               <MenuButton as={Button}>
                 <i className="fa-solid fa-bars fa-2x"></i>
@@ -196,22 +196,24 @@ export default function Navbar() {
                 </MenuItem>
               </MenuList>
             </Menu>
+
           </div>
         </div>
         :
         <div className={styles["auth-menu"]}>
-          <i
-            className={`fa-solid fa-magnifying-glass fa-xl ${styles["mag-glass"]}`}
-            onClick={() => { window.location.href = "/m/search"; }}>
-          </i>
-          <i
-            className={`fa-regular fa-bell fa-xl ${styles["bell"]}`}
-            onClick={onClickNotificationBell}>
-          </i>
+
+          <Link as={NextLink} href="/search">
+            <i className={`fa-solid fa-magnifying-glass fa-xl ${styles["mag-glass"]}`}></i>
+          </Link>
+          <Link as={NextLink} href="/auth/notifications">
+            <i className={`fa-regular fa-bell fa-xl ${styles["bell"]}`}></i>
+          </Link>
+
           <Menu>
             <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-            { username }
+              { username }
             </MenuButton>
+
             <MenuList>
               <div className={styles["small-auth-menu"]}>
                 <MenuItem
@@ -241,12 +243,13 @@ export default function Navbar() {
                 </MenuItem>
                 <MenuDivider />
               </div>
+
+              <Link as={NextLink} href="/auth/account-details">
                 <MenuItem
                   command="Account Details"
-                  className={styles["link"]}
-                  onClick={() => onClickAccountDetails()}
-                  >
+                  className={styles["link"]}>
                 </MenuItem>
+              </Link>
               <MenuItem
                 command="Logout"
                 className={styles["link"]}
@@ -254,6 +257,7 @@ export default function Navbar() {
               </MenuItem>
             </MenuList>
           </Menu>
+
         </div>
         }
         
