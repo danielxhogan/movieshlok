@@ -1,0 +1,118 @@
+.trailer-button {
+  z-index: 1;
+}
+
+.trailer-backdrop {
+}
+
+.trailer-container {
+  z-index: 0;
+  max-width: 780px;
+  margin: auto;
+  position: relative;
+  transition: all 0.5s ease;
+}
+
+.hidden.trailer-container {
+  translate: 0 -500px;
+}
+
+.shown.trailer-container {
+  translate: 0;
+}
+
+.trailer {
+  position: absolute;
+  width: 100%;
+  height: 440px;
+}
+
+.backdrop {
+  margin: 20px auto;
+  box-shadow: 10px 10px #888888;
+}
+
+.movie-title {
+  align-items: center;
+}
+
+.movie-title h1 {
+  text-align: center;
+  font-size: 3rem;
+}
+
+@media only screen and (max-width: 950px) {
+  .trailer {
+    height: 404px;
+  }
+}
+@media only screen and (max-width: 900px) {
+  .trailer {
+    height: 382px;
+  }
+}
+@media only screen and (max-width: 850px) {
+  .trailer {
+    height: 360px;
+  }
+}
+@media only screen and (max-width: 800px) {
+  .trailer {
+    height: 337px;
+  }
+}
+@media only screen and (max-width: 750px) {
+  .trailer {
+    height: 314px;
+  }
+}
+@media only screen and (max-width: 700px) {
+  .trailer {
+    height: 293px;
+  }
+}
+@media only screen and (max-width: 650px) {
+  .trailer {
+    height: 270px;
+  }
+}
+@media only screen and (max-width: 600px) {
+  .trailer {
+    height: 247px;
+  }
+}
+@media only screen and (max-width: 550px) {
+  .trailer {
+    height: 225px;
+  }
+}
+@media only screen and (max-width: 500px) {
+  .trailer {
+    height: 202px;
+  }
+}
+@media only screen and (max-width: 450px) {
+  .trailer {
+    height: 180px;
+  }
+}
+@media only screen and (max-width: 400px) {
+  .trailer {
+    height: 157px;
+  }
+}
+@media only screen and (max-width: 350px) {
+  .trailer {
+    height: 135px;
+  }
+}
+@media only screen and (max-width: 300px) {
+  .trailer {
+    height: 112px;
+  }
+}
+@media only screen and (max-width: 250px) {
+  .trailer {
+    height: 90px;
+  }
+}
