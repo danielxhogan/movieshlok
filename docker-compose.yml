@@ -1,4 +1,6 @@
 services:
-  frontend:
-  backend:
+  # frontend:
+  # backend:
   database:
+    image: danielxhogan/movieshlok-database
+    container_name: movieshlok-database
