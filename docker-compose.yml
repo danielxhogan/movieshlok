@@ -1,6 +1,22 @@
 services:
-  # frontend:
+  frontend:
+    image: danielxhogan/movieshlok-frontend
+    container_name: movieshlok-frontend
+    ports:
+      - ${FRONTEND_PORT}:3000
+    environment:
+      BACKEND_PORT: ${BACKEND_PORT}
+
   # backend:
+  #   image: danielxhogan/movieshlok-backend
+  #   container_name: movieshlok-backend
+  #   ports:
+  #     - ${BACKEND_PORT}:5000
+  #   environment:
+  #     DATABASE_PORT: ${DATABASE_PORT}
+
   database:
     image: danielxhogan/movieshlok-database
     container_name: movieshlok-database
+    ports:
+      - ${DATABASE_PORT}:5432

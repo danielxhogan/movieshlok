@@ -6,10 +6,12 @@ import reducers from './reducers';
 
 export interface State {
   movieDetails: string;
+  movieVideos: string;
 }
 
 const initialState = {
   movieDetails: "",
+  movieVideos: ""
 }
 
 const reducer = (state: State = initialState, action: AnyAction) => {
