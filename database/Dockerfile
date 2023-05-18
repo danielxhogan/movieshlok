@@ -1,7 +1,7 @@
-FROM postgres
-COPY ./makeSchema.sql /docker-entrypoint-initdb.d
-
+FROM postgres:15-alpine
 WORKDIR /movieshlok
+
+COPY ./makeSchema.sql /docker-entrypoint-initdb.d
 
 COPY ./POSTGRES_PASSWORD .
 ENV POSTGRES_PASSWORD_FILE ./POSTGRES_PASSWORD
