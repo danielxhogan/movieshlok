@@ -340,6 +340,7 @@ async function makeRequest(query: string | string[], page: string | string[], en
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  console.log(`TMDB_API_KEY: ${process.env.TMDB_API_KEY}`);
   const query = context.query.q;
   const filter = context.query.f;
   const page = context.query.p;

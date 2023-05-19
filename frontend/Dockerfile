@@ -3,13 +3,20 @@ WORKDIR /movieshlok
 
 ENV NODE_ENV=production
 
+ARG TMDB_API_KEY
+ENV TMDB_API_KEY=$TMDB_API_KEY
+
+ARG TMDB_BASE_URL
+ENV TMDB_BASE_URL=$TMDB_BASE_URL
+
+ARG TMDB_READ_ACCESS_TOKEN
+ENV TMDB_READ_ACCESS_TOKEN=$TMDB_READ_ACCESS_TOKEN
+
 COPY package*.json ./
 RUN npm i
 
 COPY . .
 RUN npm run build
-
-RUN --mount=type=secret,id=TMDB_API_KEY,required=true
 
 EXPOSE 3000
 CMD ["npm", "run", "start"]
