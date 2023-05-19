@@ -6,6 +6,7 @@ services:
       - ${FRONTEND_PORT}:3000
     environment:
       BACKEND_PORT: ${BACKEND_PORT}
+      TMDB_API_KEY_FILE: /run/secrets/TMDB_API_KEY
 
   # backend:
   #   image: danielxhogan/movieshlok-backend
