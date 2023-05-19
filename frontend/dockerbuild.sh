@@ -1,1 +1,0 @@
-docker build --secret id=TMDB_API_KEY,src=./secrets/TMDB_API_KEY -t danielxhogan/movieshlok-frontend .
