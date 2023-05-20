@@ -25,32 +25,32 @@ export default function RegisterPage() {
       return;
     }
 
-    const response = await axios({
-      url: GRAPHQL_API_URL,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: JSON.stringify({
-        query: `
-        mutation registerUser($username: String!, $password: String!, $email: String!) {
-          registerUser(
-            input: {username: $username, password: $password, email: $email}
-          ) {
-            user {
-              username
-              jwtAuthToken
-              jwtRefreshToken
-            }
-          }
-        }
-        `,
-        variables: {
-          username: username,
-          password: password,
-          email: email
-        }
-      })
-    });
-    console.log(response);
+    // const response = await axios({
+    //   url: GRAPHQL_API_URL,
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   data: JSON.stringify({
+    //     query: `
+    //     mutation registerUser($username: String!, $password: String!, $email: String!) {
+    //       registerUser(
+    //         input: {username: $username, password: $password, email: $email}
+    //       ) {
+    //         user {
+    //           username
+    //           jwtAuthToken
+    //           jwtRefreshToken
+    //         }
+    //       }
+    //     }
+    //     `,
+    //     variables: {
+    //       username: username,
+    //       password: password,
+    //       email: email
+    //     }
+    //   })
+    // });
+    // console.log(response);
 
     if (response.data && response.data.errors) {
       setError(true);
@@ -66,13 +66,13 @@ export default function RegisterPage() {
     } else {
       const username = response.data.data.registerUser.user.username;
 
-      localStorage.setItem("username", username);
-      localStorage.setItem("authToken", response.data.data.registerUser.user.jwtAuthToken);
-      localStorage.setItem("refreshToken", response.data.data.registerUser.user.jwtRefreshToken);
+      // localStorage.setItem("username", username);
+      // localStorage.setItem("authToken", response.data.data.registerUser.user.jwtAuthToken);
+      // localStorage.setItem("refreshToken", response.data.data.registerUser.user.jwtRefreshToken);
 
       document.cookie = `username=${username}`;
-      document.cookie = `authToken=${response.data.data.login.authToken}`;
-      document.cookie = `refreshToken=${response.data.data.login.refreshToken}`;
+      // document.cookie = `authToken=${response.data.data.login.authToken}`;
+      // document.cookie = `refreshToken=${response.data.data.login.refreshToken}`;
 
       let postAuthHref = localStorage.getItem("postAuthHref");
       

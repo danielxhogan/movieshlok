@@ -29,10 +29,7 @@ export default function Navbar() {
 
   useEffect(() => {
     setUsername(localStorage.getItem("username"));
-
     document.cookie = `username=${localStorage.getItem("username")}`;
-    document.cookie = `authToken=${localStorage.getItem("authToken")}`;
-    document.cookie = `refreshToken=${localStorage.getItem("refreshToken")}`;
   }, [])
 
   function onClickAuthenticatedLink(link: String) {

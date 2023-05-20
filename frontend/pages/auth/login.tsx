@@ -17,28 +17,28 @@ export default function LoginPage() {
   async function onSubmitLoginForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    const response = await axios({
-      url: GRAPHQL_API_URL,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: JSON.stringify({
-        query: `
-        mutation login($password: String!, $username: String!) {
-          login(input: {password: $password, username: $username}) {
-            authToken
-            refreshToken
-            user {
-              username
-            }
-          }
-        }
-        `,
-        variables: {
-         username: username,
-         password: password 
-        }
-      })
-    })
+    // const response = await axios({
+    //   url: GRAPHQL_API_URL,
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   data: JSON.stringify({
+    //     query: `
+    //     mutation login($password: String!, $username: String!) {
+    //       login(input: {password: $password, username: $username}) {
+    //         authToken
+    //         refreshToken
+    //         user {
+    //           username
+    //         }
+    //       }
+    //     }
+    //     `,
+    //     variables: {
+    //      username: username,
+    //      password: password 
+    //     }
+    //   })
+    // })
 
 
     if (response.data && response.data.errors) {
@@ -46,9 +46,9 @@ export default function LoginPage() {
     } else {
       const username = response.data.data.login.user.username;
 
-      localStorage.setItem("username", username);
-      localStorage.setItem("authToken", response.data.data.login.authToken);
-      localStorage.setItem("refreshToken", response.data.data.login.refreshToken);
+      // localStorage.setItem("username", username);
+      // localStorage.setItem("authToken", response.data.data.login.authToken);
+      // localStorage.setItem("refreshToken", response.data.data.login.refreshToken);
 
       document.cookie = `username=${username}`;
       document.cookie = `authToken=${response.data.data.login.authToken}`;
