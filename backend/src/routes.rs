@@ -12,7 +12,7 @@ use warp::{Filter, reject};
 fn with_auth_db_operator(pool: PgPool) -> impl Filter<Extract = (AuthDbOperator,), Error = warp::Rejection> + Clone {
   warp::any()
     .map(move || pool.clone())
-    .and_then(|pool: PgPool| async move {  match pool.get() {
+    .and_then(|pool: PgPool| async move { match pool.get() {
       Ok(conn) => Ok(AuthDbOperator::new(conn)),
       Err(err) => Err(reject::custom(
         AppError::new(format!("Error getting connection from pool: {}", err.to_string()).as_str(), ErrorType::Internal))

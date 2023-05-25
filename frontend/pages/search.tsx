@@ -388,7 +388,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
       }
     }
-  } else if(filter) {
+  } else if (filter) {
     return {
       props: {
         previousFilter: filter
