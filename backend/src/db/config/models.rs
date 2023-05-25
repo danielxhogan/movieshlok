@@ -17,16 +17,7 @@ pub struct User {
 #[derive(Debug, Insertable, Deserialize, Clone)]
 #[diesel(table_name = users)]
 pub struct NewUser {
-    // pub id: Option<Uuid>,
     pub username: String,
     pub email: String,
     pub password: String,
 }
-
-// #[derive(Insertable, Deserialize)]
-// #[diesel(table_name = schema::users)]
-// pub struct NewUserRequest<'a> {
-//     pub username: &'a str,
-//     pub email: &'a str,
-//     pub password: &'a str,
-// }

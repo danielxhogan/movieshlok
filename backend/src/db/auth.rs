@@ -20,13 +20,13 @@ struct JwtPayload<'a> {
 
 type PooledPg = PooledConnection<ConnectionManager<PgConnection>>;
 
-pub struct AuthDbOperator {
+pub struct AuthDbManager {
   connection:  PooledPg,
 }
 
-impl AuthDbOperator {
-  pub fn new(connection: PooledPg) -> AuthDbOperator {
-    AuthDbOperator {connection}
+impl AuthDbManager {
+  pub fn new(connection: PooledPg) -> AuthDbManager {
+    AuthDbManager {connection}
   }
 
   pub fn register_user(&mut self, new_user: NewUser) -> Result<User, AppError> {
