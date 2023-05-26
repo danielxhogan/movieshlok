@@ -1,3 +1,5 @@
 Dockerfile
 /node_modules
-.env*.local
+.env
+dockerbuild.sh
+dockerrun.sh

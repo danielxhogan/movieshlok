@@ -1,5 +1,3 @@
-POSTGRES_DB
-POSTGRES_PASSWORD
 dockerbuild.sh
 dockerrun.sh
 dockerpsql.sh

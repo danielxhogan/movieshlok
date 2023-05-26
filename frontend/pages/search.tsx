@@ -9,6 +9,9 @@ import { SearchIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
 import Image from "next/image";
 
+import getConfig from "next/config";
+const { publicRuntimeConfig } = getConfig();
+
 import { GetServerSideProps } from "next";
 import axios from "axios";
 

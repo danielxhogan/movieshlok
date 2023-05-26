@@ -41,34 +41,34 @@ export default function LoginPage() {
     // })
 
 
-    if (response.data && response.data.errors) {
-      setError(true);
-    } else {
-      const username = response.data.data.login.user.username;
+    // if (response.data && response.data.errors) {
+    //   setError(true);
+    // } else {
+    //   const username = response.data.data.login.user.username;
 
-      // localStorage.setItem("username", username);
-      // localStorage.setItem("authToken", response.data.data.login.authToken);
-      // localStorage.setItem("refreshToken", response.data.data.login.refreshToken);
+    //   // localStorage.setItem("username", username);
+    //   // localStorage.setItem("authToken", response.data.data.login.authToken);
+    //   // localStorage.setItem("refreshToken", response.data.data.login.refreshToken);
 
-      document.cookie = `username=${username}`;
-      document.cookie = `authToken=${response.data.data.login.authToken}`;
-      document.cookie = `refreshToken=${response.data.data.login.refreshToken}`;
+    //   document.cookie = `username=${username}`;
+    //   document.cookie = `authToken=${response.data.data.login.authToken}`;
+    //   document.cookie = `refreshToken=${response.data.data.login.refreshToken}`;
 
-      let postAuthHref = localStorage.getItem("postAuthHref");
+    //   let postAuthHref = localStorage.getItem("postAuthHref");
 
-      if (postAuthHref) {
-        localStorage.removeItem("postAuthHref");
+    //   if (postAuthHref) {
+    //     localStorage.removeItem("postAuthHref");
 
-        if(postAuthHref.startsWith("/u")) {
-          postAuthHref = postAuthHref.replace("null", username);
-        }
-        window.location.href = postAuthHref;
+    //     if(postAuthHref.startsWith("/u")) {
+    //       postAuthHref = postAuthHref.replace("null", username);
+    //     }
+    //     window.location.href = postAuthHref;
 
-      } else {
-        const profile_url = `/u/${username}/profile`;
-        window.location.href = profile_url;
-      }
-    }
+    //   } else {
+    //     const profile_url = `/u/${username}/profile`;
+    //     window.location.href = profile_url;
+    //   }
+    // }
   }
 
   function onClickRegisterButton() {
