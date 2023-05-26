@@ -17,8 +17,8 @@ async fn main() {
     .allow_any_origin();
 
   let routes = auth_filters(pg_pool)
-    .with(cors)
-    .recover(handle_rejection);
+    .recover(handle_rejection)
+    .with(cors);
 
   println!("Starting server on port 3030...");
 

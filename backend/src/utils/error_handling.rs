@@ -10,7 +10,8 @@ pub enum ErrorType {
   NotFound,
   Internal,
   BadRequest,
-  UserAlreadyExists
+  UsernameAlreadyExists,
+  EmailAlreadyExists,
 }
 
 #[derive(Debug)]
@@ -29,7 +30,8 @@ impl AppError {
       ErrorType::NotFound => warp::http::StatusCode::NOT_FOUND,
       ErrorType::Internal => warp::http::StatusCode::INTERNAL_SERVER_ERROR,
       ErrorType::BadRequest => warp::http::StatusCode::BAD_REQUEST,
-      ErrorType::UserAlreadyExists => warp::http::StatusCode::BAD_REQUEST,
+      ErrorType::UsernameAlreadyExists => warp::http::StatusCode::CONFLICT,
+      ErrorType::EmailAlreadyExists => warp::http::StatusCode::CONFLICT,
     }
   }
 

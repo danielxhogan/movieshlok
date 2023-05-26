@@ -1,12 +1,10 @@
 import styles from "../../styles/auth/register.module.css";
 import logo from "../../public/logo.png";
 
-import axios from "axios";
 import { FormEvent, useState } from "react";
 import { Input, Button } from '@chakra-ui/react';
 import Image from "next/image";
 
-// const BACKEND_URL = `${process.env.BACKEND_HOST}%3${process.env.BACKEND_PORT}`;
 const BACKEND_URL = "http://localhost:3030";
 
 
@@ -21,31 +19,63 @@ export default function RegisterPage() {
   async function onSubmitLoginForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
+    // check passwords match
     if (password !== confirmPassword) {
       setError(true);
       setErrorMessage("passwords don't match");
       return;
     }
 
-    try {
-      const params = new URLSearchParams();
-      params.append("username", username);
-      params.append("email", email);
-      params.append("password", password);
+    // construct the request
+    const registerUrl = `${BACKEND_URL}/register`;
 
-      const response = await axios({
-        url: `${BACKEND_URL}/register`,
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        data: params
-      });
+    const headers = new Headers();
+    headers.append("Content-Type", "application/x-www-form-urlencoded");
 
-    } catch (err: any) {
+    const params = new URLSearchParams();
+    params.append("username", username);
+    params.append("email", email);
+    params.append("password", password);
+
+    // send request
+    const request = new Request(registerUrl, { headers, body: params, method: "POST" });
+    const response = await fetch(request);
+
+    if (response.ok) {
+
+    } else if (response.status > 500) {
       setError(true);
-      setErrorMessage("user already exists");
+      setErrorMessage("Server Error");
 
+    } else {
+      const responseJson = await response.json();
+      const errorMessage = responseJson.message;
+      setError(true);
+      setErrorMessage(errorMessage);
     }
-    // console.log(response);
+
+    // try {
+    //   const params = new URLSearchParams();
+    //   params.append("username", username);
+    //   params.append("email", email);
+    //   params.append("password", password);
+
+    //   const response = await axios({
+    //     url: `${BACKEND_URL}/register`,
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    //     data: params
+    //   });
+    //   console.log(response);
+    //   if (response.data) {
+    //     console.log(response.data);
+    //   }
+
+    // } catch (err: any) {
+    //   console.log(err);
+    //   setError(true);
+    //   setErrorMessage("user already exists");
+    // }
 
     // if (response.data && response.data.errors) {
     //   console.log("user already exists");

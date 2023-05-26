@@ -31,17 +31,30 @@ impl AuthDbManager {
 
   pub fn register_user(&mut self, new_user: NewUser) -> Result<User, AppError> {
 
-    // check if user already exists
-    let existing_users = users::table
+    // check if username already exists
+    let existing_username = users::table
       .filter(users::username.eq(&new_user.username))
       .load::<User>(&mut self.connection)
       .map_err(|err| {
-        AppError::from_diesel_err(err, "while checking existing users in register")
+        AppError::from_diesel_err(err, "while checking existing username in register")
       });
 
       // query should return 0 results;
-      if existing_users.unwrap().len() == 1 {
-        return Err(AppError::new("user already exists", ErrorType::UserAlreadyExists));
+      if existing_username.unwrap().len() > 0 {
+        return Err(AppError::new("username already exists", ErrorType::UsernameAlreadyExists));
+      }
+
+    // check if email already exists
+    let existing_email = users::table
+      .filter(users::email.eq(&new_user.email))
+      .load::<User>(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while checking existing email in register")
+      });
+
+      // query should return 0 results;
+      if existing_email.unwrap().len() > 0 {
+        return Err(AppError::new("email already exists", ErrorType::EmailAlreadyExists));
       }
 
       // the hash function returns String but NewUser model wants &str
