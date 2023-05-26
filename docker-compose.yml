@@ -10,13 +10,14 @@ services:
     volumes:
       - movieshlok-data:/var/lib/postgresql/data
 
-  # backend:
-  #   image: danielxhogan/movieshlok-backend
-  #   container_name: movieshlok-backend
-  #   ports:
-  #     - ${BACKEND_PORT}:3030
-  #   environment:
-  #     DATABASE_URL: ${DATABASE_URL}
+  backend:
+    image: danielxhogan/movieshlok-backend
+    container_name: movieshlok-backend
+    ports:
+      - ${BACKEND_PORT}:3030
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    network_mode: host
 
   frontend:
     image: danielxhogan/movieshlok-frontend
@@ -26,8 +27,8 @@ services:
     environment:
       BACKEND_PORT: ${BACKEND_PORT}
       BACKEND_HOST: ${BACKEND_HOST}
-
-
+      TMDB_BASE_URL: ${TMDB_BASE_URL}
+      TMDB_API_KEY: ${TMDB_API_KEY}
 
 volumes:
   movieshlok-data:

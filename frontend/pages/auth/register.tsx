@@ -3,9 +3,13 @@ import logo from "../../public/logo.png";
 
 import { FormEvent, useState } from "react";
 import { Input, Button } from '@chakra-ui/react';
+import Link from 'next/link';
 import Image from "next/image";
 
-const BACKEND_URL = "http://localhost:3030";
+import getConfig from "next/config";
+const { publicRuntimeConfig } = getConfig();
+
+const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
 
 
 export default function RegisterPage() {
@@ -16,7 +20,7 @@ export default function RegisterPage() {
   const [ error, setError ] = useState(false);
   const [ errorMessage, setErrorMessage ] = useState("default");
 
-  async function onSubmitLoginForm(e: FormEvent<HTMLFormElement>) {
+  async function onSubmitRegisterForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     // check passwords match
@@ -28,6 +32,7 @@ export default function RegisterPage() {
 
     // construct the request
     const registerUrl = `${BACKEND_URL}/register`;
+    console.log(registerUrl);
 
     const headers = new Headers();
     headers.append("Content-Type", "application/x-www-form-urlencoded");
@@ -127,23 +132,23 @@ export default function RegisterPage() {
   }
 
   return <>
-    <form className={styles["register-form"]} onSubmit={onSubmitLoginForm}>
+    <form className={styles["register-form"]} onSubmit={onSubmitRegisterForm}>
       <Image src={logo} alt="logo" width={400} />
       <h1>Register</h1>
-      <Input
-        type="email"
-        variant="filled"
-        placeholder="email"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-        required
-      />
       <Input
         type="text"
         variant="filled"
         placeholder="username"
         value={username}
         onChange={e => setUsername(e.target.value)}
+        required
+      />
+      <Input
+        type="email"
+        variant="filled"
+        placeholder="email"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
         required
       />
       <Input
@@ -168,7 +173,8 @@ export default function RegisterPage() {
       >
         {errorMessage}
       </p>
-      <p>Already have an account? <span onClick={onClickLoginButton}>Login</span></p>
+      {/* <Link><p>Already have an account? <span onClick={onClickLoginButton}>Login</span></p></Link> */}
+      <Link href="/auth/login"><p>Already have an account? <span>Login</span></p></Link>
 
     </form>
   </>

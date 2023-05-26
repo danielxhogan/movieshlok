@@ -3,3 +3,4 @@ Dockerfile
 .env
 dockerbuild.sh
 dockerrun.sh
+.next
