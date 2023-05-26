@@ -1,50 +1,56 @@
 import styles from "../../styles/auth/login.module.css";
 import logo from "../../public/logo.png";
+import Navbar from "@/components/Navbar";
 
-import axios from "axios";
 import { FormEvent, useState } from "react";
-import { Input, Link, Button } from '@chakra-ui/react';
+import { Input, Button } from '@chakra-ui/react';
+import Link from 'next/link';
 import Image from "next/image";
 
-const GRAPHQL_API_URL = "http://localhost/graphql";
+import getConfig from "next/config";
+const { publicRuntimeConfig } = getConfig();
+
+const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
+
 
 export default function LoginPage() {
   const [ username, setUsername ] = useState("");
   const [ password, setPassword ] = useState("");
   const [ error, setError ] = useState(false);
+  const [ errorMessage, setErrorMessage ] = useState("default");
 
 
   async function onSubmitLoginForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    // const response = await axios({
-    //   url: GRAPHQL_API_URL,
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   data: JSON.stringify({
-    //     query: `
-    //     mutation login($password: String!, $username: String!) {
-    //       login(input: {password: $password, username: $username}) {
-    //         authToken
-    //         refreshToken
-    //         user {
-    //           username
-    //         }
-    //       }
-    //     }
-    //     `,
-    //     variables: {
-    //      username: username,
-    //      password: password 
-    //     }
-    //   })
-    // })
 
+    // construct the request
+    const loginUrl = `${BACKEND_URL}/login`;
 
-    // if (response.data && response.data.errors) {
-    //   setError(true);
-    // } else {
-    //   const username = response.data.data.login.user.username;
+    const headers = new Headers();
+    headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+    const params = new URLSearchParams();
+    params.append("username", username);
+    params.append("password", password);
+
+    // send request
+    const request = new Request(loginUrl, { headers, body: params, method: "POST" });
+    const response = await fetch(request);
+
+    if (response.ok) {
+      window.location.href = "/auth/login";
+
+    } else if (response.status >= 500) {
+      setError(true);
+      setErrorMessage("Server Error");
+
+    } else {
+      const responseJson = await response.json();
+      const errorMessage = responseJson.message;
+      setError(true);
+      setErrorMessage(errorMessage);
+    }
 
     //   // localStorage.setItem("username", username);
     //   // localStorage.setItem("authToken", response.data.data.login.authToken);
@@ -71,15 +77,8 @@ export default function LoginPage() {
     // }
   }
 
-  function onClickRegisterButton() {
-    const postAuthHref = localStorage.getItem("postAuthHref");
-    if (!postAuthHref) {
-      localStorage.setItem("postAuthHref", window.location.href);
-    }
-    window.location.href = "/auth/register";
-  }
-
   return <>
+    <Navbar />
     <form className={styles["login-form"]} onSubmit={onSubmitLoginForm}>
       <Image src={logo} alt="logo" width={400} />
       <h1>Login</h1>
@@ -103,8 +102,7 @@ export default function LoginPage() {
       <p className={error ? styles["show-error"] : styles["dont-show-error"]}>
         Incorrect username or password
       </p>
-      <p>Don&apos;t have an account? <span onClick={onClickRegisterButton}>Register</span></p>
-
+      <p>Don&apos;t have an account? <Link href="/auth/register"><span>Login</span></Link></p>
     </form>
   </>
 }

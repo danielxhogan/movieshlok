@@ -1,5 +1,6 @@
-import styles from "../../styles/auth/register.module.css";
-import logo from "../../public/logo.png";
+import styles from "@/styles/auth/register.module.css";
+import logo from "@/public/logo.png";
+import Navbar from "@/components/Navbar";
 
 import { FormEvent, useState } from "react";
 import { Input, Button } from '@chakra-ui/react';
@@ -20,6 +21,7 @@ export default function RegisterPage() {
   const [ error, setError ] = useState(false);
   const [ errorMessage, setErrorMessage ] = useState("default");
 
+
   async function onSubmitRegisterForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -32,7 +34,6 @@ export default function RegisterPage() {
 
     // construct the request
     const registerUrl = `${BACKEND_URL}/register`;
-    console.log(registerUrl);
 
     const headers = new Headers();
     headers.append("Content-Type", "application/x-www-form-urlencoded");
@@ -47,8 +48,9 @@ export default function RegisterPage() {
     const response = await fetch(request);
 
     if (response.ok) {
+      window.location.href = "/auth/login";
 
-    } else if (response.status > 500) {
+    } else if (response.status >= 500) {
       setError(true);
       setErrorMessage("Server Error");
 
@@ -58,45 +60,6 @@ export default function RegisterPage() {
       setError(true);
       setErrorMessage(errorMessage);
     }
-
-    // try {
-    //   const params = new URLSearchParams();
-    //   params.append("username", username);
-    //   params.append("email", email);
-    //   params.append("password", password);
-
-    //   const response = await axios({
-    //     url: `${BACKEND_URL}/register`,
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    //     data: params
-    //   });
-    //   console.log(response);
-    //   if (response.data) {
-    //     console.log(response.data);
-    //   }
-
-    // } catch (err: any) {
-    //   console.log(err);
-    //   setError(true);
-    //   setErrorMessage("user already exists");
-    // }
-
-    // if (response.data && response.data.errors) {
-    //   console.log("user already exists");
-    //   const responseArray = response.data.errors[0].message.split(" ");
-
-    //   if (responseArray.includes("email")) {
-    //     setErrorMessage("This email address is already registered.");
-
-    //   } else if (responseArray.includes("username")) {
-    //     setErrorMessage("This username is already registered. Please choose another one.");
-    //   }
-
-    // } else if (response.data) {
-    //   console.log(response.data);
-
-      // const username = response.data.data.registerUser.user.username;
 
       // localStorage.setItem("username", username);
       // localStorage.setItem("authToken", response.data.data.registerUser.user.jwtAuthToken);
@@ -123,15 +86,8 @@ export default function RegisterPage() {
     // }
   }
 
-  function onClickLoginButton() {
-    const postAuthHref = localStorage.getItem("postAuthHref");
-    if (!postAuthHref) {
-      localStorage.setItem("postAuthHref", window.location.href);
-    }
-    window.location.href = "/auth/login";
-  }
-
   return <>
+    <Navbar />
     <form className={styles["register-form"]} onSubmit={onSubmitRegisterForm}>
       <Image src={logo} alt="logo" width={400} />
       <h1>Register</h1>
@@ -173,8 +129,7 @@ export default function RegisterPage() {
       >
         {errorMessage}
       </p>
-      {/* <Link><p>Already have an account? <span onClick={onClickLoginButton}>Login</span></p></Link> */}
-      <Link href="/auth/login"><p>Already have an account? <span>Login</span></p></Link>
+      <p>Already have an account? <Link href="/auth/login"><span>Login</span></Link></p>
 
     </form>
   </>

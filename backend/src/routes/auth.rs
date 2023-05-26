@@ -19,6 +19,18 @@ impl RegisterResponse {
   }
 }
 
+#[derive(Debug, Serialize, Clone)]
+pub struct LoginResponse {
+  pub id: Uuid,
+}
+
+impl LoginResponse {
+  pub fn new(id: Uuid) -> LoginResponse {
+    LoginResponse { id }
+  }
+}
+
+
 fn with_auth_db_manager(pool: PgPool) -> impl Filter<Extract = (AuthDbManager,), Error = warp::Rejection> + Clone {
 
   warp::any()
@@ -48,6 +60,24 @@ async fn register_user(mut auth_db_manager: AuthDbManager, new_user: NewUser) ->
 
   let response = auth_db_manager
     .register_user(new_user)
+    .map(|created_user| { RegisterResponse::new(created_user.id) });
+
+  respond(response, warp::http::StatusCode::CREATED)
+}
+
+pub fn login_filter(pool: PgPool,) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
+
+  warp::path!("login")
+    .and(warp::post())
+    .and(with_auth_db_manager(pool))
+    .and(with_form_body::<LoginCreds>())
+    .and_then(login_user)
+}
+
+async fn login_user(mut auth_db_manager: AuthDbManager, new_user: NewUser) -> Result<impl warp::Reply, warp::Rejection> {
+
+  let response = auth_db_manager
+    .login_user(new_user)
     .map(|created_user| { RegisterResponse::new(created_user.id) });
 
   respond(response, warp::http::StatusCode::CREATED)

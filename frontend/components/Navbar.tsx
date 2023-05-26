@@ -11,59 +11,25 @@ import {
   MenuList,
   MenuItem,
   MenuDivider,
-  Link
 } from '@chakra-ui/react'
 
-import NextLink from "next/link";
+import Link from "next/link";
 import Image from "next/image";
-
-const WORDPRESS_URL = "http://localhost";
 
 enum AuthMethod {
   LOGIN,
   REGISTER
  }
 
+
 export default function Navbar() {
+  const [ authenticated, setAuthenticated ] = useState(false);
   const [ username, setUsername ] = useState<String | null>(null);
 
-  useEffect(() => {
-    setUsername(localStorage.getItem("username"));
-    document.cookie = `username=${localStorage.getItem("username")}`;
-  }, [])
-
-  function onClickAuthenticatedLink(link: String) {
-    const username = localStorage.getItem("username");
-    const destination = `/u/${username}/${link}`;
-
-    if ( !username ) { authenticate(null, AuthMethod.LOGIN, destination); }
-    else { window.location.href = `/u/${username}/${link}`; }
-  }
-
-  function authenticate(
-    _: React.MouseEvent<HTMLDivElement, MouseEvent> | React.MouseEvent<HTMLButtonElement, MouseEvent> | null,
-    method: AuthMethod,
-    destination: string | null = null
-  ) {
-    const postAuthHref = localStorage.getItem("postAuthHref");
-
-    if ( !postAuthHref ) {
-      if (destination) {
-        localStorage.setItem("postAuthHref", destination);
-      } else {
-        localStorage.setItem("postAuthHref", window.location.href);
-      }
-    }
-
-    switch (method) {
-      case AuthMethod.LOGIN:
-        window.location.href = "/auth/login";
-        break;
-      case AuthMethod.REGISTER:
-        window.location.href = "/auth/register";
-        break;
-    }
-  }
+  // useEffect(() => {
+  //   setUsername(localStorage.getItem("username"));
+  //   document.cookie = `username=${localStorage.getItem("username")}`;
+  // }, [])
 
   function onClickLogOut() {
     localStorage.removeItem("username");
@@ -74,191 +40,114 @@ export default function Navbar() {
   }
 
   return <>
-    <div className={styles["links"]}>
+    <div className={styles["navbar"]}>
+
       <div className={styles["main-nav"]}>
-        <Image
-          className={styles["logo"]}
-          src={logo}
-          alt="logo"
-          width={300}
-          onClick={ () => { window.location.href = WORDPRESS_URL}}
-        />
-
-        <div
-          className={styles["link"]}
-          onClick={() => onClickAuthenticatedLink("profile")}>
-          Profile
-        </div>
-
-        <div
-          className={styles["link"]}
-          onClick={() => onClickAuthenticatedLink("movies")}>
-          Movies
-        </div>
-
-        <div
-          className={styles["link"]}
-          onClick={() => onClickAuthenticatedLink("lists")}>
-          Lists
-        </div>
-
-        <div
-          className={styles["link"]}
-          onClick={() => onClickAuthenticatedLink("calendar")}>
-          Calendar
-        </div>
-
-        <Link as={NextLink} href="/search">
-          <div
-            className={styles["link"]}
-            >
-            Search
-          </div>
+        <Link href="/">
+          <Image
+            className={styles["logo"]}
+            src={logo}
+            alt="logo"
+            width={300}
+          />
         </Link>
 
-        <Link as={NextLink} href={`${WORDPRESS_URL}/blog`}>
-          <div
-            className={styles["link"]}
-            >
-            Blog
-          </div>
-        </Link>
+        <div className={styles["main-nav-links"]}>
+
+          {/* authenticated & large screen */}
+          { authenticated && username ? <>
+              <Link href={`/u/${username}/profie`}> Profile </Link>
+              <Link href={`/u/${username}/movies`}> Movies </Link>
+              <Link href={`/u/${username}/lists`}> Lists </Link>
+              <Link href={`/u/${username}/calendar`}> Calendar </Link>
+          </>: <></> }
+
+          {/* large screen */}
+          <Link href="/search"> Search </Link>
+
+        </div>
       </div>
 
-      <div className={styles["account"]}>
+      <div className={styles["dropdown"]}>
 
-        { !username
-        ?
-        <div className={styles["auth"]}>
-          <div
-            className={styles["link"]}
-            onClick={e => authenticate(e, AuthMethod.REGISTER)}>
-            Register
-          </div>
-          <div
-            className={styles["link"]}
-            onClick={e => authenticate(e, AuthMethod.LOGIN)}>
-            Login
-          </div>
-
-          <div className={styles["no-auth-menu"]}>
-            <Link as={NextLink} href="/search">
-              <i
-                className={`fa-solid fa-magnifying-glass fa-xl ${styles["mag-glass"]}`}
-                // onClick={() => { window.location.href = "/m/search"; }}
-                >
-              </i>
-            </Link>
-
-            <Menu >
-              <MenuButton as={Button}>
-                <i className="fa-solid fa-bars fa-2x"></i>
-              </MenuButton>
-              <MenuList>
-                <MenuItem
-                  command="Login"
-                  className={styles["link"]}
-                  onClick={e => authenticate(e, AuthMethod.LOGIN)}>
-                </MenuItem>
-                <MenuItem
-                  command="Register"
-                  className={styles["link"]}
-                  onClick={e => authenticate(e, AuthMethod.REGISTER)}>
-                </MenuItem>
-                <MenuDivider />
-                <MenuItem
-                  command="Profile"
-                  className={styles["link"]}
-                  onClick={() => onClickAuthenticatedLink("profile")}>
-                </MenuItem>
-                <MenuItem
-                  command="Movies"
-                  className={styles["link"]}
-                  onClick={() => onClickAuthenticatedLink("movies")}>
-                </MenuItem>
-                <MenuItem
-                  command="Lists"
-                  className={styles["link"]}
-                  onClick={() => onClickAuthenticatedLink("lists")}>
-                </MenuItem>
-                <MenuItem
-                  command="Calendar"
-                  className={styles["link"]}
-                  onClick={() => onClickAuthenticatedLink("calendar")}>
-                </MenuItem>
-                <MenuItem
-                  command="Blog"
-                  className={styles["link"]}
-                  onClick={() => { window.location.href = `${WORDPRESS_URL}/blog`; }}>
-                </MenuItem>
-              </MenuList>
-            </Menu>
-
-          </div>
-        </div>
-        :
-        <div className={styles["auth-menu"]}>
-
-          <Link as={NextLink} href="/search">
+        {/* small screen */}
+        <div className={styles["mag-glass"]}>
+          <Link href="/search">
             <i className={`fa-solid fa-magnifying-glass fa-xl ${styles["mag-glass"]}`}></i>
           </Link>
-          <Link as={NextLink} href="/auth/notifications">
+        </div>
+
+        { authenticated && username ?
+        <div clssName={styles["auth-menu"]}>
+
+          {/* authenticated */}
+          <Link href="/auth/notifications">
             <i className={`fa-regular fa-bell fa-xl ${styles["bell"]}`}></i>
           </Link>
 
           <Menu>
+
+            {/* authenticated */}
             <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
               { username }
             </MenuButton>
 
             <MenuList>
+              
+              {/* authenticated and small screen */}
               <div className={styles["small-auth-menu"]}>
-                <MenuItem
-                  command="Profile"
-                  className={styles["link"]}
-                  onClick={() => onClickAuthenticatedLink("profile")}>
-                </MenuItem>
-                <MenuItem
-                  command="Movies"
-                  className={styles["link"]}
-                  onClick={() => onClickAuthenticatedLink("movies")}>
-                </MenuItem>
-                <MenuItem
-                  command="Lists"
-                  className={styles["link"]}
-                  onClick={() => onClickAuthenticatedLink("lists")}>
-                </MenuItem>
-                <MenuItem
-                  command="Calendar"
-                  className={styles["link"]}
-                  onClick={() => onClickAuthenticatedLink("calendar")}>
-                </MenuItem>
-                <MenuItem
-                  command="Blog"
-                  className={styles["link"]}
-                  onClick={() => { window.location.href = `${WORDPRESS_URL}/blog`; }}>
-                </MenuItem>
+
+                <Link href={`/u/${username}/profie`}>
+                  <MenuItem command="Profile"></MenuItem>
+                </Link>
+
+                <Link href={`/u/${username}/movies`}>
+                <MenuItem command="Movies"></MenuItem>
+                </Link>
+
+                <Link href={`/u/${username}/lists`}>
+                  <MenuItem command="Lists"></MenuItem>
+                </Link>
+
+                <Link href={`/u/${username}/calendar`}>
+                  <MenuItem command="Calendar"></MenuItem>
+                </Link>
+
                 <MenuDivider />
               </div>
 
+              {/* authenticated */}
               <Link as={NextLink} href="/auth/account-details">
-                <MenuItem
-                  command="Account Details"
-                  className={styles["link"]}>
-                </MenuItem>
+                <MenuItem command="Account Details"> </MenuItem>
               </Link>
+
               <MenuItem
                 command="Logout"
-                className={styles["link"]}
+                className={styles["logout"]}
                 onClick={() => onClickLogOut()}>
               </MenuItem>
-            </MenuList>
-          </Menu>
 
+            </MenuList>
+
+          </Menu>
+        {/* end auth-menu */}
         </div>
-        }
+        :
+        <>
+
+        {/* not authenticated */}
+        <div className={styles["auth"]}>
+          <Link href={"/auth/login"}> Login </Link>
+
+          <div className={styles["register"]}>
+            <Link href={"/auth/register"}>
+              Register
+            </Link>
+          </div>
+        </div>
         
-      </div>
+        </> }
+      </div> {/* end dropdown */}
 
     </div>
   </>

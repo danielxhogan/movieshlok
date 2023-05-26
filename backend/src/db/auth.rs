@@ -68,4 +68,14 @@ impl AuthDbManager {
         AppError::from_diesel_err(err, "while inserting new user")
       })
   }
+
+  pub fn login_user(&mut self, login_creds: NewUser) -> Result<User, AppError> {
+    // check if username already exists
+    let existing_username = users::table
+      .filter(users::username.eq(&new_user.username))
+      .load::<User>(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while checking existing username in register")
+      });
+  }
 }

@@ -1,18 +1,19 @@
-.links {
+.navbar {
   position:relative;
   z-index: 1;
   background-color: white;
   display: flex;
   justify-content: space-between;
   margin: 0 20px;
+  font-family: 'Audiowide', cursive;
 }
 
-@media only screen and (max-width: 670px) {
-  .links {
+@media only screen and (max-width: 700px) {
+  .navbar {
     flex-direction: column;
   }
 
-  .account {
+  .dropdown {
     align-self: flex-end;
   }
 }
@@ -26,74 +27,77 @@
   cursor: pointer;
 }
 
-.link {
-  font-family: 'Audiowide', cursive;
-  padding-top: 20px;
-}
-
-.link:hover {
-  cursor: pointer;
-}
-
-.auth {
+.main-nav-links {
   display: flex;
   gap: 20px;
-}
-
-.no-auth-menu {
-  display: none;
-  margin-top: 20px;
+  padding-top: 20px;
 }
 
 .mag-glass {
   display: none;
 }
 
+.dropdown {
+  display: flex;
+  align-items: center;
+  color: black;
+}
+
+.auth-menu {
+  font-family: 'Audiowide', cursive;
+}
+
 .bell {
-  margin-right: 10px;
+  margin-right: 15px;
 }
 
 .bell:hover {
   cursor: pointer;
 }
 
-.auth-menu {
-  margin-top: 20px;
-  font-family: 'Audiowide', cursive;
-}
-
 .small-auth-menu {
   display: none;
 }
 
-@media only screen and (max-width: 1050px) {
-  .link {
+.logout:hover {
+  text-decoration: underline;
+}
+
+.auth {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.register {
+  border: 2px solid black;
+  border-radius: 5px;
+  padding: 7px;
+  transition: ease 0.2s;
+}
+
+.register:hover {
+  background-color: black;
+  color: white;
+  cursor: pointer;
+}
+
+.register a:hover {
+  text-decoration: none;
+}
+
+@media only screen and (max-width: 1100px) {
+  .main-nav-links {
     display: none;
-  }
-
-  .no-auth-menu {
-    display: flex;
-    gap: 20px;
-  }
-
-  .no-auth-menu a {
-    margin-top: 10px;
-
-  }
-
-  .no-auth-menu a:hover {
-    text-decoration: none;
-
   }
 
   .mag-glass {
     display: inline;
-    margin-top: 20px;
-    margin-right: 20px;
+    margin-right: 10px;
   }
 
-  .mag-glass:hover {
-    cursor: pointer;
+  .mag-glass > a:hover {
+    text-decoration: none;
   }
 
   .small-auth-menu {
