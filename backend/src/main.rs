@@ -13,6 +13,7 @@ async fn main() {
   let pg_pool = establish_connection();
 
   let routes = auth_filters(pg_pool)
+    .with(warp::cors().allow_any_origin())
     .recover(handle_rejection);
 
   println!("Starting server on port 3030...");
