@@ -9,6 +9,7 @@ import Image from "next/image";
 // const BACKEND_URL = `${process.env.BACKEND_HOST}%3${process.env.BACKEND_PORT}`;
 const BACKEND_URL = "http://localhost:3030";
 
+
 export default function RegisterPage() {
   const [ email, setEmail ] = useState("");
   const [ username, setUsername ] = useState("");
@@ -26,31 +27,40 @@ export default function RegisterPage() {
       return;
     }
 
-    const response = await axios({
-      url: `${BACKEND_URL}/register`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: {
-        username,
-        email,
-        password
-      }
-    });
-    console.log(response);
+    try {
+      const params = new URLSearchParams();
+      params.append("username", username);
+      params.append("email", email);
+      params.append("password", password);
 
-    if (response.data && response.data.errors) {
+      const response = await axios({
+        url: `${BACKEND_URL}/register`,
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        data: params
+      });
+
+    } catch (err: any) {
       setError(true);
-      const responseArray = response.data.errors[0].message.split(" ");
+      setErrorMessage("user already exists");
 
-      if (responseArray.includes("email")) {
-        setErrorMessage("This email address is already registered.");
+    }
+    // console.log(response);
 
-      } else if (responseArray.includes("username")) {
-        setErrorMessage("This username is already registered. Please choose another one.");
-      }
+    // if (response.data && response.data.errors) {
+    //   console.log("user already exists");
+    //   const responseArray = response.data.errors[0].message.split(" ");
 
-    } else if (response.data) {
-      console.log(response.data);
+    //   if (responseArray.includes("email")) {
+    //     setErrorMessage("This email address is already registered.");
+
+    //   } else if (responseArray.includes("username")) {
+    //     setErrorMessage("This username is already registered. Please choose another one.");
+    //   }
+
+    // } else if (response.data) {
+    //   console.log(response.data);
+
       // const username = response.data.data.registerUser.user.username;
 
       // localStorage.setItem("username", username);
@@ -75,7 +85,7 @@ export default function RegisterPage() {
       //   const profile_url = `/u/${username}/profile`;
       //   window.location.href = profile_url;
       // }
-    }
+    // }
   }
 
   function onClickLoginButton() {

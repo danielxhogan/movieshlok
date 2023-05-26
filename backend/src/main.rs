@@ -6,14 +6,18 @@ use db::config::db_connect::establish_connection;
 use routes::auth::auth_filters;
 use utils::error_handling::handle_rejection;
 
-use warp::Filter;
+use warp::{Filter, http::Method};
 
 #[tokio::main]
 async fn main() {
   let pg_pool = establish_connection();
 
+  let cors = warp::cors()
+    .allow_methods(&[Method::GET, Method::POST, Method::PUT, Method::DELETE])
+    .allow_any_origin();
+
   let routes = auth_filters(pg_pool)
-    .with(warp::cors().allow_any_origin())
+    .with(cors)
     .recover(handle_rejection);
 
   println!("Starting server on port 3030...");
