@@ -343,65 +343,64 @@ async function makeRequest(query: string | string[], page: string | string[], en
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  console.log(`TMDB_API_KEY: ${process.env.TMDB_API_KEY}`);
-  const query = context.query.q;
-  const filter = context.query.f;
-  const page = context.query.p;
-  let response = null;
+  // const query = context.query.q;
+  // const filter = context.query.f;
+  // const page = context.query.p;
+  // let response = null;
 
-  if (query && page) {
-    switch (filter) {
-      case "0": response = await makeRequest(query, page, "multi"); break;
-      case "1": response = await makeRequest(query, page, "movie"); break;
-      case "2": response = await makeRequest(query, page, "person"); break;
-    }
+  // if (query && page) {
+  //   switch (filter) {
+  //     case "0": response = await makeRequest(query, page, "multi"); break;
+  //     case "1": response = await makeRequest(query, page, "movie"); break;
+  //     case "2": response = await makeRequest(query, page, "person"); break;
+  //   }
 
-    const configureResponse = await axios({
-      url: `${process.env.TMDB_BASE_URL}/configuration`,
-      method: "GET",
-      params: {
-        "api_key": `${process.env.TMDB_API_KEY}`,
-      }
-    });
+  //   const configureResponse = await axios({
+  //     url: `${process.env.TMDB_BASE_URL}/configuration`,
+  //     method: "GET",
+  //     params: {
+  //       "api_key": `${process.env.TMDB_API_KEY}`,
+  //     }
+  //   });
 
-    console.log(configureResponse.status);
-    console.log(configureResponse.data);
+  //   console.log(configureResponse.status);
+  //   console.log(configureResponse.data);
 
-    if (response && response.statusText === "OK") {
-      response.data.results.sort((result1: {popularity: number;}, result2: {popularity: number;}) => {
-        if (result1.popularity < result2.popularity) { return  1; }
-        if (result1.popularity > result2.popularity) { return -1; }
-        return 0;
-      });
+  //   if (response && response.statusText === "OK") {
+  //     response.data.results.sort((result1: {popularity: number;}, result2: {popularity: number;}) => {
+  //       if (result1.popularity < result2.popularity) { return  1; }
+  //       if (result1.popularity > result2.popularity) { return -1; }
+  //       return 0;
+  //     });
 
-      return {
-        props: {
-          previousQuery: query,
-          previousFilter: filter,
-          previousPage: page,
-          searchResults: response.data
-        }
-      }
-    } else {
-      return {
-        props: {
-          previousQuery: query,
-          previousFilter: filter,
-          previousPage: page,
-        }
-      }
-    }
-  } else if (filter) {
-    return {
-      props: {
-        previousFilter: filter
-      }
-    }
+  //     return {
+  //       props: {
+  //         previousQuery: query,
+  //         previousFilter: filter,
+  //         previousPage: page,
+  //         searchResults: response.data
+  //       }
+  //     }
+  //   } else {
+  //     return {
+  //       props: {
+  //         previousQuery: query,
+  //         previousFilter: filter,
+  //         previousPage: page,
+  //       }
+  //     }
+  //   }
+  // } else if (filter) {
+  //   return {
+  //     props: {
+  //       previousFilter: filter
+  //     }
+  //   }
 
-  } else {
+  // } else {
 
     return {
       props: {}
     }
-  }
+  // }
 }
