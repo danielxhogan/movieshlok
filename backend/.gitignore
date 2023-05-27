@@ -1,3 +1,6 @@
 /migrations
 /target
 .env
+
+dockerbuild.sh
+dockerrun.sh
