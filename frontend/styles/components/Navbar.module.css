@@ -6,8 +6,7 @@
   justify-content: space-between;
   padding: 10px 20px;
   font-family: 'Audiowide', cursive;
-  border-bottom: 2px solid var(--light-grey);
-  box-shadow: -20px 0px black;
+  box-shadow: 0px 0px 9px var(--light-grey);
 }
 
 @media only screen and (max-width: 700px) {
@@ -35,6 +34,10 @@
   padding-top: 20px;
 }
 
+.main-nav-links a:hover {
+  text-decoration: underline;
+}
+
 .mag-glass {
   display: none;
 }
@@ -43,6 +46,10 @@
   display: flex;
   align-items: center;
   color: black;
+}
+
+.dropdown a:hover {
+  text-decoration: underline;
 }
 
 .auth-menu {

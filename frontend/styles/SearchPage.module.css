@@ -79,7 +79,7 @@
   height: 220px;
   font-family: 'Audiowide', cursive;
   background-color: white;
-  border: 1px solid black;
+  border: 1px solid var(--light-grey);
   box-shadow: 5px 5px #888888;
   width: 25%;
   padding: 10px;
