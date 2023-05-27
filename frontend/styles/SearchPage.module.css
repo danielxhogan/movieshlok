@@ -1,6 +1,12 @@
+.wrapper {
+  background-color: var(--background-primary);
+  min-height: 100vh;
+}
+
 .search-page {
   width: 80%;
-  margin: 30px auto;
+  margin: 30px auto 0;
+  padding-bottom: 40px;
 }
 
 .content {
@@ -15,8 +21,17 @@
 
 
 .search-result {
-  border-top: 1px solid black;
   padding: 20px;
+  background-color: white;
+  margin-bottom: 15px;
+  border: 2px solid var(--light-grey);
+  border-radius: 10px;
+  transition: ease 0.2s;
+}
+
+.search-result:hover {
+  cursor: pointer;
+  box-shadow: 0 0 10px var(--light-grey);
 }
 
 .search-result h2 {
@@ -63,6 +78,7 @@
 .filter {
   height: 220px;
   font-family: 'Audiowide', cursive;
+  background-color: white;
   border: 1px solid black;
   box-shadow: 5px 5px #888888;
   width: 25%;

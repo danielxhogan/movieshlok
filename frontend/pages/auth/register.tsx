@@ -62,7 +62,7 @@ export default function RegisterPage() {
     }
   }
 
-  return <>
+  return <div className={styles["wrapper"]}>
     <Navbar />
     <form className={styles["register-form"]} onSubmit={onSubmitRegisterForm}>
       <Image src={logo} alt="logo" width={400} />
@@ -108,5 +108,5 @@ export default function RegisterPage() {
       <p>Already have an account? <Link href="/auth/login"><span>Login</span></Link></p>
 
     </form>
-  </>
+  </div>
 }

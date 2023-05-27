@@ -65,7 +65,7 @@ export default function LoginPage() {
     }
   }
 
-  return <>
+  return <div className={styles["wrapper"]}>
     <Navbar />
     <form className={styles["login-form"]} onSubmit={onSubmitLoginForm}>
       <Image src={logo} alt="logo" width={400} />
@@ -92,7 +92,7 @@ export default function LoginPage() {
         { errorMessage }
       </p>
 
-      <p>Don&apos;t have an account? <Link href="/auth/register"><span>Login</span></Link></p>
+      <p>Don&apos;t have an account? <Link href="/auth/register"><span>Register</span></Link></p>
     </form>
-  </>
+  </div>
 }

@@ -201,7 +201,7 @@ export default function SearchPage(props: Props) {
     }
   }
 
-  return <>
+  return <div className={styles["wrapper"]}>
     <Navbar />
     <div className={styles["search-page"]}>
       <form onSubmit={onSubmitSearchForm}>
@@ -327,7 +327,7 @@ export default function SearchPage(props: Props) {
         </div>
       </div>
     </div>
-  </>
+  </div>
 }
 
 async function makeRequest(query: string | string[], page: string | string[], endpoint: string) {
