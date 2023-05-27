@@ -1,12 +1,14 @@
 use crate::db::config::db_connect::PgPool;
-use crate::db::config::models::NewUser;
+use crate::db::config::models::{NewUser, LoginCreds};
 use crate::routes::{with_form_body, respond};
 use crate::db::auth::AuthDbManager;
 use crate::utils::error_handling::{AppError, ErrorType};
 
+use jsonwebtoken::{encode, Header, EncodingKey};
 use warp::{Filter, reject};
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 use uuid::Uuid;
+use std::env;
 
 #[derive(Debug, Serialize, Clone)]
 pub struct RegisterResponse {
@@ -19,15 +21,15 @@ impl RegisterResponse {
   }
 }
 
-#[derive(Debug, Serialize, Clone)]
-pub struct LoginResponse {
-  pub id: Uuid,
+#[derive(Debug, Serialize, Deserialize)]
+struct Claims {
+    username: String,
 }
 
-impl LoginResponse {
-  pub fn new(id: Uuid) -> LoginResponse {
-    LoginResponse { id }
-  }
+#[derive(Debug, Serialize, Clone)]
+pub struct LoginResponse {
+  pub jwt_token: String,
+  pub username: String
 }
 
 
@@ -44,7 +46,8 @@ fn with_auth_db_manager(pool: PgPool) -> impl Filter<Extract = (AuthDbManager,),
 }
 
 pub fn auth_filters(pool: PgPool,) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
-  register_filter(pool)
+  register_filter(pool.clone())
+  .or(login_filter(pool))
 }
 
 pub fn register_filter(pool: PgPool,) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
@@ -65,6 +68,7 @@ async fn register_user(mut auth_db_manager: AuthDbManager, new_user: NewUser) ->
   respond(response, warp::http::StatusCode::CREATED)
 }
 
+
 pub fn login_filter(pool: PgPool,) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
 
   warp::path!("login")
@@ -74,11 +78,17 @@ pub fn login_filter(pool: PgPool,) -> impl Filter<Extract = (impl warp::Reply,),
     .and_then(login_user)
 }
 
-async fn login_user(mut auth_db_manager: AuthDbManager, new_user: NewUser) -> Result<impl warp::Reply, warp::Rejection> {
+async fn login_user(mut auth_db_manager: AuthDbManager, login_creds: LoginCreds) -> Result<impl warp::Reply, warp::Rejection> {
 
   let response = auth_db_manager
-    .login_user(new_user)
-    .map(|created_user| { RegisterResponse::new(created_user.id) });
+    .login_user(&login_creds)
+    .map(|()| {
+      let claims = Claims { username: login_creds.username.clone() };
+      let jwt_secret = env::var("JWT_SECRET").unwrap();
+      let token = encode(&Header::default(), &claims, &EncodingKey::from_secret(&jwt_secret.as_ref())).unwrap();
 
-  respond(response, warp::http::StatusCode::CREATED)
+      LoginResponse { jwt_token: token, username: login_creds.username }
+    });
+
+  respond(response, warp::http::StatusCode::OK)
 }

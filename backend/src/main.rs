@@ -8,8 +8,11 @@ use utils::error_handling::handle_rejection;
 
 use warp::{Filter, http::Method};
 
+use dotenvy::dotenv;
+
 #[tokio::main]
 async fn main() {
+  dotenv().ok();
   let pg_pool = establish_connection();
 
   let cors = warp::cors()

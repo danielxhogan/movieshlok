@@ -7,6 +7,7 @@ import { Input, Button } from '@chakra-ui/react';
 import Link from 'next/link';
 import Image from "next/image";
 
+
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
 
@@ -39,7 +40,10 @@ export default function LoginPage() {
     const response = await fetch(request);
 
     if (response.ok) {
-      window.location.href = "/auth/login";
+      const responseData = await response.json();
+      console.log(responseData);
+      document.cookie = `username=${responseData.username}`;
+      document.cookie = `jwt_token=${responseData.jwt_token}`;
 
     } else if (response.status >= 500) {
       setError(true);
@@ -99,9 +103,11 @@ export default function LoginPage() {
         required
       />
       <Button type="submit" size="sm" variant="outline" colorScheme='blue'>Login</Button>
+
       <p className={error ? styles["show-error"] : styles["dont-show-error"]}>
-        Incorrect username or password
+        { errorMessage }
       </p>
+
       <p>Don&apos;t have an account? <Link href="/auth/register"><span>Login</span></Link></p>
     </form>
   </>

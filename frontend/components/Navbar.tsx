@@ -117,7 +117,7 @@ export default function Navbar() {
               </div>
 
               {/* authenticated */}
-              <Link as={NextLink} href="/auth/account-details">
+              <Link href="/auth/account-details">
                 <MenuItem command="Account Details"> </MenuItem>
               </Link>
 

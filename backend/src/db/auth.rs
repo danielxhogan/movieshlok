@@ -1,16 +1,14 @@
 use crate::db::config::schema::users;
-use crate::db::config::models::{User, NewUser};
+use crate::db::config::models::{User, NewUser, LoginCreds};
 use crate::utils::error_handling::{AppError, ErrorType};
 
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, PooledConnection};
 
 extern crate bcrypt;
-// use bcrypt::{DEFAULT_COST, hash, verify};
-use bcrypt::{DEFAULT_COST, hash};
+use bcrypt::{DEFAULT_COST, hash, verify};
 
 use serde::{Serialize, Deserialize};
-// use jsonwebtoken::{encode, Header, EncodingKey};
 
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -69,13 +67,29 @@ impl AuthDbManager {
       })
   }
 
-  pub fn login_user(&mut self, login_creds: NewUser) -> Result<User, AppError> {
-    // check if username already exists
-    let existing_username = users::table
-      .filter(users::username.eq(&new_user.username))
+  pub fn login_user(&mut self, login_creds: &LoginCreds) -> Result<(), AppError> {
+
+    // check if username exists
+    let users_result = users::table
+      .filter(users::username.eq(&login_creds.username))
       .load::<User>(&mut self.connection)
       .map_err(|err| {
         AppError::from_diesel_err(err, "while checking existing username in register")
       });
+
+      let users = users_result.unwrap();
+
+    // query should return 1 result;
+    if users.len() != 1 {
+      return Err(AppError::new("can't find user", ErrorType::InvalidUsername));
+    }
+
+    let valid = verify(&login_creds.password, &users[0].password);
+
+    if !valid.unwrap() {
+      return Err(AppError::new("can't find user", ErrorType::InvalidPassword));
+    }
+
+    Ok(())
   }
 }

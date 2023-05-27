@@ -124,11 +124,11 @@ export default function RegisterPage() {
         required
       />
       <Button type="submit" size="sm" variant="outline" colorScheme='blue'>Register</Button>
-      <p
-        className={error ? styles["show-error"] : styles["dont-show-error"]}
-      >
+
+      <p className={error ? styles["show-error"] : styles["dont-show-error"]}>
         {errorMessage}
       </p>
+
       <p>Already have an account? <Link href="/auth/login"><span>Login</span></Link></p>
 
     </form>

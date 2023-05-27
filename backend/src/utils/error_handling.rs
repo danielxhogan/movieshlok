@@ -12,6 +12,8 @@ pub enum ErrorType {
   BadRequest,
   UsernameAlreadyExists,
   EmailAlreadyExists,
+  InvalidUsername,
+  InvalidPassword
 }
 
 #[derive(Debug)]
@@ -32,6 +34,8 @@ impl AppError {
       ErrorType::BadRequest => warp::http::StatusCode::BAD_REQUEST,
       ErrorType::UsernameAlreadyExists => warp::http::StatusCode::CONFLICT,
       ErrorType::EmailAlreadyExists => warp::http::StatusCode::CONFLICT,
+      ErrorType::InvalidUsername => warp::http::StatusCode::NOT_FOUND,
+      ErrorType::InvalidPassword => warp::http::StatusCode::NOT_FOUND,
     }
   }
 
