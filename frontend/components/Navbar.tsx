@@ -26,10 +26,13 @@ export default function Navbar() {
   const [ authenticated, setAuthenticated ] = useState(false);
   const [ username, setUsername ] = useState<String | null>(null);
 
-  // useEffect(() => {
-  //   setUsername(localStorage.getItem("username"));
-  //   document.cookie = `username=${localStorage.getItem("username")}`;
-  // }, [])
+  useEffect(() => {
+    const currentLocation = window.location.href;
+
+    if (currentLocation.indexOf("login") === -1 && currentLocation.indexOf("register") === -1) {
+      localStorage.setItem("currentLocation", currentLocation);
+    }
+  }, [])
 
   function onClickLogOut() {
     localStorage.removeItem("username");

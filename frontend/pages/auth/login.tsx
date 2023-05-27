@@ -6,11 +6,11 @@ import { FormEvent, useState } from "react";
 import { Input, Button } from '@chakra-ui/react';
 import Link from 'next/link';
 import Image from "next/image";
+import { useRouter } from 'next/router';
 
 
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
-
 const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
 
 
@@ -20,6 +20,7 @@ export default function LoginPage() {
   const [ error, setError ] = useState(false);
   const [ errorMessage, setErrorMessage ] = useState("default");
 
+  const router = useRouter();
 
   async function onSubmitLoginForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -41,9 +42,16 @@ export default function LoginPage() {
 
     if (response.ok) {
       const responseData = await response.json();
-      console.log(responseData);
       document.cookie = `username=${responseData.username}`;
       document.cookie = `jwt_token=${responseData.jwt_token}`;
+
+      const currentLocation = localStorage.getItem("currentLocation");
+
+      if (currentLocation) {
+        router.push(currentLocation);
+      } else {
+        router.push("/");
+      }
 
     } else if (response.status >= 500) {
       setError(true);
@@ -55,30 +63,6 @@ export default function LoginPage() {
       setError(true);
       setErrorMessage(errorMessage);
     }
-
-    //   // localStorage.setItem("username", username);
-    //   // localStorage.setItem("authToken", response.data.data.login.authToken);
-    //   // localStorage.setItem("refreshToken", response.data.data.login.refreshToken);
-
-    //   document.cookie = `username=${username}`;
-    //   document.cookie = `authToken=${response.data.data.login.authToken}`;
-    //   document.cookie = `refreshToken=${response.data.data.login.refreshToken}`;
-
-    //   let postAuthHref = localStorage.getItem("postAuthHref");
-
-    //   if (postAuthHref) {
-    //     localStorage.removeItem("postAuthHref");
-
-    //     if(postAuthHref.startsWith("/u")) {
-    //       postAuthHref = postAuthHref.replace("null", username);
-    //     }
-    //     window.location.href = postAuthHref;
-
-    //   } else {
-    //     const profile_url = `/u/${username}/profile`;
-    //     window.location.href = profile_url;
-    //   }
-    // }
   }
 
   return <>
