@@ -51,12 +51,10 @@ export default function Navbar() {
       const cookie = cookieString.split("=");
 
       if (cookie[0].trim() === "jwt_token") {
-        // setAuthenticated(true);
         newCredentials.jwt_token = cookie[1];
       }
 
       if (cookie[0].trim() === "username") {
-        // setUsername(cookie[1]);
         newCredentials.username = cookie[1];
       }
     });

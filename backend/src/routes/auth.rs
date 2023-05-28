@@ -1,11 +1,11 @@
 use crate::db::config::db_connect::PgPool;
 use crate::db::config::models::{NewUser, LoginCreds};
-use crate::routes::{with_form_body, respond};
 use crate::db::auth::AuthDbManager;
+use crate::routes::{with_form_body, respond};
 use crate::utils::error_handling::{AppError, ErrorType};
 
-use jsonwebtoken::{encode, Header, EncodingKey};
 use warp::{Filter, reject};
+use jsonwebtoken::{encode, Header, EncodingKey};
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 use std::env;
@@ -49,6 +49,7 @@ pub fn auth_filters(pool: PgPool,) -> impl Filter<Extract = (impl warp::Reply,),
   register_filter(pool.clone())
   .or(login_filter(pool))
 }
+
 
 pub fn register_filter(pool: PgPool,) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
 

@@ -1,9 +1,9 @@
 pub mod auth;
+pub mod tmdb;
 
 use crate::utils::error_handling::AppError;
 
 use warp::Filter;
-
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 

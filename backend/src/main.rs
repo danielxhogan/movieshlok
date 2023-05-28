@@ -4,6 +4,7 @@ pub mod utils;
 
 use db::config::db_connect::establish_connection;
 use routes::auth::auth_filters;
+use routes::tmdb::tmdb_filters;
 use utils::error_handling::handle_rejection;
 
 use warp::{Filter, http::Method};
@@ -20,6 +21,7 @@ async fn main() {
     .allow_any_origin();
 
   let routes = auth_filters(pg_pool)
+    .or(tmdb_filters())
     .recover(handle_rejection)
     .with(cors);
 
