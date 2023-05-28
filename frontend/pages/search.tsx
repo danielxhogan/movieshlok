@@ -1,7 +1,11 @@
 /* eslint-disable react/no-children-prop */
 import styles from "@/styles/SearchPage.module.css";
 import Navbar from "@/components/Navbar";
-import Pagination, { Api } from "@/components/Pagination";
+import Pagination, { UseCases } from "@/components/Pagination";
+
+import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+import { getSearchResults, SearchParams } from "@/redux/actions/tmdb";
+import { selectSearchResults, Result, KnownFor } from "@/redux/reducers/tmdb";
 
 import { FormEvent, useState } from "react";
 import { InputGroup, InputLeftElement, Input, Divider, Button, Link } from "@chakra-ui/react";
@@ -9,13 +13,6 @@ import { SearchIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
 import Image from "next/image";
 
-import getConfig from "next/config";
-const { publicRuntimeConfig } = getConfig();
-
-import { GetServerSideProps } from "next";
-import axios from "axios";
-
-const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 const TMDB_IMAGE_URL = "https://image.tmdb.org/t/p";
 
 
@@ -25,56 +22,38 @@ export enum FilterResults {
   CAST_AND_CREW
 }
 
-type KnownFor = {
-  id: number;
-  title: string;
-  media_type: string;
-}
 
-type Result = {
-  id: number;
-  popularity: number;
-  media_type?: string;    // only multi
-  title?: string;         // only movie
-  poster_path?: string;   // only movie
-  overview?: string;      // only movie
-  release_date?: string;  // only movie
-  vote_average?: number;  // only movie
-  vote_count?: number;    // only movie
-  name?: string;          // only person
-  profile_path?: string;  // only person
-  known_for: KnownFor[];
-}
+export default function SearchPage() {
 
-type Props = {
-  previousQuery?: string;
-  previousFilter?: string;
-  previousPage?: string;
-  searchResults?: {
-    total_pages: string;
-    results: [Result]
-  };
-}
+  const dispatch = useAppDispatch();
+  const searchResults = useAppSelector(selectSearchResults);
 
-export default function SearchPage(props: Props) {
-  let filterStartValue: FilterResults | null = null;
+  const [ filter, setFilter ] = useState(FilterResults.ALL);
+  const [ searchQuery, setSearchQuery ] = useState("");
 
-  if (props.previousFilter) {
-    switch (props.previousFilter) {
-      case "0": filterStartValue = FilterResults.ALL; break;
-      case "1": filterStartValue = FilterResults.MOVIES; break;
-      case "2": filterStartValue = FilterResults.CAST_AND_CREW; break;
-    }
-  }
-
-  const [ filter, setFilter ] = useState(filterStartValue ? filterStartValue : FilterResults.ALL);
-  const [ searchQuery, setSearchQuery ] = useState(props.previousQuery ? props.previousQuery : "");
 
   function onSubmitSearchForm(e: FormEvent<HTMLFormElement>, page: string = "1") {
     e.preventDefault();
+    dispatchGetSearchResults("1");
+  }
 
+  async function dispatchGetSearchResults(page: string) {
     if (searchQuery !== "") {
-      window.location.href = `/search?q=${searchQuery}&f=${filter}&p=${page}`;
+      let endpoint: string = "";
+
+      switch (filter) {
+        case 0: endpoint = "multi"; break;
+        case 1: endpoint = "movie"; break;
+        case 2: endpoint = "person"; break;
+      }
+
+      const searchParams: SearchParams = {
+        query: searchQuery,
+        page,
+        endpoint
+      }
+
+      dispatch(getSearchResults(searchParams));
     }
   }
 
@@ -107,12 +86,12 @@ export default function SearchPage(props: Props) {
 
     return <div key={result.id} className={styles["search-result"]}>
       <Link as={NextLink} href={`/details/movie/${result.id}`}>
-        <h2>{ result.title }</h2><br />
-      </Link>
+        <span className={styles["result-title"]}>{ result.title }</span><br />
+      {/* </Link> */}
 
       <div className={styles["movie-result-content"]}>
 
-        <Link as={NextLink} href={`/details/movie/${result.id}`}>
+        {/* <Link as={NextLink} href={`/details/movie/${result.id}`}> */}
           { result.poster_path &&
             <Image
               src={`${TMDB_IMAGE_URL}/w92${result.poster_path}`}
@@ -122,7 +101,7 @@ export default function SearchPage(props: Props) {
               alt="movie poster"
             />
           }
-        </Link>
+        {/* </Link> */}
 
         <div className={styles["movie-details"]}>
           <span>{ result.overview }</span><br /><br />
@@ -132,6 +111,7 @@ export default function SearchPage(props: Props) {
         </div>
 
       </div>
+        </Link>
     </div>
   }
 
@@ -159,12 +139,12 @@ export default function SearchPage(props: Props) {
   function makePersonResult(result: Result) {
     return <div key={result.id} className={styles["search-result"]}>
       <Link as={NextLink} href={`/details/person/${result.id}`}>
-        <h2>{ result.name }</h2><br />
-      </Link>
+        <span className={styles["result-title"]}>{ result.name }</span><br />
+      {/* </Link> */}
 
       <div className={styles["person-result-content"]}>
 
-        <Link as={NextLink} href={`/details/person/${result.id}`}>
+        {/* <Link as={NextLink} href={`/details/person/${result.id}`}> */}
           { result.profile_path &&
             <Image
               src={`${TMDB_IMAGE_URL}/w185${result.profile_path}`}
@@ -174,19 +154,22 @@ export default function SearchPage(props: Props) {
               alt="cast & crew profile"
             />
           }
-        </Link>
+        {/* </Link> */}
 
         <div className={styles["known-for"]}>
-          { makeKnownFor(result.known_for) }
+          { result.known_for && makeKnownFor(result.known_for) }
         </div>
 
       </div>
       <br />
+        </Link>
     </div>
   }
 
   function makeSearchResult(result: Result) {
-    switch (filterStartValue) {
+    console.log("here");
+
+    switch (filter) {
 
       case FilterResults.ALL:
         switch (result.media_type) {
@@ -199,6 +182,16 @@ export default function SearchPage(props: Props) {
 
       case FilterResults.CAST_AND_CREW: { return makePersonResult(result); }
     }
+  }
+
+  function sortAndMakeSearchResults(results: [Result]) {
+    results.sort((result1: {popularity: number;}, result2: {popularity: number;}) => {
+      if (result1.popularity < result2.popularity) { return  1; }
+      if (result1.popularity > result2.popularity) { return -1; }
+      return 0;
+    });
+
+    return results.map(result => makeSearchResult(result));
   }
 
   return <div className={styles["wrapper"]}>
@@ -261,23 +254,16 @@ export default function SearchPage(props: Props) {
 
           </div>
 
-          { props.searchResults && props.previousPage &&
-            <Pagination
-              api={Api.TMDB}
-              currentPage={props.previousPage}
-              totalPages={props.searchResults.total_pages}
-              searchQuery={searchQuery}
-              filter={filter}
-            />
-          }
+          { searchResults.data.results && sortAndMakeSearchResults([...searchResults.data.results])}
 
-          { props.searchResults?.results.map(result => makeSearchResult(result)) }
+          { searchResults.data.page &&
+            searchResults.data.total_pages &&
+            parseInt(searchResults.data.total_pages) > 1 &&
 
-          { props.searchResults && props.previousPage &&
             <Pagination
-              api={Api.TMDB}
-              currentPage={props.previousPage}
-              totalPages={props.searchResults.total_pages}
+              useCase={UseCases.SEARCH_RESULTS}
+              currentPage={searchResults.data.page}
+              totalPages={searchResults.data.total_pages}
               searchQuery={searchQuery}
               filter={filter}
             />
@@ -328,79 +314,4 @@ export default function SearchPage(props: Props) {
       </div>
     </div>
   </div>
-}
-
-async function makeRequest(query: string | string[], page: string | string[], endpoint: string) {
-  return await axios({
-    url: `${process.env.TMDB_BASE_URL}/search/${endpoint}`,
-    method: "GET",
-    params: {
-      "api_key": `${process.env.TMDB_API_KEY}`,
-      "query": query,
-      "page": page
-    }
-  });
-}
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  // const query = context.query.q;
-  // const filter = context.query.f;
-  // const page = context.query.p;
-  // let response = null;
-
-  // if (query && page) {
-  //   switch (filter) {
-  //     case "0": response = await makeRequest(query, page, "multi"); break;
-  //     case "1": response = await makeRequest(query, page, "movie"); break;
-  //     case "2": response = await makeRequest(query, page, "person"); break;
-  //   }
-
-  //   const configureResponse = await axios({
-  //     url: `${process.env.TMDB_BASE_URL}/configuration`,
-  //     method: "GET",
-  //     params: {
-  //       "api_key": `${process.env.TMDB_API_KEY}`,
-  //     }
-  //   });
-
-  //   console.log(configureResponse.status);
-  //   console.log(configureResponse.data);
-
-  //   if (response && response.statusText === "OK") {
-  //     response.data.results.sort((result1: {popularity: number;}, result2: {popularity: number;}) => {
-  //       if (result1.popularity < result2.popularity) { return  1; }
-  //       if (result1.popularity > result2.popularity) { return -1; }
-  //       return 0;
-  //     });
-
-  //     return {
-  //       props: {
-  //         previousQuery: query,
-  //         previousFilter: filter,
-  //         previousPage: page,
-  //         searchResults: response.data
-  //       }
-  //     }
-  //   } else {
-  //     return {
-  //       props: {
-  //         previousQuery: query,
-  //         previousFilter: filter,
-  //         previousPage: page,
-  //       }
-  //     }
-  //   }
-  // } else if (filter) {
-  //   return {
-  //     props: {
-  //       previousFilter: filter
-  //     }
-  //   }
-
-  // } else {
-
-    return {
-      props: {}
-    }
-  // }
 }

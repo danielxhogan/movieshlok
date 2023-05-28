@@ -1,38 +1,52 @@
 import styles from "@/styles/components/Pagination.module.css";
 import { FilterResults } from "@/pages/search";
+import { getSearchResults, SearchParams } from "@/redux/actions/tmdb";
+import { useAppDispatch } from "@/redux/hooks";
 
-import { Link } from "@chakra-ui/react";
-import NextLink from "next/link";
-
-export enum Api {
-  TMDB,
-  WPGRAPHQL
+export enum UseCases {
+  SEARCH_RESULTS
 }
 
-type TMDBProps = {
-  api: Api.TMDB;
+type SearchResultsData = {
+  useCase: UseCases.SEARCH_RESULTS,
   currentPage: string;
   totalPages: string;
   searchQuery: string;
   filter: FilterResults;
 }
 
-type WPGRAPHQLProps = {
-  api: Api.WPGRAPHQL;
-  limit: string;
-  totalResults: string;
-}
 
-type Props = TMDBProps | WPGRAPHQLProps;
+type Props = SearchResultsData;
 
 export default function Pagination(props: Props) {
+  const dispatch = useAppDispatch();
+
+  function onClickPaginationButton(page: string) {
+    let endpoint: string = "";
+
+    switch (props.filter) {
+      case 0: endpoint = "multi"; break;
+      case 1: endpoint = "movie"; break;
+      case 2: endpoint = "person"; break;
+    }
+
+    const searchParams: SearchParams = {
+      query: props.searchQuery,
+      page,
+      endpoint
+  }
+
+  dispatch(getSearchResults(searchParams));
+
+  }
+
   let currentPage_number;
   let totalPages_number;
 
   function makeLinks() {
-    switch (props.api) {
+    switch (props.useCase) {
 
-      case Api.TMDB:
+      case UseCases.SEARCH_RESULTS:
         currentPage_number = parseInt(props.currentPage);
         totalPages_number = parseInt(props.totalPages);
 
@@ -58,9 +72,11 @@ export default function Pagination(props: Props) {
         }
 
         for (let i=startI; i<endI; i++) {
+          const pageString = (i+1).toString();
+
           linksArray.push(
-            <Link key={i} as={NextLink} href={`/search?q=${props.searchQuery}&f=${props.filter}&p=${i+1}`}>
               <span
+                onClick={ () => onClickPaginationButton(pageString) }
                 className={
                   (i+1) === currentPage_number
                   ?
@@ -72,80 +88,75 @@ export default function Pagination(props: Props) {
                 { i + 1 }
 
               </span>
-            </Link>
           )
         }
         return linksArray;
-        break;
-
-      case Api.WPGRAPHQL:
         break;
     }
   }
 
   function makeLeftArrows() {
-    switch (props.api) {
+    switch (props.useCase) {
 
-      case Api.TMDB:
-        const previousPageNumber = parseInt(props.currentPage) - 1;
+      case UseCases.SEARCH_RESULTS:
+        // let previousPageNumber = (parseInt(props.currentPage) - 1).toString();
+
+        const previousPageNumberInt = (parseInt(props.currentPage) - 1);
+        let previousPageNumber: string = "";
+
+        if (previousPageNumberInt <= 0) {
+          previousPageNumber = (1).toString();
+        } else {
+          previousPageNumber = previousPageNumberInt.toString();
+        }
 
         return (
           <span className={styles["left-buttons"]}>
-            <Link as={NextLink} href={`/search?q=${props.searchQuery}&f=${props.filter}&p=1`}>
-              <span className={styles["icon-span"]}>
+              <span className={styles["icon-span"]} onClick={ () => onClickPaginationButton("1") }>
                 <i className="fa-solid fa-chevron-left"></i>
                 <i className="fa-solid fa-chevron-left"></i>
               </span>
-            </Link>
-            <Link as={NextLink} href={`/search?q=${props.searchQuery}&f=${props.filter}&p=${previousPageNumber}`}>
-              <span className={styles["icon-span"]}>
+              <span className={styles["icon-span"]} onClick={ () => onClickPaginationButton(previousPageNumber) }>
                 <i className="fa-solid fa-chevron-left"></i>
               </span>
-            </Link>
           </span>
-
-        )
-        break;
-
-      case Api.WPGRAPHQL:
+        );
         break;
     }
   }
 
   function makeRightArrows() {
-    switch (props.api) {
+    switch (props.useCase) {
 
-      case Api.TMDB:
-        const nextPageNumber = parseInt(props.currentPage) + 1;
+      case UseCases.SEARCH_RESULTS:
+        // const nextPageNumber = (parseInt(props.currentPage) + 1).toString();
+        const nextPageNumberInt = parseInt(props.currentPage) + 1;
+        let nextPageNumber: string = "";
+
+        if (nextPageNumberInt >= parseInt(props.totalPages)) {
+          nextPageNumber = props.totalPages;
+        } else {
+          nextPageNumber = nextPageNumberInt.toString();
+        }
 
         return (
           <span className={styles["right-buttons"]}>
-            <Link as={NextLink} href={`/search?q=${props.searchQuery}&f=${props.filter}&p=${nextPageNumber}`}>
-              <span className={styles["icon-span"]}>
+              <span className={styles["icon-span"]} onClick={ () => onClickPaginationButton(nextPageNumber) }>
                 <i className="fa-solid fa-chevron-right"></i>
               </span>
-            </Link>
-            <Link as={NextLink} href={`/search?q=${props.searchQuery}&f=${props.filter}&p=${props.totalPages}`}>
-              <span className={styles["icon-span"]}>
+              <span className={styles["icon-span"]} onClick={ () => onClickPaginationButton(props.totalPages) }>
                 <i className="fa-solid fa-chevron-right"></i>
                 <i className="fa-solid fa-chevron-right"></i>
               </span>
-            </Link>
           </span>
-
-        )
-        break;
-
-      case Api.WPGRAPHQL:
+        );
         break;
     }
   }
 
   return <div className={styles["pagination"]}>
     { makeLeftArrows() }
-
     { makeLinks() }
-
     { makeRightArrows() }
   </div>
 }

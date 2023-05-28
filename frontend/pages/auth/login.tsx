@@ -25,7 +25,6 @@ export default function LoginPage() {
   async function onSubmitLoginForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-
     // construct the request
     const loginUrl = `${BACKEND_URL}/login`;
 
