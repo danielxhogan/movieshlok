@@ -87,11 +87,8 @@ export default function SearchPage() {
     return <div key={result.id} className={styles["search-result"]}>
       <Link as={NextLink} href={`/details/movie/${result.id}`}>
         <span className={styles["result-title"]}>{ result.title }</span><br />
-      {/* </Link> */}
 
       <div className={styles["movie-result-content"]}>
-
-        {/* <Link as={NextLink} href={`/details/movie/${result.id}`}> */}
           { result.poster_path &&
             <Image
               src={`${TMDB_IMAGE_URL}/w92${result.poster_path}`}
@@ -101,7 +98,6 @@ export default function SearchPage() {
               alt="movie poster"
             />
           }
-        {/* </Link> */}
 
         <div className={styles["movie-details"]}>
           <span>{ result.overview }</span><br /><br />
@@ -140,11 +136,8 @@ export default function SearchPage() {
     return <div key={result.id} className={styles["search-result"]}>
       <Link as={NextLink} href={`/details/person/${result.id}`}>
         <span className={styles["result-title"]}>{ result.name }</span><br />
-      {/* </Link> */}
 
       <div className={styles["person-result-content"]}>
-
-        {/* <Link as={NextLink} href={`/details/person/${result.id}`}> */}
           { result.profile_path &&
             <Image
               src={`${TMDB_IMAGE_URL}/w185${result.profile_path}`}
@@ -154,7 +147,6 @@ export default function SearchPage() {
               alt="cast & crew profile"
             />
           }
-        {/* </Link> */}
 
         <div className={styles["known-for"]}>
           { result.known_for && makeKnownFor(result.known_for) }
@@ -196,6 +188,7 @@ export default function SearchPage() {
 
   return <div className={styles["wrapper"]}>
     <Navbar />
+
     <div className={styles["search-page"]}>
       <form onSubmit={onSubmitSearchForm}>
         <InputGroup>
@@ -268,7 +261,6 @@ export default function SearchPage() {
               filter={filter}
             />
           }
-
         </div>
 
         <div className={styles["filter"]}>
@@ -311,7 +303,9 @@ export default function SearchPage() {
           </div>
 
         </div>
+
       </div>
     </div>
+
   </div>
 }

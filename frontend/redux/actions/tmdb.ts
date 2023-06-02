@@ -34,14 +34,14 @@ export const getSearchResults = createAsyncThunk(
 
     if (response.ok) {
       const data = await response.json();
-      return { success: true, message: "ok", data }
+      return { success: true, message: "ok", data };
 
     } else if (response.status >= 500) {
-      return { success: false, message: "server error", data: {} }
+      return { success: false, message: "server error", data: {} };
 
     } else {
       const data = await response.json();
-      return { success: false, message: data.message, data: {} }
+      return { success: false, message: data.message, data: {} };
     }
   }
 )

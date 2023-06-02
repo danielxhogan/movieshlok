@@ -99,8 +99,6 @@ export default function Pagination(props: Props) {
     switch (props.useCase) {
 
       case UseCases.SEARCH_RESULTS:
-        // let previousPageNumber = (parseInt(props.currentPage) - 1).toString();
-
         const previousPageNumberInt = (parseInt(props.currentPage) - 1);
         let previousPageNumber: string = "";
 
@@ -129,7 +127,6 @@ export default function Pagination(props: Props) {
     switch (props.useCase) {
 
       case UseCases.SEARCH_RESULTS:
-        // const nextPageNumber = (parseInt(props.currentPage) + 1).toString();
         const nextPageNumberInt = parseInt(props.currentPage) + 1;
         let nextPageNumber: string = "";
 

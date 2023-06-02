@@ -41,14 +41,6 @@
   text-decoration: underline;
 }
 
-/* .search-result a:hover {
-  text-decoration: none;
-}
-
-.search-result a h2:hover {
-  text-decoration: underline;
-} */
-
 .search-result:hover {
   cursor: pointer;
   box-shadow: 0 0 10px var(--light-grey);

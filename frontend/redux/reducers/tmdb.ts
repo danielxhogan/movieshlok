@@ -20,7 +20,7 @@ export interface Result {
   vote_count?: number;    // only movie
   name?: string;          // only person
   profile_path?: string;  // only person
-  known_for?: KnownFor[];
+  known_for?: KnownFor[]; // only person
 }
 
 interface SearchResults {
