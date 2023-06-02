@@ -6,6 +6,74 @@ use serde::{Serialize, Deserialize};
 use std::env;
 
 
+// MOVIE DETAILS STRUCTS
+// **************************************************
+// REQUEST PARAMS
+#[derive(Deserialize, Debug)]
+struct MovieDetailsParams {
+  movie_id: String
+}
+
+// RESPONSE DATA
+#[derive(Serialize, Deserialize, Debug)]
+struct Genre {
+  id: Option<i32>,
+  name: Option<String>
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct ProductionCompany {
+  id: Option<i32>,
+  logo_path: Option<String>,
+  name: Option<String>,
+  origin_country: Option<String>
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct ProductionCountry {
+  iso_3166_1: Option<String>,
+  name: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Language {
+  english_name: Option<String>,
+  iso_639_1: Option<String>,
+  name: Option<String>
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct MovieDetails {
+  adult: Option<bool>,
+  backdrop_path: Option<String>,
+  // belongs_to_collection: Option<String>,
+  budget: Option<i32>,
+  genres: Option<Box<[Genre]>>,
+  homepage: Option<String>,
+  id: Option<i32>,
+  imdb_id: Option<String>,
+  original_language: Option<String>,
+  original_title: Option<String>,
+  overview: Option<String>,
+  popularity: Option<f32>,
+  poster_path: Option<String>,
+  production_companies: Option<Box<[ProductionCompany]>>,
+  production_countries: Option<Box<[ProductionCountry]>>,
+  release_date: Option<String>,
+  revenue: Option<i32>,
+  runtime: Option<i32>,
+  spoken_languages: Option<Box<[Language]>>,
+  status: Option<String>,
+  tagline: Option<String>,
+  title: Option<String>,
+  video: Option<bool>,
+  vote_average: Option<f32>,
+  vote_count: Option<i32>
+}
+
+// SEARCH STRUCTS
+// **************************************************
+// REQUEST PARAMS
 #[derive(Deserialize, Debug)]
 struct QueryParams {
   query: String,
@@ -13,6 +81,7 @@ struct QueryParams {
   endpoint: String
 }
 
+// RESPONSE DATA
 #[derive(Serialize, Deserialize, Debug)]
 struct KnownFor {
   adult: Option<bool>,
@@ -69,9 +138,34 @@ struct SearchResults {
 }
 
 
-
 pub fn tmdb_filters() -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
   search_filter()
+  .or(movie_details_filter())
+}
+
+pub fn movie_details_filter() -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
+  warp::path!("tmdb" / "movie")
+    .and(warp::post())
+    .and(with_form_body::<MovieDetailsParams>())
+    .and_then(movie_details)
+}
+
+async fn movie_details(movie_details_params: MovieDetailsParams) -> Result<impl warp::Reply, warp::Rejection> {
+  let tmdb_base_url = env::var("TMDB_BASE_URL").unwrap();
+  let tmdb_api_key = env::var("TMDB_API_KEY").unwrap();
+
+  let movie_details_url = format!("{}/movie/{}?api_key={}&language=en-US",
+    &tmdb_base_url,
+    &movie_details_params.movie_id,
+    &tmdb_api_key);
+
+    let response = reqwest::get(&movie_details_url).await.unwrap()
+    .json::<MovieDetails>().await
+    .map_err(|err| {
+      AppError::new(&err.to_string(), ErrorType::FailedToGetMovieDetails)
+    });
+
+  respond(response, warp::http::StatusCode::OK)
 }
 
 pub fn search_filter() -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {

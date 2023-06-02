@@ -14,7 +14,8 @@ pub enum ErrorType {
   EmailAlreadyExists,
   InvalidUsername,
   InvalidPassword,
-  FailedToSearch
+  FailedToSearch,
+  FailedToGetMovieDetails
 }
 
 #[derive(Debug)]
@@ -38,6 +39,7 @@ impl AppError {
       ErrorType::InvalidUsername => warp::http::StatusCode::NOT_FOUND,
       ErrorType::InvalidPassword => warp::http::StatusCode::NOT_FOUND,
       ErrorType::FailedToSearch => warp::http::StatusCode::BAD_REQUEST,
+      ErrorType::FailedToGetMovieDetails => warp::http::StatusCode::BAD_REQUEST,
     }
   }
 
