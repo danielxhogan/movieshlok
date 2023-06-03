@@ -22,18 +22,10 @@ export default function Pagination(props: Props) {
   const dispatch = useAppDispatch();
 
   function onClickPaginationButton(page: string) {
-    let endpoint: string = "";
-
-    switch (props.filter) {
-      case 0: endpoint = "multi"; break;
-      case 1: endpoint = "movie"; break;
-      case 2: endpoint = "person"; break;
-    }
-
     const searchParams: SearchParams = {
       query: props.searchQuery,
       page,
-      endpoint
+      filter: props.filter
   }
 
   dispatch(getSearchResults(searchParams));

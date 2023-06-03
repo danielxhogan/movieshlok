@@ -1,16 +1,18 @@
 /* eslint-disable react/no-children-prop */
 import styles from "@/styles/SearchPage.module.css";
 import Navbar from "@/components/Navbar";
+import Searchbar from "@/components/Searchbar";
 import Pagination, { UseCases } from "@/components/Pagination";
 
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { getSearchResults, SearchParams } from "@/redux/actions/tmdb";
 import { selectSearchResults, SearchResult, KnownFor } from "@/redux/reducers/tmdb";
 
-import { FormEvent, useState } from "react";
-import { InputGroup, InputLeftElement, Input, Divider, Button, Link } from "@chakra-ui/react";
+import { FormEvent, useState, useEffect, useCallback } from "react";
+import { InputGroup, InputLeftElement, Input, Divider, Button } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
-import NextLink from "next/link";
+// import NextLink from "next/link";
+import Link from "next/link";
 import Image from "next/image";
 
 import getConfig from "next/config";
@@ -23,37 +25,51 @@ export enum FilterResults {
   CAST_AND_CREW
 }
 
-export default function SearchPage() {
 
+export default function SearchPage() {
   const dispatch = useAppDispatch();
   const searchResults = useAppSelector(selectSearchResults);
 
-  const [ filter, setFilter ] = useState(FilterResults.ALL);
-  const [ searchQuery, setSearchQuery ] = useState("");
+  let defaultFilter: FilterResults;
+  if (searchResults.filter !== null) {
+    defaultFilter = searchResults.filter;
+  } else {
+    defaultFilter = FilterResults.ALL;
+  }
 
+  const [ filter, setFilter ] = useState(defaultFilter);
+  const [ searchQuery, setSearchQuery ] = useState(searchResults.query);
+
+
+  function dispatchGetSearchResults(page: string, newFilter: FilterResults | null = null) {
+    if (searchQuery !== "") {
+      let filterUsing: FilterResults;
+
+      if (newFilter !== null) {
+        filterUsing = newFilter;
+      } else {
+        filterUsing = filter;
+      }
+
+      const searchParams: SearchParams = {
+        query: searchQuery,
+        page,
+        filter: filterUsing
+      }
+
+      dispatch(getSearchResults(searchParams));
+    }
+  }
 
   function onSubmitSearchForm(e: FormEvent<HTMLFormElement>, page: string = "1") {
     e.preventDefault();
     dispatchGetSearchResults("1");
   }
 
-  async function dispatchGetSearchResults(page: string) {
-    if (searchQuery !== "") {
-      let endpoint: string = "";
-
-      switch (filter) {
-        case 0: endpoint = "multi"; break;
-        case 1: endpoint = "movie"; break;
-        case 2: endpoint = "person"; break;
-      }
-
-      const searchParams: SearchParams = {
-        query: searchQuery,
-        page,
-        endpoint
-      }
-
-      dispatch(getSearchResults(searchParams));
+  function onClickFilterButton(newFilter: FilterResults) {
+    if (newFilter !== filter) {
+      setFilter(newFilter);
+      dispatchGetSearchResults("1", newFilter);
     }
   }
 
@@ -85,7 +101,7 @@ export default function SearchPage() {
     const date = result.release_date ? reformatDate(result.release_date) : result.release_date;
 
     return <div key={result.id} className={styles["search-result"]}>
-      <Link as={NextLink} href={`/details/movie/${result.id}`}>
+      <Link href={`/details/movie/${result.id}`}>
         <span className={styles["result-title"]}>{ result.title }</span><br />
 
       <div className={styles["movie-result-content"]}>
@@ -116,7 +132,7 @@ export default function SearchPage() {
       if (idx >= 10 || movie.media_type !== "movie") { return; }
       else {
         return (
-        <Link key={movie.id} as={NextLink} href={`/details/movie/${movie.id}`}>
+        <Link key={movie.id} href={`/details/movie/${movie.id}`}>
           <Button
             colorScheme="teal"
             size="sm"
@@ -134,7 +150,7 @@ export default function SearchPage() {
 
   function makePersonResult(result: SearchResult) {
     return <div key={result.id} className={styles["search-result"]}>
-      <Link as={NextLink} href={`/details/person/${result.id}`}>
+      <Link href={`/details/person/${result.id}`}>
         <span className={styles["result-title"]}>{ result.name }</span><br />
 
       <div className={styles["person-result-content"]}>
@@ -159,8 +175,6 @@ export default function SearchPage() {
   }
 
   function makeSearchResult(result: SearchResult) {
-    console.log("here");
-
     switch (filter) {
 
       case FilterResults.ALL:
@@ -186,10 +200,13 @@ export default function SearchPage() {
     return results.map(result => makeSearchResult(result));
   }
 
+
   return <div className={styles["wrapper"]}>
     <Navbar />
 
     <div className={styles["search-page"]}>
+      <Searchbar />
+
       <form onSubmit={onSubmitSearchForm}>
         <InputGroup>
           <InputLeftElement
@@ -209,41 +226,35 @@ export default function SearchPage() {
       <div className={styles["content"]}>
         <div className={styles["results"]}>
 
-          <div className={styles["vertical-filter"]}>
+          <div className={styles["horizontal-filter"]}>
             <h3>show results for:</h3>
 
-            <Link as={NextLink} href={`/search?q=${searchQuery}&f=${FilterResults.ALL}&p=1`}>
               <Button
                 colorScheme='teal'
                 variant={filter === FilterResults.ALL ? "solid" : "ghost"}
                 className={styles["filter-button"]}
-                onClick={() => setFilter(FilterResults.ALL)}
+                onClick={() => onClickFilterButton(FilterResults.ALL)}
                 justifyContent="left">
                 ALL
               </Button>
-            </Link>
 
-            <Link as={NextLink} href={`/search?q=${searchQuery}&f=${FilterResults.MOVIES}&p=1`}>
               <Button
                 colorScheme='teal'
                 variant={filter === FilterResults.MOVIES ? "solid" : "ghost"}
                 className={styles["filter-button"]}
-                onClick={() => setFilter(FilterResults.MOVIES)}
+                onClick={() => onClickFilterButton(FilterResults.MOVIES)}
                 justifyContent="left">
                 MOVIES
               </Button>
-            </Link>
 
-            <Link as={NextLink} href={`/search?q=${searchQuery}&f=${FilterResults.CAST_AND_CREW}&p=1`}>
               <Button
                 colorScheme='teal'
                 variant={filter === FilterResults.CAST_AND_CREW ? "solid" : "ghost"}
                 className={styles["filter-button"]}
-                onClick={() => setFilter(FilterResults.CAST_AND_CREW)}
+                onClick={() => onClickFilterButton(FilterResults.CAST_AND_CREW)}
                 justifyContent="left">
                 CAST & CREW
               </Button>
-            </Link>
 
           </div>
 
@@ -268,38 +279,32 @@ export default function SearchPage() {
           <Divider />
 
           <div className={styles["filter-buttons"]}>
-            <Link as={NextLink} href={`/search?q=${searchQuery}&f=${FilterResults.ALL}&p=1`}>
               <Button
                 colorScheme='teal'
                 variant={filter === FilterResults.ALL ? "solid" : "ghost"}
                 className={styles["filter-button"]}
-                onClick={() => setFilter(FilterResults.ALL)}
+                onClick={() => onClickFilterButton(FilterResults.ALL)}
                 justifyContent="left">
                 ALL
               </Button>
-            </Link>
 
-            <Link as={NextLink} href={`/search?q=${searchQuery}&f=${FilterResults.MOVIES}&p=1`}>
               <Button
                 colorScheme='teal'
                 variant={filter === FilterResults.MOVIES ? "solid" : "ghost"}
                 className={styles["filter-button"]}
-                onClick={() => setFilter(FilterResults.MOVIES)}
+                onClick={() => onClickFilterButton(FilterResults.MOVIES)}
                 justifyContent="left">
                 MOVIES
               </Button>
-            </Link>
 
-            <Link as={NextLink} href={`/search?q=${searchQuery}&f=${FilterResults.CAST_AND_CREW}&p=1`}>
               <Button
                 colorScheme='teal'
                 variant={filter === FilterResults.CAST_AND_CREW ? "solid" : "ghost"}
                 className={styles["filter-button"]}
-                onClick={() => setFilter(FilterResults.CAST_AND_CREW)}
+                onClick={() => onClickFilterButton(FilterResults.CAST_AND_CREW)}
                 justifyContent="left">
                 CAST & CREW
               </Button>
-            </Link>
           </div>
 
         </div>

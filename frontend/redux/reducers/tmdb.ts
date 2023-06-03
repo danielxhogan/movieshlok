@@ -1,3 +1,4 @@
+import { FilterResults } from "@/pages/search";
 import { getSearchResults, getMovieDetails } from "@/redux/actions/tmdb";
 import { AppState } from "@/redux/store";
 import { createSlice } from "@reduxjs/toolkit";
@@ -122,6 +123,8 @@ interface SearchResults {
   status: string;
   success: boolean | null;
   message: string;
+  query: string;
+  filter: FilterResults | null;
   data: {
     page?: string
     results?: [SearchResult]
@@ -134,6 +137,8 @@ const initialSearchResultsState: SearchResults = {
   status: "idle",
   success: null,
   message: "",
+  query: "",
+  filter: null,
   data: {}
 }
 
@@ -148,12 +153,16 @@ export const searchResultsSlice = createSlice({
         state.status = "loading";
         state.success = null;
         state.message = "";
+        state.query = "";
+        state.filter = null;
         state.data = {};
       })
       .addCase(getSearchResults.fulfilled, (state, action) => {
         state.status = "fullfilled";
         state.success = action.payload.success;
         state.message = action.payload.message;
+        state.query = action.payload.query;
+        state.filter = action.payload.filter;
         state.data = action.payload.data;
       })
   }
