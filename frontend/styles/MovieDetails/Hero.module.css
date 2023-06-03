@@ -3,6 +3,10 @@
   justify-content: center;
 }
 
+.wrapper {
+  margin-top: 30px;
+}
+
 .trailer {
   margin: 40px 0 20px;
   width: 100%;

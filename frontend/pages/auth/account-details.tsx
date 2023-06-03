@@ -1,11 +1,19 @@
+import styles from "@/styles/auth/AccountDetailsPage.module.css";
 import Navbar from "@/components/Navbar";
-import { GetServerSideProps } from 'next';
+
+import { GetServerSideProps } from "next";
+import Searchbar from "@/components/Searchbar";
 
 export default function AccountDetailsPage() {
-  return <>
+  return <div className={styles["wrapper"]}>
     <Navbar />
-    Account Details
-  </>
+
+    <div className={styles["account-details-page"]}>
+      <Searchbar />
+
+      <h1>Account Details Page</h1>
+    </div>
+  </div>
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {

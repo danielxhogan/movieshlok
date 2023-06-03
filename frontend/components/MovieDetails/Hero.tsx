@@ -60,7 +60,7 @@ export default function Hero() {
       <Spinner size='xl' />
     </div>
     :
-    <>
+    <div className={styles["wrapper"]}>
     { trailerPath && trailerSite === "YouTube" && <><Button
       colorScheme='teal' variant='outline'
       className={styles["trailer-button"]}
@@ -82,7 +82,6 @@ export default function Hero() {
               allowFullScreen>
             </iframe>
         </ModalBody>
-
       </ModalContent>
     </Modal></>
     }
@@ -99,6 +98,6 @@ export default function Hero() {
     <div className={styles["movie-title"]}>
         <h1>{ movieDetails.data.title }</h1>
     </div>
-    </>}
+    </div>}
   </>
 }

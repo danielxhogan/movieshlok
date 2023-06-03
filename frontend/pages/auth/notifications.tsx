@@ -1,11 +1,18 @@
+import styles from "@/styles/auth/NotificationsPage.module.css";
 import Navbar from "@/components/Navbar";
 import { GetServerSideProps } from "next";
+import Searchbar from "@/components/Searchbar";
 
 export default function NotificationsPage() {
-  return <>
+  return <div className={styles["wrapper"]}>
     <Navbar />
-    Notifications
-  </>
+
+    <div className={styles["notifications-page"]}>
+      <Searchbar />
+
+      <h1>Notifications Page</h1>
+    </div>
+  </div>
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {

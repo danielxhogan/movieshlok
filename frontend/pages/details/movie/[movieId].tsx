@@ -1,5 +1,6 @@
 import styles from "@/styles/MovieDetails/MovieDetails.module.css";
 import Navbar from "@/components/Navbar"
+import Searchbar from "@/components/Searchbar";
 import Hero from "@/components/MovieDetails/Hero";
 import MovieData from "@/components/MovieDetails/MovieData";
 import Ratings from "@/components/MovieDetails/Ratings";
@@ -20,6 +21,7 @@ const TMDB_IMAGE_URL = publicRuntimeConfig.TMDB_IMAGE_URL;
 // import { GetServerSideProps } from "next";
 // import { wrapper } from "@/redux/store";
 
+
 export default function MovieDetailsPage() {
   const dispatch = useAppDispatch();
   const movieDetails = useAppSelector(selectMovieDetails);
@@ -38,6 +40,7 @@ export default function MovieDetailsPage() {
     <Navbar />
 
     <div className={styles["movie-details"]}>
+      <Searchbar />
       <Hero />
 
       <div className={styles["sub-hero"]}>

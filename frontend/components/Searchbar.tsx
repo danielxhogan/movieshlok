@@ -3,7 +3,8 @@ import { getSearchResults, SearchParams } from "@/redux/actions/tmdb";
 import { selectSearchResults } from "@/redux/reducers/tmdb";
 import { FilterResults } from "@/pages/search";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from 'next/router';
 import { InputGroup, InputLeftElement, Input } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
 
@@ -13,14 +14,17 @@ interface Props {
 }
 
 export default function Searchbar(props: Props) {
-  const dispatch = useAppDispatch();
   const searchResults = useAppSelector(selectSearchResults);
-
-  let defaultFilter: FilterResults;
-  if (props.filter !== undefined) { defaultFilter = props.filter; }
-  else { defaultFilter = FilterResults.ALL; }
+  const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const [ searchQuery, setSearchQuery ] = useState(searchResults.query);
+
+  useEffect(() => {
+    if (searchResults.status === "fullfilled") {
+      onChangeSearchQuery(searchResults.query);
+    }
+  }, [searchResults])
 
   function onChangeSearchQuery(value: string) {
     setSearchQuery(value);
@@ -29,8 +33,12 @@ export default function Searchbar(props: Props) {
     }
   }
 
-  function onSubmitSearchForm(e) {
+  function onSubmitSearchForm(e: React.ChangeEvent<HTMLInputElement>) {
     e.preventDefault();
+
+    let defaultFilter: FilterResults;
+    if (props.filter !== undefined) { defaultFilter = props.filter; }
+    else { defaultFilter = FilterResults.ALL; }
 
     if (searchQuery !== "") {
       const searchParams: SearchParams = {
@@ -40,6 +48,9 @@ export default function Searchbar(props: Props) {
       };
 
       dispatch(getSearchResults(searchParams));
+      if (!window.location.href.includes("search")) {
+        router.push("/search");
+      }
     }
   }
 

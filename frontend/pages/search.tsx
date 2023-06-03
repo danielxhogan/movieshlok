@@ -40,6 +40,7 @@ export default function SearchPage() {
       setSearchQuery(value);
   }
 
+
   function dispatchGetSearchResults(page: string, newFilter: FilterResults | null = null) {
     if (searchQuery !== "") {
       let filterUsing: FilterResults;
@@ -59,11 +60,6 @@ export default function SearchPage() {
       dispatch(getSearchResults(searchParams));
     }
   }
-
-  // function onSubmitSearchForm(e: FormEvent<HTMLFormElement>, page: string = "1") {
-  //   e.preventDefault();
-  //   dispatchGetSearchResults("1");
-  // }
 
   function onClickFilterButton(newFilter: FilterResults) {
     if (newFilter !== filter) {
@@ -205,22 +201,6 @@ export default function SearchPage() {
 
     <div className={styles["search-page"]}>
       <Searchbar filter={filter} setParentSeachQuery={setParentSeachQuery}/>
-
-      {/* <form onSubmit={onSubmitSearchForm}>
-        <InputGroup>
-          <InputLeftElement
-            pointerEvents='none'
-            children={<SearchIcon color='gray.500' />}
-          />
-          <Input
-            type="text"
-            variant="filled"
-            placeholder="search movies, or cast & crew"
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-          />
-        </InputGroup>
-      </form> */}
 
       <div className={styles["content"]}>
         <div className={styles["results"]}>
