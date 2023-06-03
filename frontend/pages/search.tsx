@@ -8,10 +8,8 @@ import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { getSearchResults, SearchParams } from "@/redux/actions/tmdb";
 import { selectSearchResults, SearchResult, KnownFor } from "@/redux/reducers/tmdb";
 
-import { FormEvent, useState, useEffect, useCallback } from "react";
-import { InputGroup, InputLeftElement, Input, Divider, Button } from "@chakra-ui/react";
-import { SearchIcon } from "@chakra-ui/icons";
-// import NextLink from "next/link";
+import { useState } from "react";
+import { Divider, Button } from "@chakra-ui/react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -31,15 +29,16 @@ export default function SearchPage() {
   const searchResults = useAppSelector(selectSearchResults);
 
   let defaultFilter: FilterResults;
-  if (searchResults.filter !== null) {
-    defaultFilter = searchResults.filter;
-  } else {
-    defaultFilter = FilterResults.ALL;
-  }
+  if (searchResults.filter !== null) { defaultFilter = searchResults.filter; }
+  else { defaultFilter = FilterResults.ALL; }
 
   const [ filter, setFilter ] = useState(defaultFilter);
   const [ searchQuery, setSearchQuery ] = useState(searchResults.query);
 
+  function setParentSeachQuery(value: string) {
+    console.log(value);
+      setSearchQuery(value);
+  }
 
   function dispatchGetSearchResults(page: string, newFilter: FilterResults | null = null) {
     if (searchQuery !== "") {
@@ -61,10 +60,10 @@ export default function SearchPage() {
     }
   }
 
-  function onSubmitSearchForm(e: FormEvent<HTMLFormElement>, page: string = "1") {
-    e.preventDefault();
-    dispatchGetSearchResults("1");
-  }
+  // function onSubmitSearchForm(e: FormEvent<HTMLFormElement>, page: string = "1") {
+  //   e.preventDefault();
+  //   dispatchGetSearchResults("1");
+  // }
 
   function onClickFilterButton(newFilter: FilterResults) {
     if (newFilter !== filter) {
@@ -205,9 +204,9 @@ export default function SearchPage() {
     <Navbar />
 
     <div className={styles["search-page"]}>
-      <Searchbar />
+      <Searchbar filter={filter} setParentSeachQuery={setParentSeachQuery}/>
 
-      <form onSubmit={onSubmitSearchForm}>
+      {/* <form onSubmit={onSubmitSearchForm}>
         <InputGroup>
           <InputLeftElement
             pointerEvents='none'
@@ -221,7 +220,7 @@ export default function SearchPage() {
             onChange={e => setSearchQuery(e.target.value)}
           />
         </InputGroup>
-      </form>
+      </form> */}
 
       <div className={styles["content"]}>
         <div className={styles["results"]}>
