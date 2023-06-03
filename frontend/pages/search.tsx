@@ -13,7 +13,6 @@ import { SearchIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
 import Image from "next/image";
 
-// const TMDB_IMAGE_URL = "https://image.tmdb.org/t/p";
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
 const TMDB_IMAGE_URL = publicRuntimeConfig.TMDB_IMAGE_URL;
@@ -23,7 +22,6 @@ export enum FilterResults {
   MOVIES,
   CAST_AND_CREW
 }
-
 
 export default function SearchPage() {
 

@@ -7,3 +7,34 @@
   width: 80%;
   margin: 30px auto 0;
 }
+
+.sub-hero {
+  display: flex;
+  margin-bottom: 50px;
+}
+
+.movie-poster {
+  /* min-width: 150px; */
+}
+
+.movie-content {
+  width: 80%;
+  /* min-width: 700px; */
+  margin: auto;
+}
+
+@media screen and (max-width: 1250px) {
+  .movie-details {
+    width: 90%;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .movie-poster {
+    display: none;
+  }
+
+  .movie-content {
+    width: 100%;
+  }
+}
