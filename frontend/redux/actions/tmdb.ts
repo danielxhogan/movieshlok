@@ -45,3 +45,31 @@ export const getSearchResults = createAsyncThunk(
     }
   }
 )
+
+export const getMovieDetails = createAsyncThunk(
+  "movieDetails/fetchDetails",
+  async (movieId: string): Promise<Payload> => {
+    const movieDetailsUrl = `${BACKEND_URL}/tmdb/movie`;
+
+    const headers = new Headers();
+    headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+    const params = new URLSearchParams();
+    params.append("movie_id", movieId);
+
+    const request = new Request(movieDetailsUrl, { headers, body: params, method: "POST" });
+    const response = await fetch(request);
+
+    if (response.ok) {
+      const data = await response.json();
+      return { success: true, message: movieId, data };
+
+    } else if (response.status >= 500) {
+      return { success: false, message: "server error", data: {} };
+
+    } else {
+      const data = await response.json();
+      return { success: false, message: data.message, data: {} };
+    }
+  }
+)

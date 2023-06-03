@@ -6,8 +6,9 @@ use serde::{Serialize, Deserialize};
 use std::env;
 
 
-// MOVIE DETAILS STRUCTS
+// MOVIE DETAILS
 // **************************************************
+
 // REQUEST PARAMS
 #[derive(Deserialize, Debug)]
 struct MovieDetailsParams {
@@ -42,6 +43,28 @@ struct Language {
   name: Option<String>
 }
 
+// VIDEOS
+#[derive(Serialize, Deserialize, Debug)]
+struct VideoResult {
+  iso_639_1: Option<String>,
+  iso_3166_1: Option<String>,
+  name: Option<String>,
+  key: Option<String>,
+  site: Option<String>,
+  size: Option<i32>,
+  r#type: Option<String>,
+  official: Option<bool>,
+  published_at: Option<String>,
+  id: Option<String>
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Video {
+  id: Option<i32>,
+  results: Option<Box<[VideoResult]>>
+}
+
+// MAIN RESPONSE
 #[derive(Serialize, Deserialize, Debug)]
 struct MovieDetails {
   adult: Option<bool>,
@@ -68,11 +91,14 @@ struct MovieDetails {
   title: Option<String>,
   video: Option<bool>,
   vote_average: Option<f32>,
-  vote_count: Option<i32>
+  vote_count: Option<i32>,
+  videos: Option<Video>
 }
 
-// SEARCH STRUCTS
+
+// SEARCH
 // **************************************************
+
 // REQUEST PARAMS
 #[derive(Deserialize, Debug)]
 struct QueryParams {
@@ -129,18 +155,21 @@ struct SearchResult {
   media_type: Option<String>,
 }
 
+
+// MAIN RESPONSE
 #[derive(Serialize, Deserialize, Debug)]
 struct SearchResults {
   page: Option<i32>,
   results: Option<Box<[SearchResult]>>,
   total_pages: Option<i32>,
-  total_results: Option<i32>
+  total_results: Option<i32>,
 }
 
 
 pub fn tmdb_filters() -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
   search_filter()
   .or(movie_details_filter())
+  .or(trailers_filter())
 }
 
 pub fn movie_details_filter() -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
@@ -154,9 +183,34 @@ async fn movie_details(movie_details_params: MovieDetailsParams) -> Result<impl 
   let tmdb_base_url = env::var("TMDB_BASE_URL").unwrap();
   let tmdb_api_key = env::var("TMDB_API_KEY").unwrap();
 
-  let movie_details_url = format!("{}/movie/{}?api_key={}&language=en-US",
+  let movie_details_url = format!("{}/movie/{}?api_key={}&language=en-US&append_to_response=videos",
     &tmdb_base_url,
     &movie_details_params.movie_id,
+    &tmdb_api_key);
+
+    let response = reqwest::get(&movie_details_url).await.unwrap()
+    .json::<MovieDetails>().await
+    .map_err(|err| {
+      AppError::new(&err.to_string(), ErrorType::FailedToGetMovieDetails)
+    });
+
+  respond(response, warp::http::StatusCode::OK)
+}
+
+pub fn trailers_filter() -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
+  warp::path!("tmdb" / "trailers")
+    .and(warp::post())
+    .and(with_form_body::<MovieDetailsParams>())
+    .and_then(trailers)
+}
+
+async fn trailers(trailers_params: MovieDetailsParams) -> Result<impl warp::Reply, warp::Rejection> {
+  let tmdb_base_url = env::var("TMDB_BASE_URL").unwrap();
+  let tmdb_api_key = env::var("TMDB_API_KEY").unwrap();
+
+  let movie_details_url = format!("{}/movie/{}/videos?api_key={}&language=en-US",
+    &tmdb_base_url,
+    &trailers_params.movie_id,
     &tmdb_api_key);
 
     let response = reqwest::get(&movie_details_url).await.unwrap()

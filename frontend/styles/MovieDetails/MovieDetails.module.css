@@ -1,4 +1,9 @@
+.wrapper {
+  background-color: var(--background-primary);
+  min-height: 100vh;
+}
+
 .movie-details {
   width: 80%;
-  margin: auto;
+  margin: 30px auto 0;
 }

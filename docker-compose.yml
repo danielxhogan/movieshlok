@@ -27,6 +27,7 @@ services:
     environment:
       BACKEND_PORT: ${BACKEND_PORT}
       BACKEND_HOST: ${BACKEND_HOST}
+      TMDB_IMAGE_URL: ${TMDB_IMAGE_URL}
       TMDB_BASE_URL: ${TMDB_BASE_URL}
       TMDB_API_KEY: ${TMDB_API_KEY}
 

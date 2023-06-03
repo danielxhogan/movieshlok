@@ -5,7 +5,7 @@ import Pagination, { UseCases } from "@/components/Pagination";
 
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { getSearchResults, SearchParams } from "@/redux/actions/tmdb";
-import { selectSearchResults, Result, KnownFor } from "@/redux/reducers/tmdb";
+import { selectSearchResults, SearchResult, KnownFor } from "@/redux/reducers/tmdb";
 
 import { FormEvent, useState } from "react";
 import { InputGroup, InputLeftElement, Input, Divider, Button, Link } from "@chakra-ui/react";
@@ -13,8 +13,10 @@ import { SearchIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
 import Image from "next/image";
 
-const TMDB_IMAGE_URL = "https://image.tmdb.org/t/p";
-
+// const TMDB_IMAGE_URL = "https://image.tmdb.org/t/p";
+import getConfig from "next/config";
+const { publicRuntimeConfig } = getConfig();
+const TMDB_IMAGE_URL = publicRuntimeConfig.TMDB_IMAGE_URL;
 
 export enum FilterResults {
   ALL,
@@ -81,7 +83,7 @@ export default function SearchPage() {
     return `${monthText} ${day}, ${year}`;
   }
 
-  function makeMovieResult(result: Result) {
+  function makeMovieResult(result: SearchResult) {
     const date = result.release_date ? reformatDate(result.release_date) : result.release_date;
 
     return <div key={result.id} className={styles["search-result"]}>
@@ -132,7 +134,7 @@ export default function SearchPage() {
     return knownForText;
   }
 
-  function makePersonResult(result: Result) {
+  function makePersonResult(result: SearchResult) {
     return <div key={result.id} className={styles["search-result"]}>
       <Link as={NextLink} href={`/details/person/${result.id}`}>
         <span className={styles["result-title"]}>{ result.name }</span><br />
@@ -158,7 +160,7 @@ export default function SearchPage() {
     </div>
   }
 
-  function makeSearchResult(result: Result) {
+  function makeSearchResult(result: SearchResult) {
     console.log("here");
 
     switch (filter) {
@@ -176,7 +178,7 @@ export default function SearchPage() {
     }
   }
 
-  function sortAndMakeSearchResults(results: [Result]) {
+  function sortAndMakeSearchResults(results: [SearchResult]) {
     results.sort((result1: {popularity: number;}, result2: {popularity: number;}) => {
       if (result1.popularity < result2.popularity) { return  1; }
       if (result1.popularity > result2.popularity) { return -1; }
