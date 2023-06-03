@@ -9,7 +9,6 @@ import Image from "next/image";
 
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
-
 const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
 
 
@@ -62,11 +61,14 @@ export default function RegisterPage() {
     }
   }
 
+
   return <div className={styles["wrapper"]}>
     <Navbar />
+
     <form className={styles["register-form"]} onSubmit={onSubmitRegisterForm}>
       <Image src={logo} alt="logo" width={400} />
       <h1>Register</h1>
+
       <Input
         type="text"
         variant="filled"

@@ -8,7 +8,6 @@ import Link from 'next/link';
 import Image from "next/image";
 import { useRouter } from 'next/router';
 
-
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
 const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
@@ -21,6 +20,7 @@ export default function LoginPage() {
   const [ errorMessage, setErrorMessage ] = useState("default");
 
   const router = useRouter();
+
 
   async function onSubmitLoginForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -64,11 +64,14 @@ export default function LoginPage() {
     }
   }
 
+
   return <div className={styles["wrapper"]}>
     <Navbar />
+
     <form className={styles["login-form"]} onSubmit={onSubmitLoginForm}>
       <Image src={logo} alt="logo" width={400} />
       <h1>Login</h1>
+
       <Input
         type="text"
         variant="filled"
