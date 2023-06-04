@@ -158,7 +158,7 @@ export const searchResultsSlice = createSlice({
         state.data = {};
       })
       .addCase(getSearchResults.fulfilled, (state, action) => {
-        state.status = "fullfilled";
+        state.status = "fulfilled";
         state.success = action.payload.success;
         state.message = action.payload.message;
         state.query = action.payload.query;
@@ -185,7 +185,7 @@ export const movieDetailsSlice = createSlice({
         state.data = {};
       })
       .addCase(getMovieDetails.fulfilled, (state, action) => {
-        state.status = "fullfilled";
+        state.status = "fulfilled";
         state.success = action.payload.success;
         state.message = action.payload.message;
         state.data = action.payload.data;
