@@ -44,7 +44,7 @@ pub fn get_reviews_filters(pool: PgPool)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
   warp::path!("reviews")
-    .and(warp::get())
+    .and(warp::post())
     .and(with_reviews_db_manager(pool))
     .and(with_form_body::<ReviewsMovieId>())
     .and_then(get_reviews)
@@ -63,7 +63,7 @@ async fn get_reviews(mut reviews_db_manager: ReviewsDbManager, get_reviews_param
 pub fn post_review_filters(pool: PgPool)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
-  warp::path!("reviews")
+  warp::path!("review")
     .and(warp::post())
     .and(warp::cookie("jwt_token"))
     .and(with_reviews_db_manager(pool))

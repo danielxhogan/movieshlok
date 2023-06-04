@@ -21,8 +21,7 @@ export const getReviews = createAsyncThunk(
     const params = new URLSearchParams();
     params.append("movie_id", movieId);
 
-
-    const request = new Request(getReviewsUrl, { headers, body: params, method: "GET" });
+    const request = new Request(getReviewsUrl, { headers, body: params, method: "POST" });
     const response = await fetch(request);
 
     if (response.ok) {

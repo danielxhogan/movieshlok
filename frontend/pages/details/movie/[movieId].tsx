@@ -8,6 +8,7 @@ import Reviews from "@/components/MovieDetails/Reviews";
 
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { getMovieDetails } from "@/redux/actions/tmdb";
+import { getReviews } from "@/redux/actions/reviews";
 import { selectMovieDetails } from "@/redux/reducers/tmdb";
 
 import { useEffect } from "react";
@@ -30,8 +31,8 @@ export default function MovieDetailsPage() {
 
   useEffect(() => {
     if (router.query.movieId && typeof router.query.movieId === "string") {
-      // dispatch(clearResults());
       dispatch(getMovieDetails(router.query.movieId));
+      dispatch(getReviews(router.query.movieId));
     }
 
   }, [dispatch, router.query])
