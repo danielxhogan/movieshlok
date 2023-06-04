@@ -34,7 +34,6 @@ pub struct LoginResponse {
 
 
 fn with_auth_db_manager(pool: PgPool) -> impl Filter<Extract = (AuthDbManager,), Error = warp::Rejection> + Clone {
-
   warp::any()
     .map(move || pool.clone())
     .and_then(|pool: PgPool| async move { match pool.get() {

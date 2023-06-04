@@ -1,5 +1,6 @@
 pub mod auth;
 pub mod tmdb;
+pub mod reviews;
 
 use crate::utils::error_handling::AppError;
 
