@@ -1,4 +1,4 @@
-use crate::db::config::schema::users;
+use crate::db::config::schema::{users, reviews};
 
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -39,6 +39,20 @@ pub struct Review {
     pub rating: Option<i32>,
     pub review: String,
     pub liked: Option<bool>
+}
+
+#[derive(Deserialize, Insertable, Debug)]
+#[diesel(table_name = reviews)]
+pub struct InsertingNewReview {
+    pub user_id: Uuid,
+    pub movie_id: String,
+    pub review: String
+}
+
+#[derive(Deserialize, Debug)]
+pub struct IncomingNewReview {
+    pub movie_id: String,
+    pub review: String
 }
 
 #[derive(Debug, Deserialize, Clone)]

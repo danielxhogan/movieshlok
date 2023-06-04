@@ -15,7 +15,8 @@ pub enum ErrorType {
   InvalidUsername,
   InvalidPassword,
   FailedToSearch,
-  FailedToGetMovieDetails
+  FailedToGetMovieDetails,
+  InvalidJwtToken
 }
 
 #[derive(Debug)]
@@ -40,6 +41,7 @@ impl AppError {
       ErrorType::InvalidPassword => warp::http::StatusCode::NOT_FOUND,
       ErrorType::FailedToSearch => warp::http::StatusCode::BAD_REQUEST,
       ErrorType::FailedToGetMovieDetails => warp::http::StatusCode::BAD_REQUEST,
+      ErrorType::InvalidJwtToken => warp::http::StatusCode::UNAUTHORIZED,
     }
   }
 
@@ -85,15 +87,19 @@ pub async fn handle_rejection(err: Rejection) -> Result<impl Reply, Infallible> 
   if err.is_not_found() {
     code = warp::http::StatusCode::NOT_FOUND;
     message = "Not Found";
+
   } else if let Some(app_err) = err.find::<AppError>() {
     code = app_err.to_http_status();
     message = app_err.message.as_str();
+
   } else if let Some(_) = err.find::<warp::filters::body::BodyDeserializeError>() {
     code = warp::http::StatusCode::BAD_REQUEST;
     message = "Invalid Body";
+
   } else if let Some(_) = err.find::<warp::reject::MethodNotAllowed>() {
     code = warp::http::StatusCode::METHOD_NOT_ALLOWED;
     message = "Method Not Allowed";
+
   } else {
     // In case we missed something - log and respond with 500
     eprintln!("unhandled rejection: {:?}", err);

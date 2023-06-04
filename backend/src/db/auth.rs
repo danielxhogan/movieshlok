@@ -9,6 +9,7 @@ extern crate bcrypt;
 use bcrypt::{DEFAULT_COST, hash, verify};
 
 use serde::{Serialize, Deserialize};
+use uuid::Uuid;
 
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -17,6 +18,7 @@ struct JwtPayload<'a> {
 }
 
 type PooledPg = PooledConnection<ConnectionManager<PgConnection>>;
+
 
 pub struct AuthDbManager {
   connection:  PooledPg,
@@ -55,7 +57,6 @@ impl AuthDbManager {
         return Err(AppError::new("email already exists", ErrorType::EmailAlreadyExists));
       }
 
-      // the hash function returns String but NewUser model wants &str
       let hashed_password = hash(new_user.password, DEFAULT_COST).unwrap();
       let inserting_user = NewUser { username: new_user.username, email: new_user.email, password: hashed_password };
 
@@ -67,7 +68,7 @@ impl AuthDbManager {
       })
   }
 
-  pub fn login_user(&mut self, login_creds: &LoginCreds) -> Result<(), AppError> {
+  pub fn login_user<'a>(&mut self, login_creds: &'a LoginCreds) -> Result<Uuid, AppError> {
 
     // check if username exists
     let users_result = users::table
@@ -90,6 +91,8 @@ impl AuthDbManager {
       return Err(AppError::new("can't find user", ErrorType::InvalidPassword));
     }
 
-    Ok(())
+    let user_id = users[0].id;
+
+    Ok(user_id)
   }
 }

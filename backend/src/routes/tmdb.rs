@@ -127,7 +127,6 @@ struct KnownFor {
   vote_count: Option<i32>
 }
 
-
 #[derive(Serialize, Deserialize, Debug)]
 struct SearchResult {
   adult: Option<bool>,
@@ -154,7 +153,6 @@ struct SearchResult {
 
   media_type: Option<String>,
 }
-
 
 // MAIN RESPONSE
 #[derive(Serialize, Deserialize, Debug)]

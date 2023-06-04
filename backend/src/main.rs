@@ -9,8 +9,8 @@ use routes::reviews::reviews_filters;
 use utils::error_handling::handle_rejection;
 
 use warp::{Filter, http::Method};
-
 use dotenvy::dotenv;
+
 
 #[tokio::main]
 async fn main() {
@@ -28,6 +28,5 @@ async fn main() {
     .with(cors);
 
   println!("Starting server on port 3030...");
-
   warp::serve(routes).run(([127, 0, 0, 1], 3030)).await;
 }

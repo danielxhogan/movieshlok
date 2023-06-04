@@ -9,21 +9,18 @@ use jsonwebtoken::{encode, Header, EncodingKey};
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 use std::env;
+use chrono::Utc;
+
 
 #[derive(Debug, Serialize, Clone)]
 pub struct RegisterResponse {
   pub id: Uuid,
 }
 
-impl RegisterResponse {
-  pub fn new(id: Uuid) -> RegisterResponse {
-    RegisterResponse { id }
-  }
-}
-
 #[derive(Debug, Serialize, Deserialize)]
-struct Claims {
-    username: String,
+pub struct Claims {
+    pub user_id: Uuid,
+    exp: usize
 }
 
 #[derive(Debug, Serialize, Clone)]
@@ -51,7 +48,6 @@ pub fn auth_filters(pool: PgPool,) -> impl Filter<Extract = (impl warp::Reply,),
 
 
 pub fn register_filter(pool: PgPool,) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
-
   warp::path!("register")
     .and(warp::post())
     .and(with_auth_db_manager(pool))
@@ -60,17 +56,15 @@ pub fn register_filter(pool: PgPool,) -> impl Filter<Extract = (impl warp::Reply
 }
 
 async fn register_user(mut auth_db_manager: AuthDbManager, new_user: NewUser) -> Result<impl warp::Reply, warp::Rejection> {
-
   let response = auth_db_manager
     .register_user(new_user)
-    .map(|created_user| { RegisterResponse::new(created_user.id) });
+    .map(|created_user| { RegisterResponse { id: created_user.id } });
 
   respond(response, warp::http::StatusCode::CREATED)
 }
 
 
 pub fn login_filter(pool: PgPool,) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
-
   warp::path!("login")
     .and(warp::post())
     .and(with_auth_db_manager(pool))
@@ -79,15 +73,20 @@ pub fn login_filter(pool: PgPool,) -> impl Filter<Extract = (impl warp::Reply,),
 }
 
 async fn login_user(mut auth_db_manager: AuthDbManager, login_creds: LoginCreds) -> Result<impl warp::Reply, warp::Rejection> {
-
   let response = auth_db_manager
     .login_user(&login_creds)
-    .map(|()| {
-      let claims = Claims { username: login_creds.username.clone() };
+    .map(|user_id| {
+      let exp = Utc::now().timestamp() + 86400;
+
+      let claims = Claims {
+        user_id,
+        exp: exp.try_into().unwrap()
+      };
+
       let jwt_secret = env::var("JWT_SECRET").unwrap();
       let token = encode(&Header::default(), &claims, &EncodingKey::from_secret(&jwt_secret.as_ref())).unwrap();
 
-      LoginResponse { jwt_token: token, username: login_creds.username }
+      LoginResponse { jwt_token: token, username: login_creds.username.clone() }
     });
 
   respond(response, warp::http::StatusCode::OK)
