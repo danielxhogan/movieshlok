@@ -19,7 +19,7 @@ pub struct RegisterResponse {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
-    pub user_id: Uuid,
+    user_id: Uuid,
     exp: usize
 }
 

@@ -18,7 +18,9 @@ fn with_form_body<T: DeserializeOwned + Send>()
     warp::body::content_length_limit(1024 * 16).and(warp::body::form())
 }
 
-fn auth_check(jwt_token: String) -> Result<TokenData<Claims>, AppError> {
+fn auth_check(jwt_token: String)
+-> Result<TokenData<Claims>, AppError>
+{
   let jwt_secret = env::var("JWT_SECRET").unwrap();
 
   decode::<Claims>(&jwt_token, &DecodingKey::from_secret(&jwt_secret.as_ref()), &Validation::default())
