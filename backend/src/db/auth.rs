@@ -29,8 +29,9 @@ impl AuthDbManager {
     AuthDbManager {connection}
   }
 
-  pub fn register_user(&mut self, new_user: NewUser) -> Result<User, AppError> {
-
+  pub fn register_user(&mut self, new_user: NewUser)
+  -> Result<User, AppError>
+  {
     // check if username already exists
     let existing_username = users::table
       .filter(users::username.eq(&new_user.username))
@@ -52,13 +53,18 @@ impl AuthDbManager {
         AppError::from_diesel_err(err, "while checking existing email in register")
       });
 
-      // query should return 0 results;
-      if existing_email.unwrap().len() > 0 {
-        return Err(AppError::new("email already exists", ErrorType::EmailAlreadyExists));
-      }
+    // query should return 0 results;
+    if existing_email.unwrap().len() > 0 {
+      return Err(AppError::new("email already exists", ErrorType::EmailAlreadyExists));
+    }
 
-      let hashed_password = hash(new_user.password, DEFAULT_COST).unwrap();
-      let inserting_user = NewUser { username: new_user.username, email: new_user.email, password: hashed_password };
+    let hashed_password = hash(new_user.password, DEFAULT_COST).unwrap();
+
+    let inserting_user = NewUser {
+      username: new_user.username,
+      email: new_user.email,
+      password: hashed_password
+    };
 
     diesel::insert_into(users::table)
       .values(&inserting_user)
@@ -68,8 +74,9 @@ impl AuthDbManager {
       })
   }
 
-  pub fn login_user<'a>(&mut self, login_creds: &'a LoginCreds) -> Result<Uuid, AppError> {
-
+  pub fn login_user(&mut self, login_creds: & LoginCreds)
+  -> Result<Uuid, AppError>
+  {
     // check if username exists
     let users_result = users::table
       .filter(users::username.eq(&login_creds.username))
@@ -78,7 +85,7 @@ impl AuthDbManager {
         AppError::from_diesel_err(err, "while checking existing username in register")
       });
 
-      let users = users_result.unwrap();
+    let users = users_result.unwrap();
 
     // query should return 1 result;
     if users.len() != 1 {
@@ -92,7 +99,6 @@ impl AuthDbManager {
     }
 
     let user_id = users[0].id;
-
     Ok(user_id)
   }
 }

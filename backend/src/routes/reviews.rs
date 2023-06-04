@@ -8,7 +8,6 @@ use warp::{Filter, reject};
 use serde::{Serialize, Deserialize};
 
 
-
 #[derive(Serialize)]
 pub struct GetReviewsResponse {
   reviews: Box<Vec<Review>>
@@ -20,7 +19,9 @@ struct JwtToken {
 }
 
 
-fn with_reviews_db_manager(pool: PgPool) -> impl Filter<Extract = (ReviewsDbManager,), Error = warp::Rejection> + Clone {
+fn with_reviews_db_manager(pool: PgPool)
+-> impl Filter<Extract = (ReviewsDbManager,), Error = warp::Rejection> + Clone
+{
   warp::any()
     .map(move || pool.clone())
     .and_then(|pool: PgPool| async move { match pool.get() {
@@ -31,13 +32,17 @@ fn with_reviews_db_manager(pool: PgPool) -> impl Filter<Extract = (ReviewsDbMana
     }})
 }
 
-pub fn reviews_filters(pool: PgPool) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
+pub fn reviews_filters(pool: PgPool)
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
   get_reviews_filters(pool.clone())
   .or(post_review_filters(pool))
 }
 
 
-pub fn get_reviews_filters(pool: PgPool) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
+pub fn get_reviews_filters(pool: PgPool)
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
   warp::path!("reviews")
     .and(warp::get())
     .and(with_reviews_db_manager(pool))
@@ -45,7 +50,9 @@ pub fn get_reviews_filters(pool: PgPool) -> impl Filter<Extract = (impl warp::Re
     .and_then(get_reviews)
 }
 
-async fn get_reviews(mut reviews_db_manager: ReviewsDbManager, get_reviews_params: ReviewsMovieId) -> Result<impl warp::Reply, warp::Rejection> {
+async fn get_reviews(mut reviews_db_manager: ReviewsDbManager, get_reviews_params: ReviewsMovieId)
+-> Result<impl warp::Reply, warp::Rejection>
+{
   let response = reviews_db_manager
     .get_reviews(get_reviews_params)
     .map(|reviews| { GetReviewsResponse { reviews } });
@@ -53,7 +60,9 @@ async fn get_reviews(mut reviews_db_manager: ReviewsDbManager, get_reviews_param
   respond(response, warp::http::StatusCode::OK)
 }
 
-pub fn post_review_filters(pool: PgPool) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
+pub fn post_review_filters(pool: PgPool)
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
   warp::path!("reviews")
     .and(warp::post())
     .and(warp::cookie("jwt_token"))
@@ -62,7 +71,9 @@ pub fn post_review_filters(pool: PgPool) -> impl Filter<Extract = (impl warp::Re
     .and_then(post_review)
 }
 
-async fn post_review(jwt_token: String, mut reviews_db_manager: ReviewsDbManager, new_review: IncomingNewReview) -> Result<impl warp::Reply, warp::Rejection> {
+async fn post_review(jwt_token: String, mut reviews_db_manager: ReviewsDbManager, new_review: IncomingNewReview)
+-> Result<impl warp::Reply, warp::Rejection>
+{
   let payload = auth_check(jwt_token);
 
   match payload {
@@ -80,5 +91,4 @@ async fn post_review(jwt_token: String, mut reviews_db_manager: ReviewsDbManager
       return respond(response, warp::http::StatusCode::CREATED);
     }
   };
-
 }

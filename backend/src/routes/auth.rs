@@ -30,7 +30,9 @@ pub struct LoginResponse {
 }
 
 
-fn with_auth_db_manager(pool: PgPool) -> impl Filter<Extract = (AuthDbManager,), Error = warp::Rejection> + Clone {
+fn with_auth_db_manager(pool: PgPool)
+-> impl Filter<Extract = (AuthDbManager,), Error = warp::Rejection> + Clone
+{
   warp::any()
     .map(move || pool.clone())
     .and_then(|pool: PgPool| async move { match pool.get() {
@@ -41,13 +43,17 @@ fn with_auth_db_manager(pool: PgPool) -> impl Filter<Extract = (AuthDbManager,),
     }})
 }
 
-pub fn auth_filters(pool: PgPool,) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
+pub fn auth_filters(pool: PgPool,)
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
   register_filter(pool.clone())
   .or(login_filter(pool))
 }
 
 
-pub fn register_filter(pool: PgPool,) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
+pub fn register_filter(pool: PgPool,)
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
   warp::path!("register")
     .and(warp::post())
     .and(with_auth_db_manager(pool))
@@ -55,7 +61,9 @@ pub fn register_filter(pool: PgPool,) -> impl Filter<Extract = (impl warp::Reply
     .and_then(register_user)
 }
 
-async fn register_user(mut auth_db_manager: AuthDbManager, new_user: NewUser) -> Result<impl warp::Reply, warp::Rejection> {
+async fn register_user(mut auth_db_manager: AuthDbManager, new_user: NewUser)
+-> Result<impl warp::Reply, warp::Rejection>
+{
   let response = auth_db_manager
     .register_user(new_user)
     .map(|created_user| { RegisterResponse { id: created_user.id } });
@@ -64,7 +72,9 @@ async fn register_user(mut auth_db_manager: AuthDbManager, new_user: NewUser) ->
 }
 
 
-pub fn login_filter(pool: PgPool,) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
+pub fn login_filter(pool: PgPool,)
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
   warp::path!("login")
     .and(warp::post())
     .and(with_auth_db_manager(pool))
@@ -72,7 +82,9 @@ pub fn login_filter(pool: PgPool,) -> impl Filter<Extract = (impl warp::Reply,),
     .and_then(login_user)
 }
 
-async fn login_user(mut auth_db_manager: AuthDbManager, login_creds: LoginCreds) -> Result<impl warp::Reply, warp::Rejection> {
+async fn login_user(mut auth_db_manager: AuthDbManager, login_creds: LoginCreds)
+-> Result<impl warp::Reply, warp::Rejection>
+{
   let response = auth_db_manager
     .login_user(&login_creds)
     .map(|user_id| {

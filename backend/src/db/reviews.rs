@@ -17,7 +17,9 @@ impl ReviewsDbManager {
     ReviewsDbManager {connection}
   }
 
-  pub fn get_reviews(&mut self, reviews_movie_id: ReviewsMovieId) -> Result<Box<Vec<Review>>, AppError> {
+  pub fn get_reviews(&mut self, reviews_movie_id: ReviewsMovieId)
+  -> Result<Box<Vec<Review>>, AppError>
+  {
     let results = reviews::table
       .filter(reviews::movie_id.eq(&reviews_movie_id.movie_id))
       .load::<Review>(&mut self.connection)
@@ -31,7 +33,9 @@ impl ReviewsDbManager {
     }
   }
 
-  pub fn post_review(&mut self, new_review: InsertingNewReview) -> Result<Review, AppError> {
+  pub fn post_review(&mut self, new_review: InsertingNewReview)
+  -> Result<Review, AppError>
+  {
     diesel::insert_into(reviews::table)
       .values(&new_review)
       .get_result(&mut self.connection)
