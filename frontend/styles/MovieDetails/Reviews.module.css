@@ -1,4 +1,12 @@
 .wrapper {
-  border: 1px solid black;
-  height: 500px;
+  /* border: 1px solid black; */
+  /* height: 500px; */
+}
+
+.section-title {
+  font-size: 2rem;
+}
+
+.username {
+  font-weight: bold;
 }

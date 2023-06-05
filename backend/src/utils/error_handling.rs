@@ -92,6 +92,10 @@ pub async fn handle_rejection(err: Rejection) -> Result<impl Reply, Infallible> 
     code = app_err.to_http_status();
     message = app_err.message.as_str();
 
+  } else if let Some(_) = err.find::<warp::reject::InvalidHeader>() {
+    code = warp::http::StatusCode::UNAUTHORIZED;
+    message = "Must be logged in";
+
   } else if let Some(_) = err.find::<warp::filters::body::BodyDeserializeError>() {
     code = warp::http::StatusCode::BAD_REQUEST;
     message = "Invalid Body";

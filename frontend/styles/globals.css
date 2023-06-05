@@ -3,3 +3,17 @@
   --background-secondary: #FFF3E2;
   --light-grey: #c0c0c0;
 }
+
+.block {
+  background-color: white;
+  padding: 20px;
+  margin-bottom: 15px;
+  border: 2px solid var(--light-grey);
+  border-radius: 10px;
+  transition: ease 0.2s;
+}
+
+.block:hover {
+  cursor: pointer;
+  box-shadow: 0 0 10px var(--light-grey);
+}

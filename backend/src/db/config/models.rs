@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 // AUTH
+// ***********************************************
 #[derive(Queryable, Serialize)]
 pub struct User {
     pub id: Uuid,
@@ -30,10 +31,23 @@ pub struct LoginCreds {
 }
 
 // REVIEWS
+// ***********************************************
 #[derive(Queryable, Serialize)]
 pub struct Review {
     pub id: Uuid,
     pub user_id: Uuid,
+    pub movie_id: String,
+    #[diesel(sql_type = Nullable<Int4>)]
+    pub rating: Option<i32>,
+    pub review: String,
+    pub liked: Option<bool>
+}
+
+#[derive(Queryable, Serialize)]
+pub struct SelectingReview {
+    pub id: Uuid,
+    pub user_id: Uuid,
+    pub username: String,
     pub movie_id: String,
     #[diesel(sql_type = Nullable<Int4>)]
     pub rating: Option<i32>,
@@ -51,6 +65,7 @@ pub struct InsertingNewReview {
 
 #[derive(Deserialize, Debug)]
 pub struct IncomingNewReview {
+    pub jwt_token: String,
     pub movie_id: String,
     pub review: String
 }

@@ -31,12 +31,22 @@ export default function LoginPage() {
     const headers = new Headers();
     headers.append("Content-Type", "application/x-www-form-urlencoded");
 
+
     const params = new URLSearchParams();
     params.append("username", username);
     params.append("password", password);
 
     // send request
-    const request = new Request(loginUrl, { headers, body: params, method: "POST" });
+    const request = new Request(loginUrl,
+      {
+        headers,
+        credentials: "include",
+        mode: "cors",
+        body: params,
+        method: "POST"
+      }
+    );
+
     const response = await fetch(request);
 
     if (response.ok) {

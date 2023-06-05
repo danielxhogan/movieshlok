@@ -16,21 +16,7 @@
 
 .results {
   width: 75%;
-  padding: 20px;
-}
-
-
-.search-result {
-  padding: 20px;
-  background-color: white;
-  margin-bottom: 15px;
-  border: 2px solid var(--light-grey);
-  border-radius: 10px;
-  transition: ease 0.2s;
-}
-
-.search-result a:hover {
-  text-decoration: none;
+  padding: 20px 20px 0 0;
 }
 
 .result-title {
@@ -39,15 +25,6 @@
 
 .result-title:hover {
   text-decoration: underline;
-}
-
-.search-result:hover {
-  cursor: pointer;
-  box-shadow: 0 0 10px var(--light-grey);
-}
-
-.search-result h2 {
-  font-size: 1.5rem;
 }
 
 .movie-result-content {

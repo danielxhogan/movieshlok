@@ -21,7 +21,7 @@ export default function Searchbar(props: Props) {
   const [ searchQuery, setSearchQuery ] = useState(searchResults.query);
 
   useEffect(() => {
-    if (searchResults.status === "fullfilled") {
+    if (searchResults.status === "fulfilled") {
       onChangeSearchQuery(searchResults.query);
     }
   }, [searchResults])

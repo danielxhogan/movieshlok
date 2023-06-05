@@ -164,19 +164,25 @@ struct SearchResults {
 }
 
 
-pub fn tmdb_filters() -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
+pub fn tmdb_filters()
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
   search_filter()
   .or(movie_details_filter())
 }
 
-pub fn movie_details_filter() -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
+pub fn movie_details_filter()
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
   warp::path!("tmdb" / "movie")
     .and(warp::post())
     .and(with_form_body::<MovieDetailsParams>())
     .and_then(movie_details)
 }
 
-async fn movie_details(movie_details_params: MovieDetailsParams) -> Result<impl warp::Reply, warp::Rejection> {
+async fn movie_details(movie_details_params: MovieDetailsParams)
+-> Result<impl warp::Reply, warp::Rejection>
+{
   let tmdb_base_url = env::var("TMDB_BASE_URL").unwrap();
   let tmdb_api_key = env::var("TMDB_API_KEY").unwrap();
 
@@ -194,15 +200,18 @@ async fn movie_details(movie_details_params: MovieDetailsParams) -> Result<impl 
   respond(response, warp::http::StatusCode::OK)
 }
 
-pub fn search_filter() -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
-
+pub fn search_filter()
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
   warp::path!("tmdb" / "search")
     .and(warp::post())
     .and(with_form_body::<QueryParams>())
     .and_then(search)
 }
 
-async fn search(query_params: QueryParams) -> Result<impl warp::Reply, warp::Rejection> {
+async fn search(query_params: QueryParams)
+-> Result<impl warp::Reply, warp::Rejection>
+{
   let tmdb_base_url = env::var("TMDB_BASE_URL").unwrap();
   let tmdb_api_key = env::var("TMDB_API_KEY").unwrap();
 

@@ -25,6 +25,7 @@ async fn main() {
     .or(tmdb_filters())
     .or(reviews_filters(pg_pool))
     .recover(handle_rejection)
+    .map(|reply| { warp::reply::with_header(reply, "Access-Control-Allow-Credentials", "true")})
     .with(cors);
 
   println!("Starting server on port 3030...");

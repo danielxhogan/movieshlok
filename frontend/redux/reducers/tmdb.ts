@@ -1,5 +1,6 @@
 import { FilterResults } from "@/pages/search";
 import { getSearchResults, getMovieDetails } from "@/redux/actions/tmdb";
+import { Status } from "@/redux/reducers/index"
 import { AppState } from "@/redux/store";
 import { createSlice } from "@reduxjs/toolkit";
 
@@ -52,7 +53,7 @@ export interface Video {
 
 // MAIN RESPONSE
 export interface MovieDetails {
-  status: string;
+  status: Status;
   success: boolean | null;
   message: string;
   data: {
@@ -70,7 +71,7 @@ export interface MovieDetails {
     poster_path?: string;
     production_companies?: [ProductionCompany];
     production_countries?: [ProductionCountry];
-    release_data?: string;
+    release_date?: string;
     revenue?: number;
     runtime?: number;
     spoken_languages?: [Language];
@@ -120,7 +121,7 @@ export interface SearchResult {
 
 // MAIN RESPONSE
 interface SearchResults {
-  status: string;
+  status: Status;
   success: boolean | null;
   message: string;
   query: string;

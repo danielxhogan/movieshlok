@@ -1,5 +1,5 @@
 use crate::db::config::db_connect::PgPool;
-use crate::db::config::models::{Review, ReviewsMovieId, IncomingNewReview, InsertingNewReview};
+use crate::db::config::models::{SelectingReview, ReviewsMovieId, IncomingNewReview, InsertingNewReview};
 use crate::db::reviews::ReviewsDbManager;
 use crate::routes::{with_form_body, auth_check, respond};
 use crate::utils::error_handling::{AppError, ErrorType};
@@ -10,7 +10,7 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Serialize)]
 pub struct GetReviewsResponse {
-  reviews: Box<Vec<Review>>
+  reviews: Box<Vec<SelectingReview>>
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -65,19 +65,20 @@ pub fn post_review_filters(pool: PgPool)
 {
   warp::path!("review")
     .and(warp::post())
-    .and(warp::cookie("jwt_token"))
+    // .and(warp::cookie("jwt_token"))
     .and(with_reviews_db_manager(pool))
     .and(with_form_body::<IncomingNewReview>())
     .and_then(post_review)
 }
 
-async fn post_review(jwt_token: String, mut reviews_db_manager: ReviewsDbManager, new_review: IncomingNewReview)
+// async fn post_review(jwt_token: String, mut reviews_db_manager: ReviewsDbManager, new_review: IncomingNewReview)
+async fn post_review(mut reviews_db_manager: ReviewsDbManager, new_review: IncomingNewReview)
 -> Result<impl warp::Reply, warp::Rejection>
 {
-  let payload = auth_check(jwt_token);
+  let payload = auth_check(new_review.jwt_token);
 
   match payload {
-    Err(err) => { return respond(Err(err), warp::http::StatusCode::OK)},
+    Err(err) => { return respond(Err(err), warp::http::StatusCode::UNAUTHORIZED)},
 
     Ok(payload) => {
       let user_id = payload.claims.user_id;

@@ -10,11 +10,16 @@
 
 .sub-hero {
   display: flex;
+  gap: 15px;
   margin-bottom: 50px;
 }
 
 .movie-poster {
   /* min-width: 150px; */
+}
+
+.backdrop {
+  border-radius: 10px;
 }
 
 .movie-content {

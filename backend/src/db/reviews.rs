@@ -1,5 +1,5 @@
-use crate::db::config::schema::reviews;
-use crate::db::config::models::{Review, ReviewsMovieId, InsertingNewReview};
+use crate::db::config::schema::{reviews, users};
+use crate::db::config::models::{Review, SelectingReview, ReviewsMovieId, InsertingNewReview};
 use crate::utils::error_handling::AppError;
 
 use diesel::prelude::*;
@@ -18,11 +18,19 @@ impl ReviewsDbManager {
   }
 
   pub fn get_reviews(&mut self, reviews_movie_id: ReviewsMovieId)
-  -> Result<Box<Vec<Review>>, AppError>
+  -> Result<Box<Vec<SelectingReview>>, AppError>
   {
     let results = reviews::table
+      .inner_join(users::table)
+      .select((reviews::id,
+        reviews::user_id,
+        users::username,
+        reviews::movie_id,
+        reviews::rating,
+        reviews::review,
+        reviews::liked))
       .filter(reviews::movie_id.eq(&reviews_movie_id.movie_id))
-      .load::<Review>(&mut self.connection)
+      .load::<SelectingReview>(&mut self.connection)
       .map_err(|err| {
         AppError::from_diesel_err(err, "while getting reviews")
       });

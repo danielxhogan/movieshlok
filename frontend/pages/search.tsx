@@ -8,7 +8,7 @@ import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { getSearchResults, SearchParams } from "@/redux/actions/tmdb";
 import { selectSearchResults, SearchResult, KnownFor } from "@/redux/reducers/tmdb";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Divider, Button } from "@chakra-ui/react";
 import Link from "next/link";
 import Image from "next/image";
@@ -95,30 +95,30 @@ export default function SearchPage() {
   function makeMovieResult(result: SearchResult) {
     const date = result.release_date ? reformatDate(result.release_date) : result.release_date;
 
-    return <div key={result.id} className={styles["search-result"]}>
+    return <div key={result.id} className="block">
       <Link href={`/details/movie/${result.id}`}>
         <span className={styles["result-title"]}>{ result.title }</span><br />
 
-      <div className={styles["movie-result-content"]}>
-          { result.poster_path &&
-            <Image
-              src={`${TMDB_IMAGE_URL}/w92${result.poster_path}`}
-              className={styles["movie-poster-image"]}
-              width={75}
-              height={225}
-              alt="movie poster"
-            />
-          }
+        <div className={styles["movie-result-content"]}>
+            { result.poster_path &&
+              <Image
+                src={`${TMDB_IMAGE_URL}/w92${result.poster_path}`}
+                className={styles["movie-poster-image"]}
+                width={75}
+                height={225}
+                alt="movie poster"
+              />
+            }
 
-        <div className={styles["movie-details"]}>
-          <span>{ result.overview }</span><br /><br />
-          <span>Average score: { result.vote_average }</span><br />
-          <span>Votes: { result.vote_count }</span><br />
-          <span>Release date: { date }</span><br />
+          <div className={styles["movie-details"]}>
+            <span>{ result.overview }</span><br /><br />
+            <span>Average score: { result.vote_average }</span><br />
+            <span>Votes: { result.vote_count }</span><br />
+            <span>Release date: { date }</span><br />
+          </div>
         </div>
 
-      </div>
-        </Link>
+      </Link>
     </div>
   }
 
@@ -144,7 +144,7 @@ export default function SearchPage() {
   }
 
   function makePersonResult(result: SearchResult) {
-    return <div key={result.id} className={styles["search-result"]}>
+    return <div key={result.id} className="block">
       <Link href={`/details/person/${result.id}`}>
         <span className={styles["result-title"]}>{ result.name }</span><br />
 
