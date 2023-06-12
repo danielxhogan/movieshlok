@@ -43,6 +43,11 @@ pub struct Review {
     pub liked: Option<bool>
 }
 
+#[derive(Debug, Deserialize, Clone)]
+pub struct ReviewsMovieId {
+    pub movie_id: String
+}
+
 #[derive(Queryable, Serialize)]
 pub struct SelectingReview {
     pub id: Uuid,
@@ -61,16 +66,4 @@ pub struct InsertingNewReview {
     pub user_id: Uuid,
     pub movie_id: String,
     pub review: String
-}
-
-#[derive(Deserialize, Debug)]
-pub struct IncomingNewReview {
-    pub jwt_token: String,
-    pub movie_id: String,
-    pub review: String
-}
-
-#[derive(Debug, Deserialize, Clone)]
-pub struct ReviewsMovieId {
-    pub movie_id: String
 }

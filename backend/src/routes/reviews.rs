@@ -1,16 +1,28 @@
 use crate::db::config::db_connect::PgPool;
-use crate::db::config::models::{SelectingReview, ReviewsMovieId, IncomingNewReview, InsertingNewReview};
+use crate::db::config::models::{
+  ReviewsMovieId,
+  SelectingReview,
+  // IncomingNewReview,
+  InsertingNewReview
+};
 use crate::db::reviews::ReviewsDbManager;
 use crate::routes::{with_form_body, auth_check, respond};
 use crate::utils::error_handling::{AppError, ErrorType};
 
 use warp::{Filter, reject};
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 
 
 #[derive(Serialize)]
 pub struct GetReviewsResponse {
   reviews: Box<Vec<SelectingReview>>
+}
+
+#[derive(Deserialize, Debug)]
+pub struct IncomingNewReview {
+    pub jwt_token: String,
+    pub movie_id: String,
+    pub review: String
 }
 
 

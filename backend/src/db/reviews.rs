@@ -1,5 +1,10 @@
 use crate::db::config::schema::{reviews, users};
-use crate::db::config::models::{Review, SelectingReview, ReviewsMovieId, InsertingNewReview};
+use crate::db::config::models::{
+  ReviewsMovieId,
+  SelectingReview,
+  InsertingNewReview,
+  Review
+};
 use crate::utils::error_handling::AppError;
 
 use diesel::prelude::*;
