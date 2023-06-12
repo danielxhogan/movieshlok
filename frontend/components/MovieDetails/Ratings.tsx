@@ -73,44 +73,44 @@ export default function Ratings() {
 
   return <div className={`${styles["wrapper"]} block`}>
     {/* <h2 className={styles["section-title"]}>Ratings</h2> */}
-    {credentials.jwt_token ? <>
-    <Button
-      colorScheme="teal" variant="outline"
-      className={styles["trailer-button"]}
-      onClick={onOpen}>
-      Leave Review
-    </Button>
+    { credentials.jwt_token ? <>
+      <Button
+        colorScheme="teal" variant="outline"
+        className={styles["trailer-button"]}
+        onClick={onOpen}>
+        Leave Review
+      </Button>
 
-    <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
-      <ModalOverlay />
+      <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
+        <ModalOverlay />
 
-      <ModalContent>
-        <ModalHeader>{makeModalHeader()}</ModalHeader>
-        <ModalCloseButton />
+        <ModalContent>
+          <ModalHeader>{ makeModalHeader() }</ModalHeader>
+          <ModalCloseButton />
 
-        <ModalBody>
-          <FormControl>
-            <FormLabel><i>What did you think?</i></FormLabel>
-            <Textarea
-              value={newReviewText}
-              onChange={e => setNewReviewText(e.target.value)}
-              rows={10}
-            />
-          </FormControl>
-        </ModalBody>
+          <ModalBody>
+            <FormControl>
+              <FormLabel><i>What did you think?</i></FormLabel>
+              <Textarea
+                value={newReviewText}
+                onChange={e => setNewReviewText(e.target.value)}
+                rows={10}
+              />
+            </FormControl>
+          </ModalBody>
 
-        <ModalFooter>
-          <Button
-            colorScheme="teal" variant="outline"
-            mr={3}
-            onClick={onClickCloseReviewModal}
-            >
-            Submit Review
-          </Button>
-        </ModalFooter>
+          <ModalFooter>
+            <Button
+              colorScheme="teal" variant="outline"
+              mr={3}
+              onClick={onClickCloseReviewModal}
+              >
+              Submit Review
+            </Button>
+          </ModalFooter>
 
-      </ModalContent>
-    </Modal>
+        </ModalContent>
+      </Modal>
     </> : <>
       Login to leave a review
     </>

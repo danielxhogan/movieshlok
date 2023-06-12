@@ -5,17 +5,12 @@ use crate::routes::{with_form_body, auth_check, respond};
 use crate::utils::error_handling::{AppError, ErrorType};
 
 use warp::{Filter, reject};
-use serde::{Serialize, Deserialize};
+use serde::Serialize;
 
 
 #[derive(Serialize)]
 pub struct GetReviewsResponse {
   reviews: Box<Vec<SelectingReview>>
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct JwtToken {
-  jwt_token: String
 }
 
 

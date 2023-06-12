@@ -36,6 +36,7 @@ export const getReviews = createAsyncThunk(
 
     if (response.ok) {
       const data = await response.json();
+
       return {
         success: true,
         message: "ok",
