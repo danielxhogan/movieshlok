@@ -7,7 +7,9 @@ edition = "2021"
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }
+tokio-stream = "0.1.14"
 warp = "0.3"
+futures = { version = "0.3", default-features = false }
 reqwest = { version = "0.11.18", features = ["json"] }
 diesel = { version = "2.0.0", features = ["postgres", "uuid", "r2d2"] }
 bcrypt = "0.14.0"
