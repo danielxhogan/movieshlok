@@ -34,7 +34,6 @@ export default function MovieDetailsPage() {
       dispatch(getMovieDetails(router.query.movieId));
       dispatch(getReviews(router.query.movieId));
     }
-
   }, [dispatch, router.query])
 
   return <div className={styles["wrapper"]}>

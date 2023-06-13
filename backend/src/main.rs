@@ -18,7 +18,7 @@ async fn main() {
   dotenv().ok();
   let pg_pool = establish_connection();
 
-  let reviews_ws_clients_list = make_client_list();
+  let reviews_ws_client_list = make_client_list();
 
   let cors = warp::cors()
     .allow_methods(&[Method::GET, Method::POST, Method::PUT, Method::DELETE])
@@ -26,7 +26,7 @@ async fn main() {
 
   let routes = auth_filters(pg_pool.clone())
     .or(tmdb_filters())
-    .or(reviews_filters(pg_pool, reviews_ws_clients_list))
+    .or(reviews_filters(pg_pool, reviews_ws_client_list))
     .recover(handle_rejection)
     .map(|reply| { warp::reply::with_header(reply, "Access-Control-Allow-Credentials", "true")})
     .with(cors);

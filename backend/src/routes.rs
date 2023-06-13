@@ -22,10 +22,10 @@ fn with_form_body<T: DeserializeOwned + Send>()
 }
 
 // filter for adding a reference to the client hashmap to a handler function for a ws enpoint
-fn with_clients(clients: ClientList)
+fn with_clients(client_list: ClientList)
 -> impl Filter<Extract = (ClientList,), Error = Infallible> + Clone
 {
-  warp::any().map(move || clients.clone())
+  warp::any().map(move || client_list.clone())
 }
 
 fn auth_check(jwt_token: String)

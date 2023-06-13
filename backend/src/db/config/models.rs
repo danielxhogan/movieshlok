@@ -32,7 +32,7 @@ pub struct LoginCreds {
 
 // REVIEWS
 // ***********************************************
-#[derive(Queryable, Serialize)]
+#[derive(Queryable, Serialize, Deserialize)]
 pub struct Review {
     pub id: Uuid,
     pub user_id: Uuid,

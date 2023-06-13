@@ -7,14 +7,13 @@ export enum UseCases {
   SEARCH_RESULTS
 }
 
-type SearchResultsData = {
+interface SearchResultsData {
   useCase: UseCases.SEARCH_RESULTS,
   currentPage: string;
   totalPages: string;
   searchQuery: string;
   filter: FilterResults;
 }
-
 
 type Props = SearchResultsData;
 

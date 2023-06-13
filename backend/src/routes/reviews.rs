@@ -2,35 +2,61 @@ use crate::db::config::db_connect::PgPool;
 use crate::db::config::models::{
   ReviewsMovieId,
   SelectingReview,
-  InsertingNewReview
+  InsertingNewReview,
+  // Review
 };
 use crate::db::reviews::ReviewsDbManager;
 use crate::routes::{with_form_body, auth_check, respond, with_clients};
 use crate::utils::error_handling::{AppError, ErrorType};
 use crate::utils::websockets::{ClientList, Client};
 
-use warp::{Filter, reject, ws::WebSocket};
+use warp::{Filter, reject, ws::{WebSocket, Message}};
 use futures::{FutureExt, StreamExt};
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::UnboundedReceiverStream;
 use serde::{Serialize, Deserialize};
+use uuid::Uuid;
+use std::env;
 
 
 // results from db query for all reviews for a movie
 // sent to client in response to get_reviews endpoint
 #[derive(Serialize)]
-pub struct GetReviewsResponse {
+struct GetReviewsResponse {
   reviews: Box<Vec<SelectingReview>>
 }
 
 // sent from client when posting a new review
 #[derive(Deserialize, Debug)]
-pub struct IncomingNewReview {
+struct IncomingNewReview {
     pub jwt_token: String,
     pub movie_id: String,
     pub review: String
 }
 
+#[derive(Deserialize, Debug)]
+struct WsRegisterRequest {
+  jwt_token: Option<String>,
+  topic: String
+}
+
+#[derive(Serialize, Debug)]
+struct WsRegisterResponse {
+    ws_url: String,
+}
+
+#[derive(Deserialize)]
+struct WsPublishRequest {
+  jwt_token: String,
+  // review: Review,
+  topic: String,
+  message: String
+}
+
+#[derive(Serialize, Debug)]
+struct WsPublishResponse {
+  message: String
+}
 
 // filter for adding a database connection object to the handler function for an endpoint
 fn with_reviews_db_manager(pool: PgPool)
@@ -46,19 +72,21 @@ fn with_reviews_db_manager(pool: PgPool)
     }})
 }
 
+
 // groups all review enpoints together
 pub fn reviews_filters(pool: PgPool, ws_client_list: ClientList)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
   get_reviews_filters(pool.clone())
   .or(post_review_filters(pool))
-  .or(ws_filter(ws_client_list.clone()))
+  .or(register_ws_client_filters(ws_client_list.clone()))
+  .or(make_ws_connection_filters(ws_client_list.clone()))
+  .or(emit_review_filters(ws_client_list.clone()))
 }
-
 
 // ENDPOINTS FOR QUERYING DATABASE
 // ********************************************************
-pub fn get_reviews_filters(pool: PgPool)
+fn get_reviews_filters(pool: PgPool)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
   warp::path!("reviews")
@@ -78,7 +106,7 @@ async fn get_reviews(mut reviews_db_manager: ReviewsDbManager, get_reviews_param
   respond(response, warp::http::StatusCode::OK)
 }
 
-pub fn post_review_filters(pool: PgPool)
+fn post_review_filters(pool: PgPool)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
   warp::path!("review")
@@ -114,36 +142,86 @@ async fn post_review(mut reviews_db_manager: ReviewsDbManager, new_review: Incom
 
 // ENPOINTS FOR MANAGING SOCKETS
 // ********************************************************
-pub fn ws_filter(client_list: ClientList)
+
+// before a client establishes a websocket connection, this enpoint is used
+// to indicate to the server that the client intends to connect. This is a
+// normal post request the client sends a request to with the user's user_id
+// if the user is logged in, and the topic they want to subscribe to. This
+// function creates a new entry for them in the list of clients. The sender
+// property is initially None, but once they make the websocket connection
+// the sender property is bound to sender part of the websocket channel
+// established with this client.
+fn register_ws_client_filters(client_list: ClientList)
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
+  warp::path!("ws-register")
+    .and(warp::post())
+    .and(with_form_body::<WsRegisterRequest>())
+    .and(with_clients(client_list.clone()))
+    .and_then(register_ws_client)
+}
+
+async fn register_ws_client(req: WsRegisterRequest, client_list: ClientList)
+-> Result<impl warp::Reply, warp::Rejection>
+{
+  let mut user_id: Option<Uuid> = None;
+
+  match req.jwt_token {
+    Some(token) => {
+      let payload = auth_check(token);
+
+      match payload {
+        Err(err) => { return respond(Err(err), warp::http::StatusCode::UNAUTHORIZED) },
+        Ok(payload) => { user_id = Some(payload.claims.user_id); }
+      }
+    }
+    None => {}
+  };
+
+  let uuid = Uuid::new_v4().as_simple().to_string();
+
+  client_list.write().await.insert(
+    uuid.clone(),
+    Client { user_id, topic: req.topic, sender: None }
+  );
+
+  let backend_host = env::var("BACKEND_HOST").unwrap();
+  let backend_port = env::var("BACKEND_PORT").unwrap();
+  let ws_url = format!("ws://{}:{}/ws/{}", backend_host, backend_port, uuid);
+  let response = WsRegisterResponse { ws_url };
+
+  respond(Ok(response), warp::http::StatusCode::OK)
+}
+
+fn make_ws_connection_filters(client_list: ClientList)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
   warp::path!("ws")
     .and(warp::ws())
     .and(warp::path::param())
     .and(with_clients(client_list.clone()))
-    .and_then(ws)
+    .and_then(make_ws_connection)
 }
 
-
-pub async fn ws(ws: warp::ws::Ws, id: String, clients: ClientList)
+async fn make_ws_connection(ws: warp::ws::Ws, id: String, client_list: ClientList)
 -> Result<impl warp::Reply, warp::Rejection>
 {
-  let client = clients.read().await.get(&id).cloned();
+  let client = client_list.read().await.get(&id).cloned();
 
   match client {
-    Some(c) => Ok(ws.on_upgrade(move |socket| client_connection(socket, id, clients, c))),
+    Some(c) => Ok(ws.on_upgrade(move |socket| client_connection(socket, id, client_list, c))),
     None => {
-      let err = AppError::new("webosocket client not registered", ErrorType::WSClientNotRegistered);
+      let err = AppError::new("websocket client not registered", ErrorType::WSClientNotRegistered);
       Err(warp::reject::custom(err))
     }
   }
 }
 
-pub async fn client_connection(ws: WebSocket, id: String, clients: ClientList, mut client: Client) {
+async fn client_connection(ws: WebSocket, id: String, client_list: ClientList, mut client: Client) {
   let (client_ws_sender, mut client_ws_rcv) = ws.split();
   let (client_sender, client_rcv) = mpsc::unbounded_channel();
-
   let client_rcv = UnboundedReceiverStream::new(client_rcv);
+
   tokio::task::spawn(client_rcv.forward(client_ws_sender).map(|result| {
       if let Err(e) = result {
           eprintln!("error sending websocket msg: {}", e);
@@ -151,7 +229,7 @@ pub async fn client_connection(ws: WebSocket, id: String, clients: ClientList, m
   }));
 
   client.sender = Some(client_sender);
-  clients.write().await.insert(id.clone(), client);
+  client_list.write().await.insert(id.clone(), client);
 
   println!("{} connected", id);
 
@@ -164,9 +242,46 @@ pub async fn client_connection(ws: WebSocket, id: String, clients: ClientList, m
               break;
           }
       };
-      // client_msg(&id, msg, &clients).await;
+      // client_msg(&id, msg, &client_list).await;
   }
 
-  clients.write().await.remove(&id);
+  client_list.write().await.remove(&id);
   println!("{} disconnected", id);
+}
+
+fn emit_review_filters(client_list: ClientList)
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
+  warp::path!("emit-review")
+    .and(with_form_body::<WsPublishRequest>())
+    .and(with_clients(client_list.clone()))
+    .and_then(emit_review)
+}
+
+async fn emit_review(req: WsPublishRequest, client_list: ClientList)
+-> Result<impl warp::Reply, warp::Rejection>
+{
+  let payload = auth_check(req.jwt_token);
+
+  match payload {
+    Err(err) => { return respond(Err(err), warp::http::StatusCode::UNAUTHORIZED) },
+
+    Ok(payload) => {
+      let user_id = Some(payload.claims.user_id);
+
+      client_list.read().await.iter()
+        .filter(|(_, client)| match user_id {
+          Some(id) => client.user_id != Some(id),
+          None => true
+        })
+        .filter(|(_, client)| client.topic == req.topic)
+        .for_each(|(_, client)| {
+          if let Some(sender) = &client.sender {
+            let _ = sender.send(Ok(Message::text(req.message.clone())));
+          }
+        });
+
+      respond(Ok(WsPublishResponse { message: "ok".to_string() }), warp::http::StatusCode::OK)
+    }
+  }
 }

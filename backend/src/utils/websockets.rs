@@ -1,5 +1,6 @@
 use warp::ws::Message;
 use tokio::sync::{mpsc, RwLock};
+use uuid::Uuid;
 
 use std::sync::Arc;
 use std::collections::HashMap;
@@ -7,8 +8,8 @@ use std::collections::HashMap;
 // struct containing relevant data for a websocket(ws) client
 #[derive(Debug, Clone)]
 pub struct Client {
-    pub user_id: usize,
-    pub topics: String,
+    pub user_id: Option<Uuid>,
+    pub topic: String,
     pub sender: Option<mpsc::UnboundedSender<std::result::Result<Message, warp::Error>>>,
 }
 
