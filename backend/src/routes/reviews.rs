@@ -43,18 +43,24 @@ struct WsRegisterRequest {
 #[derive(Serialize, Debug)]
 struct WsRegisterResponse {
     ws_url: String,
+    uuid: String
+}
+
+#[derive(Deserialize, Debug)]
+struct WsUnregisterRequest {
+  uuid: String
 }
 
 #[derive(Deserialize)]
-struct WsPublishRequest {
+struct WsEmitRequest {
   jwt_token: String,
-  // review: Review,
+  // review: SelectingReview,
   topic: String,
   message: String
 }
 
 #[derive(Serialize, Debug)]
-struct WsPublishResponse {
+struct WsOkResponse {
   message: String
 }
 
@@ -73,13 +79,14 @@ fn with_reviews_db_manager(pool: PgPool)
 }
 
 
-// groups all review enpoints together
+// groups all review enpoints together, imported in main
 pub fn reviews_filters(pool: PgPool, ws_client_list: ClientList)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
   get_reviews_filters(pool.clone())
   .or(post_review_filters(pool))
   .or(register_ws_client_filters(ws_client_list.clone()))
+  .or(unregister_ws_client_filters(ws_client_list.clone()))
   .or(make_ws_connection_filters(ws_client_list.clone()))
   .or(emit_review_filters(ws_client_list.clone()))
 }
@@ -166,6 +173,12 @@ async fn register_ws_client(req: WsRegisterRequest, client_list: ClientList)
 {
   let mut user_id: Option<Uuid> = None;
 
+  // authentication is not required to register, it is only required to emit
+  // messages of new reviews because a user must be logged in to leave a review.
+  // However, they can still connect to websocket to recieve new posts in real
+  // time if other users leave reviews. In the case the user provides a jwt
+  // token but it's determined to be invalid, an error response is sent to the
+  // client and the function returns immediately so this issue can be dealt with.
   match req.jwt_token {
     Some(token) => {
       let payload = auth_check(token);
@@ -180,17 +193,36 @@ async fn register_ws_client(req: WsRegisterRequest, client_list: ClientList)
 
   let uuid = Uuid::new_v4().as_simple().to_string();
 
+  // add new client to client_list
   client_list.write().await.insert(
     uuid.clone(),
     Client { user_id, topic: req.topic, sender: None }
   );
 
+  // generate url client will to use to make websocket connection
   let backend_host = env::var("BACKEND_HOST").unwrap();
   let backend_port = env::var("BACKEND_PORT").unwrap();
   let ws_url = format!("ws://{}:{}/ws/{}", backend_host, backend_port, uuid);
-  let response = WsRegisterResponse { ws_url };
+  let response = WsRegisterResponse { ws_url, uuid };
 
   respond(Ok(response), warp::http::StatusCode::OK)
+}
+
+fn unregister_ws_client_filters(client_list: ClientList)
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
+  warp::path!("unregister-ws")
+    .and(warp::post())
+    .and(with_form_body::<WsUnregisterRequest>())
+    .and(with_clients(client_list.clone()))
+    .and_then(unregister_ws_client)
+}
+
+async fn unregister_ws_client(req: WsUnregisterRequest, client_list: ClientList)
+-> Result<impl warp::Reply, warp::Rejection>
+{
+  client_list.write().await.remove(&req.uuid);
+  respond(Ok(WsOkResponse { message: "ok".to_string() }), warp::http::StatusCode::OK)
 }
 
 fn make_ws_connection_filters(client_list: ClientList)
@@ -203,13 +235,13 @@ fn make_ws_connection_filters(client_list: ClientList)
     .and_then(make_ws_connection)
 }
 
-async fn make_ws_connection(ws: warp::ws::Ws, id: String, client_list: ClientList)
+async fn make_ws_connection(ws: warp::ws::Ws, uuid: String, client_list: ClientList)
 -> Result<impl warp::Reply, warp::Rejection>
 {
-  let client = client_list.read().await.get(&id).cloned();
+  let client = client_list.read().await.get(&uuid).cloned();
 
   match client {
-    Some(c) => Ok(ws.on_upgrade(move |socket| client_connection(socket, id, client_list, c))),
+    Some(c) => Ok(ws.on_upgrade(move |socket| client_connection(socket, uuid, client_list, c))),
     None => {
       let err = AppError::new("websocket client not registered", ErrorType::WSClientNotRegistered);
       Err(warp::reject::custom(err))
@@ -217,7 +249,7 @@ async fn make_ws_connection(ws: warp::ws::Ws, id: String, client_list: ClientLis
   }
 }
 
-async fn client_connection(ws: WebSocket, id: String, client_list: ClientList, mut client: Client) {
+async fn client_connection(ws: WebSocket, uuid: String, client_list: ClientList, mut client: Client) {
   let (client_ws_sender, mut client_ws_rcv) = ws.split();
   let (client_sender, client_rcv) = mpsc::unbounded_channel();
   let client_rcv = UnboundedReceiverStream::new(client_rcv);
@@ -229,36 +261,36 @@ async fn client_connection(ws: WebSocket, id: String, client_list: ClientList, m
   }));
 
   client.sender = Some(client_sender);
-  client_list.write().await.insert(id.clone(), client);
+  client_list.write().await.insert(uuid.clone(), client);
 
-  println!("{} connected", id);
+  println!("{} connected", uuid);
 
   while let Some(result) = client_ws_rcv.next().await {
       // let msg = match result {
       let _ = match result {
           Ok(msg) => msg,
           Err(e) => {
-              eprintln!("error receiving ws message for id: {}): {}", id.clone(), e);
+              eprintln!("error receiving ws message for uuid: {}): {}", uuid.clone(), e);
               break;
           }
       };
-      // client_msg(&id, msg, &client_list).await;
+      // client_msg(&uuid, msg, &client_list).await;
   }
 
-  client_list.write().await.remove(&id);
-  println!("{} disconnected", id);
+  client_list.write().await.remove(&uuid);
+  println!("{} disconnected", uuid);
 }
 
 fn emit_review_filters(client_list: ClientList)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
   warp::path!("emit-review")
-    .and(with_form_body::<WsPublishRequest>())
+    .and(with_form_body::<WsEmitRequest>())
     .and(with_clients(client_list.clone()))
     .and_then(emit_review)
 }
 
-async fn emit_review(req: WsPublishRequest, client_list: ClientList)
+async fn emit_review(req: WsEmitRequest, client_list: ClientList)
 -> Result<impl warp::Reply, warp::Rejection>
 {
   let payload = auth_check(req.jwt_token);
@@ -267,21 +299,19 @@ async fn emit_review(req: WsPublishRequest, client_list: ClientList)
     Err(err) => { return respond(Err(err), warp::http::StatusCode::UNAUTHORIZED) },
 
     Ok(payload) => {
-      let user_id = Some(payload.claims.user_id);
+      let user_id = payload.claims.user_id;
 
       client_list.read().await.iter()
-        .filter(|(_, client)| match user_id {
-          Some(id) => client.user_id != Some(id),
-          None => true
+        .filter(|(_, client)| {
+          client.user_id != Some(user_id) && client.topic == req.topic
         })
-        .filter(|(_, client)| client.topic == req.topic)
         .for_each(|(_, client)| {
           if let Some(sender) = &client.sender {
             let _ = sender.send(Ok(Message::text(req.message.clone())));
           }
         });
 
-      respond(Ok(WsPublishResponse { message: "ok".to_string() }), warp::http::StatusCode::OK)
+      respond(Ok(WsOkResponse { message: "ok".to_string() }), warp::http::StatusCode::OK)
     }
   }
 }
