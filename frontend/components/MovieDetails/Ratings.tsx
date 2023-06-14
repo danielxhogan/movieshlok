@@ -1,8 +1,8 @@
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { selectCredentials } from "@/redux/reducers/auth";
 import { selectMovieDetails } from "@/redux/reducers/tmdb";
-import { getReviews, postReview } from "@/redux/actions/reviews";
-import { selectNewReview, resetNewReview } from "@/redux/reducers/reviews";
+import { postReview } from "@/redux/actions/reviews";
+import { selectNewReview, Review, addNewReview } from "@/redux/reducers/reviews";
 
 import { useEffect, useState } from "react";
 
@@ -62,13 +62,20 @@ export default function Ratings() {
   useEffect(() => {
     if (newReview.status === "fulfilled" &&
         newReview.success === true &&
-        movieDetails.data &&
-        movieDetails.data.id
+        newReview.data &&
+        credentials.username
     ) {
-      dispatch(getReviews(movieDetails.data.id.toString()));
-      dispatch(resetNewReview());
+      const insertingNewReview: Review = {
+        id: newReview.data.id,
+        user_id: newReview.data.user_id,
+        username: credentials.username,
+        movie_id: newReview.data.movie_id,
+        review: newReview.data.review
+      };
+
+      dispatch(addNewReview({ newReview: insertingNewReview }));
     }
-  }, [dispatch, movieDetails.data, newReview])
+  }, [credentials.username, dispatch, newReview])
 
 
   return <div className={`${styles["wrapper"]} block`}>

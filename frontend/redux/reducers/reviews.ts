@@ -3,6 +3,8 @@ import { Status } from "@/redux/reducers/index"
 import { AppState } from "@/redux/store";
 import { createSlice } from "@reduxjs/toolkit";
 
+import { ReturnedNewReview } from "@/redux/actions/reviews";
+
 
 // GET REVEIWS
 // **********************************
@@ -41,18 +43,24 @@ interface NewReview {
   status: Status;
   success: boolean | null;
   message: string;
+  data: ReturnedNewReview | null;
 }
 
 const initialNewReviewState: NewReview = {
   status: "idle",
   success: null,
-  message: ""
+  message: "",
+  data: null
 }
 
 export const reviewsSlice = createSlice({
   name: "reviews",
   initialState: initialReviewsState,
-  reducers: {},
+  reducers: {
+    addNewReview(state, action) {
+      state.data.reviews?.push(action.payload.newReview)
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getReviews.pending, (state) => {
@@ -70,6 +78,7 @@ export const reviewsSlice = createSlice({
   }
 });
 
+export const { addNewReview } = reviewsSlice.actions;
 export const selectReveiws = (state: AppState) => state.reviews;
 export const reviewsReducer = reviewsSlice.reducer;
 
@@ -89,12 +98,14 @@ export const newReviewSlice = createSlice({
       .addCase(postReview.pending, (state) => {
         state.status = "loading",
         state.success = null,
-        state.message = ""
+        state.message = "",
+        state.data = null
       })
       .addCase(postReview.fulfilled, (state, action) => {
         state.status = "fulfilled",
         state.success = action.payload.success,
-        state.message = action.payload.message
+        state.message = action.payload.message,
+        state.data = action.payload.data
       })
   }
 });

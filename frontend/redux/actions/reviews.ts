@@ -15,9 +15,19 @@ interface NewReview {
   review: string;
 }
 
+export interface ReturnedNewReview {
+  id: string,
+  user_id: string,
+  movie_id: string,
+  rating?: number,
+  review: string,
+  liked?: boolean
+}
+
 interface NewReviewPayload {
   success: boolean;
   message: string;
+  data: ReturnedNewReview | null
 }
 
 export const getReviews = createAsyncThunk(
@@ -105,20 +115,25 @@ export const postReview = createAsyncThunk(
     const response = await fetch(request);
 
     if (response.ok) {
+      const data = await response.json();
+
       return {
         success: true,
-        message: "ok"
+        message: "ok",
+        data
       }
     } else if (response.status >= 500) {
       return {
         success: false,
-        message: "server error"
+        message: "server error",
+        data: null
       }
     } else {
       const data = await response.json();
       return {
         success: false,
-        message: data.message
+        message: data.message,
+        data: null
       }
     }
   }
