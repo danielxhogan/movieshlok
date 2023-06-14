@@ -17,6 +17,8 @@ services:
       - ${BACKEND_PORT}:3030
     environment:
       DATABASE_URL: ${DATABASE_URL}
+      TMDB_BASE_URL: ${TMDB_BASE_URL}
+      TMDB_API_KEY: ${TMDB_API_KEY}
       BACKEND_HOST: ${BACKEND_HOST}
       BACKEND_PORT: ${BACKEND_PORT}
     network_mode: host
