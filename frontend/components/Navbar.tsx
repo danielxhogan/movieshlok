@@ -62,7 +62,6 @@ export default function Navbar() {
     if (newCredentials.jwt_token !== null && newCredentials.username !== null) {
       setCreds(newCredentials);
     }
-    
   }, [])
 
   useEffect(() => {
@@ -71,7 +70,7 @@ export default function Navbar() {
     } else {
       setAuthenticated(false);
     }
-  }, [credentials])
+  }, [credentials]);
 
   function onClickLogOut() {
     document.cookie = "username=";
@@ -143,7 +142,7 @@ export default function Navbar() {
                 </Link>
 
                 <Link href={`/u/${credentials.username}/movies`}>
-                <MenuItem command="Movies"></MenuItem>
+                  <MenuItem command="Movies"></MenuItem>
                 </Link>
 
                 <Link href={`/u/${credentials.username}/lists`}>

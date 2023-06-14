@@ -28,7 +28,6 @@ export default function MovieDetailsPage() {
   const movieDetails = useAppSelector(selectMovieDetails);
   const router = useRouter();
 
-
   useEffect(() => {
     if (router.query.movieId && typeof router.query.movieId === "string") {
       dispatch(getMovieDetails(router.query.movieId));

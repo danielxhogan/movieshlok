@@ -12,7 +12,6 @@ use utils::websockets::make_client_list;
 use warp::{Filter, http::Method};
 use dotenvy::dotenv;
 
-
 #[tokio::main]
 async fn main() {
   dotenv().ok();
