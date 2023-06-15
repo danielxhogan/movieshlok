@@ -10,6 +10,7 @@ import {
 } from "@/redux/reducers/reviews";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
@@ -17,6 +18,7 @@ const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeC
 
 
 export default function Reviews() {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const credentials = useAppSelector(selectCredentials);
   const movieDetails = useAppSelector(selectMovieDetails);
@@ -29,10 +31,7 @@ export default function Reviews() {
 
   useEffect(() => {
     async function wsSetup() {
-      if (!websocket &&
-          !uuid &&
-          movieDetails.data.id
-      ) {
+      if (!websocket && !uuid) {
         const registerWsUrl = `${BACKEND_URL}/ws-register`;
 
         const headers = new Headers();
@@ -43,9 +42,11 @@ export default function Reviews() {
           params.append("jwt_token", credentials.jwt_token);
         }
 
-        console.log(movieDetails.data.id);
-        params.append("topic", movieDetails.data.id.toString());
-
+        const topic = router.query.movieId;
+        if (typeof topic === "string") {
+          console.log(`topic: ${topic}`);
+          params.append("topic", topic);
+        }
 
         const request = new Request(registerWsUrl,
           {
@@ -67,7 +68,7 @@ export default function Reviews() {
         ws.onopen = () => { console.log("connected"); };
         ws.onmessage = (msg) => { console.log(`recieved message: ${msg.data}`); }
         setWebsocket(ws);
-        setUuid(data.uuid)
+        setUuid(data.uuid);
       }
     }
 
@@ -77,6 +78,7 @@ export default function Reviews() {
       if (websocket && uuid) {
         setWebsocket(null);
         setUuid(null);
+
         const unregisterWsUrl = `${BACKEND_URL}/ws-unregister`;
 
         const headers = new Headers();
@@ -101,7 +103,7 @@ export default function Reviews() {
       }
     });
 
-  }, [credentials.jwt_token, movieDetails.data.id, uuid, websocket]);
+  }, [credentials.jwt_token, router.query.movieId, uuid, websocket]);
 
   useEffect(() => {
     if (newReview.status === "fulfilled" &&

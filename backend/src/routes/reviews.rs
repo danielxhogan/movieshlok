@@ -306,7 +306,6 @@ fn emit_review_filters(client_list: ClientList)
 async fn emit_review(req: WsEmitRequest, client_list: ClientList)
 -> Result<impl warp::Reply, warp::Rejection>
 {
-  println!("message: {}", req.message);
   let payload = auth_check(req.jwt_token);
 
   match payload {
