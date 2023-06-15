@@ -21,6 +21,11 @@ import {
   ModalFooter
 } from "@chakra-ui/react";
 
+import getConfig from "next/config";
+const { publicRuntimeConfig } = getConfig();
+const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
+
+
 export default function Ratings() {
   const dispatch = useAppDispatch();
   const credentials = useAppSelector(selectCredentials);
@@ -56,6 +61,28 @@ export default function Ratings() {
       };
 
       dispatch(postReview(newReview));
+
+      const emitReviewUlr = `${BACKEND_URL}/emit-review`;
+
+      const headers = new Headers();
+      headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+      const params = new URLSearchParams();
+      params.append("jwt_token", credentials.jwt_token);
+      params.append("topic", movieDetails.data.id.toString());
+      params.append("message", "hi");
+
+      const request = new Request(emitReviewUlr,
+        {
+          headers,
+          credentials: "include",
+          mode: "cors",
+          body: params,
+          method: "POST"
+        }
+      );
+
+      fetch(request);
     }
   }
 

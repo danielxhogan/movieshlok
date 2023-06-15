@@ -1,7 +1,3 @@
-import getConfig from "next/config";
-const { publicRuntimeConfig } = getConfig();
-const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
-
 import styles from "@/styles/MovieDetails/Reviews.module.css";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { selectCredentials } from "@/redux/reducers/auth";
@@ -13,7 +9,11 @@ import {
   addNewReview
 } from "@/redux/reducers/reviews";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
+
+import getConfig from "next/config";
+const { publicRuntimeConfig } = getConfig();
+const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
 
 
 export default function Reviews() {
@@ -23,44 +23,85 @@ export default function Reviews() {
   const reviews = useAppSelector(selectReveiws);
   const newReview = useAppSelector(selectNewReview);
 
+  const [ websocket, setWebsocket ] = useState<WebSocket | null>(null);
+  const [ uuid, setUuid ] = useState<string | null>(null);
+
 
   useEffect(() => {
     async function wsSetup() {
-      const registerWsUrl = `${BACKEND_URL}/ws-register`;
+      if (!websocket &&
+          !uuid &&
+          movieDetails.data.id
+      ) {
+        const registerWsUrl = `${BACKEND_URL}/ws-register`;
 
-      const headers = new Headers();
-      headers.append("Content-Type", "application/x-www-form-urlencoded");
+        const headers = new Headers();
+        headers.append("Content-Type", "application/x-www-form-urlencoded");
 
-      const params = new URLSearchParams();
-      if (credentials.jwt_token) {
-        params.append("jwt_token", credentials.jwt_token);
-      }
-      if (movieDetails.data.id) {
-        params.append("topic", movieDetails.data.id.toString());
-      }
-
-      const request = new Request(registerWsUrl,
-        {
-          headers,
-          credentials: "include",
-          mode: "cors",
-          body: params,
-          method: "POST"
+        const params = new URLSearchParams();
+        if (credentials.jwt_token) {
+          params.append("jwt_token", credentials.jwt_token);
         }
-      );
 
-      const response = await fetch(request);
-      if (!response.ok) { return; }
+        console.log(movieDetails.data.id);
+        params.append("topic", movieDetails.data.id.toString());
 
-      const data = await response.json();
-      console.log(data.ws_url);
-      const ws = new WebSocket(data.ws_url);
 
-      ws.onopen = () => { console.log("connected"); };
+        const request = new Request(registerWsUrl,
+          {
+            headers,
+            credentials: "include",
+            mode: "cors",
+            body: params,
+            method: "POST"
+          }
+        );
+
+        const response = await fetch(request);
+        if (!response.ok) { return; }
+
+        const data = await response.json();
+        console.log(data);
+        const ws = new WebSocket(data.ws_url);
+
+        ws.onopen = () => { console.log("connected"); };
+        ws.onmessage = (msg) => { console.log(`recieved message: ${msg.data}`); }
+        setWebsocket(ws);
+        setUuid(data.uuid)
+      }
     }
+
     wsSetup();
 
-  }, [credentials.jwt_token, movieDetails.data.id]);
+    return (() => {
+      if (websocket && uuid) {
+        setWebsocket(null);
+        setUuid(null);
+        const unregisterWsUrl = `${BACKEND_URL}/ws-unregister`;
+
+        const headers = new Headers();
+        headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+        const params = new URLSearchParams();
+
+        console.log(`disconnecting: uuid: ${uuid}`);
+        params.append("uuid", uuid);
+
+        const request = new Request(unregisterWsUrl,
+          {
+            headers,
+            credentials: "include",
+            mode: "cors",
+            body: params,
+            method: "POST"
+          }
+        );
+
+        fetch(request);
+      }
+    });
+
+  }, [credentials.jwt_token, movieDetails.data.id, uuid, websocket]);
 
   useEffect(() => {
     if (newReview.status === "fulfilled" &&
@@ -92,5 +133,3 @@ export default function Reviews() {
     { reviews.data.reviews && reviews.data.reviews.map(makeReview)}
   </div>
 }
-
-

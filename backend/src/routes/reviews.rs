@@ -198,6 +198,7 @@ async fn register_ws_client(req: WsRegisterRequest, client_list: ClientList)
       match payload {
         Err(err) => { return respond(Err(err), warp::http::StatusCode::UNAUTHORIZED) },
         Ok(payload) => { user_id = Some(payload.claims.user_id); }
+          
       }
     }
     None => {}
@@ -223,7 +224,7 @@ async fn register_ws_client(req: WsRegisterRequest, client_list: ClientList)
 fn unregister_ws_client_filters(client_list: ClientList)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
-  warp::path!("unregister-ws")
+  warp::path!("ws-unregister")
     .and(warp::post())
     .and(with_form_body::<WsUnregisterRequest>())
     .and(with_clients(client_list.clone()))
@@ -250,8 +251,6 @@ fn make_ws_connection_filters(client_list: ClientList)
 async fn make_ws_connection(ws: warp::ws::Ws, query_params: WsConnectionRequest, client_list: ClientList)
 -> Result<impl warp::Reply, warp::Rejection>
 {
-  println!("here: {}", query_params.uuid);
-
   let client = client_list.read().await.get(&query_params.uuid).cloned();
 
   match client {
@@ -261,8 +260,6 @@ async fn make_ws_connection(ws: warp::ws::Ws, query_params: WsConnectionRequest,
       Err(warp::reject::custom(err))
     }
   }
-
-  // respond(Ok(WsOkResponse { message: "ok".to_string() }), warp::http::StatusCode::OK)
 }
 
 async fn client_connection(ws: WebSocket, uuid: String, client_list: ClientList, mut client: Client) {
@@ -309,6 +306,7 @@ fn emit_review_filters(client_list: ClientList)
 async fn emit_review(req: WsEmitRequest, client_list: ClientList)
 -> Result<impl warp::Reply, warp::Rejection>
 {
+  println!("message: {}", req.message);
   let payload = auth_check(req.jwt_token);
 
   match payload {
