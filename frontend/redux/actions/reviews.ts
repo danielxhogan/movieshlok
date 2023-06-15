@@ -4,17 +4,42 @@ const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeC
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
+// TYPES
+// *****************************
+// GET ALL REVIEWS FOR A MOVIE
+// *****************************
+
+// review type received from api by getReviews action when all reviews are fetched for a movie
+export interface Review {
+  id: string;
+  user_id: string;
+  username: string;
+  movie_id: string;
+  rating?: number;
+  review: string;
+  liked?: boolean;
+}
+
+// payload sent by getReviews action to reviewsSlice reducer
 interface ReviewsResultsPayload {
   success: boolean;
   message: string;
-  data: {};
+  data: {
+    reviews?: [Review]
+  };
 }
 
-interface NewReview {
+// CREATE A NEW REVIEW IN THE DATABASE TYPES
+// ******************************************
+
+// passed in when postReview action is dispatched
+export interface NewReview {
   movieId: string;
   review: string;
+  jwt_token: string;
 }
 
+// if new review is created in the database, this is the returned review
 export interface ReturnedNewReview {
   id: string,
   user_id: string,
@@ -24,11 +49,17 @@ export interface ReturnedNewReview {
   liked?: boolean
 }
 
+// payload sent by postReview action to newReviewSlice reducer
 interface NewReviewPayload {
   success: boolean;
   message: string;
   data: ReturnedNewReview | null
 }
+
+// ACTIONS
+// ****************************
+// GET ALL REVIEWS FOR A MOVIE
+// ****************************
 
 export const getReviews = createAsyncThunk(
   "reviews/fetchReviews",
@@ -71,36 +102,22 @@ export const getReviews = createAsyncThunk(
   }
 )
 
+// CREATE A NEW REVIEW IN THE DATABASE
+// ************************************
+
 export const postReview = createAsyncThunk(
   "reviews/postReview",
   async (newReview: NewReview): Promise<NewReviewPayload> => {
     const postReviewUrl = `${BACKEND_URL}/review`;
 
-    const cookies = document.cookie;
-    const cookiesArray = cookies.split(";");
-    let jwt_token: string;
-
-    cookiesArray.forEach(cookie => {
-      if (cookie.includes("jwt_token")) {
-        jwt_token = cookie.split("=")[1];
-      }
-    });
-
-    if (!jwt_token) {
-      return {
-        success: false,
-        message: "must be logged in"
-      }
-    }
-
     const headers = new Headers();
     headers.append("Content-Type", "application/x-www-form-urlencoded");
-    headers.append("Cookie", `jwt_token=${jwt_token}`)
+    headers.append("Cookie", `jwt_token=${newReview.jwt_token}`)
 
     const params = new URLSearchParams();
     params.append("movie_id", newReview.movieId);
     params.append("review", newReview.review);
-    params.append("jwt_token", jwt_token);
+    params.append("jwt_token", newReview.jwt_token);
 
     const request = new Request(postReviewUrl,
       {

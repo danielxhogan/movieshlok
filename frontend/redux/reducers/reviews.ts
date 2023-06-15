@@ -1,25 +1,15 @@
-import { getReviews, postReview } from "../actions/reviews";
+import { getReviews, postReview, Review, ReturnedNewReview } from "@/redux/actions/reviews";
 import { Status } from "@/redux/reducers/index"
 import { AppState } from "@/redux/store";
 import { createSlice } from "@reduxjs/toolkit";
 
-import { ReturnedNewReview } from "@/redux/actions/reviews";
 
+// TYPES
+// *****************************
+// GET ALL REVIEWS FOR A MOVIE
+// *****************************
 
-// GET REVEIWS
-// **********************************
-export interface Review {
-  id: string;
-  user_id: string;
-  username: string;
-  movie_id: string;
-  rating?: number;
-  review: string;
-  liked?: boolean;
-
-}
-
-// MAIN RESPONSE
+// type for value of reviews variable in redux store
 interface Reviews {
   status: Status;
   success: boolean | null;
@@ -29,7 +19,7 @@ interface Reviews {
   }
 }
 
-// INITIAL STATE
+// default value for reviews
 const initialReviewsState: Reviews = {
   status: "idle",
   success: null,
@@ -37,8 +27,10 @@ const initialReviewsState: Reviews = {
   data: {}
 }
 
-// NEW REVIEW
-// **********************************
+// CREATE A NEW REVIEW IN THE DATABASE TYPES
+// ******************************************
+
+// type for value of newReview variable in redux store
 interface NewReview {
   status: Status;
   success: boolean | null;
@@ -46,6 +38,7 @@ interface NewReview {
   data: ReturnedNewReview | null;
 }
 
+// default value for newReview
 const initialNewReviewState: NewReview = {
   status: "idle",
   success: null,
@@ -53,6 +46,12 @@ const initialNewReviewState: NewReview = {
   data: null
 }
 
+// REDUCERS
+// ****************************
+// GET ALL REVIEWS FOR A MOVIE
+// ****************************
+
+// this reducer sets the value for reviews in redux store
 export const reviewsSlice = createSlice({
   name: "reviews",
   initialState: initialReviewsState,
@@ -83,6 +82,10 @@ export const selectReveiws = (state: AppState) => state.reviews;
 export const reviewsReducer = reviewsSlice.reducer;
 
 
+// CREATE A NEW REVIEW IN THE DATABASE
+// ************************************
+
+// this reducer sets the value for newReview in redux store
 export const newReviewSlice = createSlice({
   name: "newReview",
   initialState: initialNewReviewState,

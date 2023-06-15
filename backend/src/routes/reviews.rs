@@ -19,6 +19,9 @@ use uuid::Uuid;
 use std::env;
 
 
+// STRUCTS FOR QUERYING DATABASE
+// **************************************************
+
 // results from db query for all reviews for a movie
 // sent to client in response to get_reviews endpoint
 #[derive(Serialize)]
@@ -34,6 +37,8 @@ struct IncomingNewReview {
     pub review: String
 }
 
+// STRUCTS FOR MANAGING WEBSOCKETS
+// **************************************************
 #[derive(Deserialize, Debug)]
 struct WsRegisterRequest {
   jwt_token: Option<String>,
@@ -50,6 +55,12 @@ struct WsRegisterResponse {
 struct WsUnregisterRequest {
   uuid: String
 }
+
+#[derive(Deserialize, Debug)]
+struct WsConnectionRequest {
+  uuid: String
+}
+
 
 #[derive(Deserialize)]
 struct WsEmitRequest {
@@ -147,7 +158,7 @@ async fn post_review(mut reviews_db_manager: ReviewsDbManager, new_review: Incom
   };
 }
 
-// ENPOINTS FOR MANAGING SOCKETS
+// ENPOINTS FOR MANAGING WEBSOCKETS
 // ********************************************************
 
 // before a client establishes a websocket connection, this enpoint is used
@@ -179,6 +190,7 @@ async fn register_ws_client(req: WsRegisterRequest, client_list: ClientList)
   // time if other users leave reviews. In the case the user provides a jwt
   // token but it's determined to be invalid, an error response is sent to the
   // client and the function returns immediately so this issue can be dealt with.
+
   match req.jwt_token {
     Some(token) => {
       let payload = auth_check(token);
@@ -202,7 +214,7 @@ async fn register_ws_client(req: WsRegisterRequest, client_list: ClientList)
   // generate url client will to use to make websocket connection
   let backend_host = env::var("BACKEND_HOST").unwrap();
   let backend_port = env::var("BACKEND_PORT").unwrap();
-  let ws_url = format!("ws://{}:{}/ws/{}", backend_host, backend_port, uuid);
+  let ws_url = format!("ws://{}:{}/ws?uuid={}", backend_host, backend_port, uuid);
   let response = WsRegisterResponse { ws_url, uuid };
 
   respond(Ok(response), warp::http::StatusCode::OK)
@@ -230,23 +242,27 @@ fn make_ws_connection_filters(client_list: ClientList)
 {
   warp::path!("ws")
     .and(warp::ws())
-    .and(warp::path::param())
+    .and(warp::query::<WsConnectionRequest>())
     .and(with_clients(client_list.clone()))
     .and_then(make_ws_connection)
 }
 
-async fn make_ws_connection(ws: warp::ws::Ws, uuid: String, client_list: ClientList)
+async fn make_ws_connection(ws: warp::ws::Ws, query_params: WsConnectionRequest, client_list: ClientList)
 -> Result<impl warp::Reply, warp::Rejection>
 {
-  let client = client_list.read().await.get(&uuid).cloned();
+  println!("here: {}", query_params.uuid);
+
+  let client = client_list.read().await.get(&query_params.uuid).cloned();
 
   match client {
-    Some(c) => Ok(ws.on_upgrade(move |socket| client_connection(socket, uuid, client_list, c))),
+    Some(c) => Ok(ws.on_upgrade(move |socket| client_connection(socket, query_params.uuid, client_list, c))),
     None => {
       let err = AppError::new("websocket client not registered", ErrorType::WSClientNotRegistered);
       Err(warp::reject::custom(err))
     }
   }
+
+  // respond(Ok(WsOkResponse { message: "ok".to_string() }), warp::http::StatusCode::OK)
 }
 
 async fn client_connection(ws: WebSocket, uuid: String, client_list: ClientList, mut client: Client) {

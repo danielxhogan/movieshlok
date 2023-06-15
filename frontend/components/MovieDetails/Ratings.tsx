@@ -1,12 +1,11 @@
+import styles from "@/styles/MovieDetails/Ratings.module.css";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { selectCredentials } from "@/redux/reducers/auth";
 import { selectMovieDetails } from "@/redux/reducers/tmdb";
-import { postReview } from "@/redux/actions/reviews";
-import { selectNewReview, Review, addNewReview } from "@/redux/reducers/reviews";
+import { postReview, NewReview } from "@/redux/actions/reviews";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import styles from "@/styles/MovieDetails/Ratings.module.css";
 import {
   useDisclosure,
   Button,
@@ -26,7 +25,6 @@ export default function Ratings() {
   const dispatch = useAppDispatch();
   const credentials = useAppSelector(selectCredentials);
   const movieDetails = useAppSelector(selectMovieDetails);
-  const newReview = useAppSelector(selectNewReview);
 
   const [ newReviewText, setNewReviewText ] = useState("");
 
@@ -47,35 +45,19 @@ export default function Ratings() {
 
     if (newReviewText !== "" &&
         movieDetails.data &&
-        movieDetails.data.id
+        movieDetails.data.id &&
+        credentials.jwt_token
       ) {
       const movieId = movieDetails.data.id.toString();
-      const newReview = {
+      const newReview: NewReview = {
         movieId,
-        review: newReviewText
+        review: newReviewText,
+        jwt_token: credentials.jwt_token
       };
 
       dispatch(postReview(newReview));
     }
   }
-
-  useEffect(() => {
-    if (newReview.status === "fulfilled" &&
-        newReview.success === true &&
-        newReview.data &&
-        credentials.username
-    ) {
-      const insertingNewReview: Review = {
-        id: newReview.data.id,
-        user_id: newReview.data.user_id,
-        username: credentials.username,
-        movie_id: newReview.data.movie_id,
-        review: newReview.data.review
-      };
-
-      dispatch(addNewReview({ newReview: insertingNewReview }));
-    }
-  }, [credentials.username, dispatch, newReview])
 
 
   return <div className={`${styles["wrapper"]} block`}>
