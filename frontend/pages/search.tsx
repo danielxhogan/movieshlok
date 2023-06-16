@@ -36,7 +36,6 @@ export default function SearchPage() {
   const [ searchQuery, setSearchQuery ] = useState(searchResults.query);
 
   function setParentSeachQuery(value: string) {
-    console.log(value);
       setSearchQuery(value);
   }
 

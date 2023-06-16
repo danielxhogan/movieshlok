@@ -57,7 +57,7 @@ export const reviewsSlice = createSlice({
   initialState: initialReviewsState,
   reducers: {
     addNewReview(state, action) {
-      state.data.reviews?.push(action.payload.newReview)
+      state.data.reviews?.unshift(action.payload.newReview)
     }
   },
   extraReducers: (builder) => {

@@ -64,10 +64,12 @@ struct WsConnectionRequest {
 
 #[derive(Deserialize)]
 struct WsEmitRequest {
+  id: String,
   jwt_token: String,
+  username: String,
   // review: SelectingReview,
   topic: String,
-  message: String
+  review: String
 }
 
 #[derive(Serialize, Debug)]
@@ -248,6 +250,8 @@ fn make_ws_connection_filters(client_list: ClientList)
     .and_then(make_ws_connection)
 }
 
+// checks to make sure the client is already registed. If so, creates a new socket
+// passes it into the client connection function.
 async fn make_ws_connection(ws: warp::ws::Ws, query_params: WsConnectionRequest, client_list: ClientList)
 -> Result<impl warp::Reply, warp::Rejection>
 {
@@ -262,6 +266,11 @@ async fn make_ws_connection(ws: warp::ws::Ws, query_params: WsConnectionRequest,
   }
 }
 
+// splits the websocket into a sender and reciever, then creates
+// a new unbounded channel. The sender part of this stream is stored
+// as the sender field the in this clients entry in the client_list
+// and is used to send them messages. The reciever part of the channel
+// is bound to the sends part of the websocket channel.
 async fn client_connection(ws: WebSocket, uuid: String, client_list: ClientList, mut client: Client) {
   let (client_ws_sender, mut client_ws_rcv) = ws.split();
   let (client_sender, client_rcv) = mpsc::unbounded_channel();
@@ -276,7 +285,7 @@ async fn client_connection(ws: WebSocket, uuid: String, client_list: ClientList,
   client.sender = Some(client_sender);
   client_list.write().await.insert(uuid.clone(), client);
 
-  println!("{} connected", uuid);
+  // println!("{} connected", uuid);
 
   while let Some(result) = client_ws_rcv.next().await {
       // let msg = match result {
@@ -291,7 +300,7 @@ async fn client_connection(ws: WebSocket, uuid: String, client_list: ClientList,
   }
 
   client_list.write().await.remove(&uuid);
-  println!("{} disconnected", uuid);
+  // println!("{} disconnected", uuid);
 }
 
 fn emit_review_filters(client_list: ClientList)
@@ -303,6 +312,12 @@ fn emit_review_filters(client_list: ClientList)
     .and_then(emit_review)
 }
 
+// the client sends a request to this endpoint whenever a new review
+// is successfully created in the database. It loops through the list
+// clients in the reviews client_list and sends the new reviw to any
+// client subscribed to the same topic as the new review, meaning
+// that client is currently viewing the movieDetails page for movie
+// that the new review is for.
 async fn emit_review(req: WsEmitRequest, client_list: ClientList)
 -> Result<impl warp::Reply, warp::Rejection>
 {
@@ -313,6 +328,13 @@ async fn emit_review(req: WsEmitRequest, client_list: ClientList)
 
     Ok(payload) => {
       let user_id = payload.claims.user_id;
+      let message = format!("id={};user_id={};username={};movie_id={};review={}",
+      req.id,
+      user_id,
+      req.username,
+      req.topic,
+      req.review
+    );
 
       client_list.read().await.iter()
         .filter(|(_, client)| {
@@ -320,7 +342,7 @@ async fn emit_review(req: WsEmitRequest, client_list: ClientList)
         })
         .for_each(|(_, client)| {
           if let Some(sender) = &client.sender {
-            let _ = sender.send(Ok(Message::text(req.message.clone())));
+            let _ = sender.send(Ok(Message::text(&message)));
           }
         });
 

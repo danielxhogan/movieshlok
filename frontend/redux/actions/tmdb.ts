@@ -33,26 +33,32 @@ export const getSearchResults = createAsyncThunk(
     // calculate endpoint to send request to based on filter value
     type Endpoint = "multi" | "movie" | "person" | "";
     let endpoint: Endpoint = "";
+    console.log("1");
 
     switch (searchParams.filter) {
       case FilterResults.ALL: endpoint = "multi"; break;
       case FilterResults.MOVIES: endpoint = "movie"; break;
       case FilterResults.CAST_AND_CREW: endpoint = "person"; break;
     }
+    console.log("2");
 
     // construct the request
     const searchUrl = `${BACKEND_URL}/tmdb/search`;
+    console.log("3");
 
     const headers = new Headers();
     headers.append("Content-Type", "application/x-www-form-urlencoded");
+    console.log("4");
 
     const params = new URLSearchParams();
     params.append("query", searchParams.query);
     params.append("page", searchParams.page);
     params.append("endpoint", endpoint);
+    console.log("5");
 
     // make the request
     const request = new Request(searchUrl, { headers, body: params, method: "POST" });
+    console.log("here");
     const response = await fetch(request);
 
     if (response.ok) {
