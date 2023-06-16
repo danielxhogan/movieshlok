@@ -285,7 +285,7 @@ async fn client_connection(ws: WebSocket, uuid: String, client_list: ClientList,
   client.sender = Some(client_sender);
   client_list.write().await.insert(uuid.clone(), client);
 
-  // println!("{} connected", uuid);
+   // println!("{} connected", uuid);
 
   while let Some(result) = client_ws_rcv.next().await {
       // let msg = match result {
@@ -300,7 +300,7 @@ async fn client_connection(ws: WebSocket, uuid: String, client_list: ClientList,
   }
 
   client_list.write().await.remove(&uuid);
-  // println!("{} disconnected", uuid);
+   // println!("{} disconnected", uuid);
 }
 
 fn emit_review_filters(client_list: ClientList)
