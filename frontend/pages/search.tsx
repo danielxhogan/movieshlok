@@ -58,6 +58,7 @@ export default function SearchPage() {
           }
 
           setFilter(filterResults);
+          setSearchQuery(query);
 
           const searchParams: SearchParams = {
             query,

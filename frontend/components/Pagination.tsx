@@ -25,14 +25,6 @@ export default function Pagination(props: Props) {
 
   function onClickPaginationButton(page: string) {
     router.push(`/search?query=${props.searchQuery}&filter=${props.filter}&page=${page}`);
-  //   const searchParams: SearchParams = {
-  //     query: props.searchQuery,
-  //     page,
-  //     filter: props.filter
-  // }
-
-  // dispatch(getSearchResults(searchParams));
-
   }
 
   let currentPage_number;
@@ -106,11 +98,10 @@ export default function Pagination(props: Props) {
         return (
           <span className={styles["left-buttons"]}>
               <span className={styles["icon-span"]} onClick={ () => onClickPaginationButton("1") }>
-                <i className="fa-solid fa-chevron-left"></i>
-                <i className="fa-solid fa-chevron-left"></i>
+                <i className="fa-solid fa-backward-step fa-lg"></i>
               </span>
               <span className={styles["icon-span"]} onClick={ () => onClickPaginationButton(previousPageNumber) }>
-                <i className="fa-solid fa-chevron-left"></i>
+                <i className="fa-solid fa-play fa-rotate-180"></i>
               </span>
           </span>
         );
@@ -134,11 +125,10 @@ export default function Pagination(props: Props) {
         return (
           <span className={styles["right-buttons"]}>
               <span className={styles["icon-span"]} onClick={ () => onClickPaginationButton(nextPageNumber) }>
-                <i className="fa-solid fa-chevron-right"></i>
+                <i className="fa-solid fa-play"></i>
               </span>
               <span className={styles["icon-span"]} onClick={ () => onClickPaginationButton(props.totalPages) }>
-                <i className="fa-solid fa-chevron-right"></i>
-                <i className="fa-solid fa-chevron-right"></i>
+                <i className="fa-solid fa-forward-step fa-lg"></i>
               </span>
           </span>
         );

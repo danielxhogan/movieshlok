@@ -3,9 +3,10 @@ import logo from "@/public/logo.png";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { setCredentials, unsetCredentials, selectCredentials, Credentials } from "@/redux/reducers/auth";
 
-import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
@@ -19,6 +20,7 @@ import {
 
 
 export default function Navbar() {
+  const router = useRouter();
   const [ authenticated, setAuthenticated ] = useState(false);
 
   const dispatch = useAppDispatch();
@@ -27,12 +29,12 @@ export default function Navbar() {
   // set current location in localStorage unless on login or register page
   // used to send user back to the page they were on after successful login
   useEffect(() => {
-    const currentLocation = window.location.href;
+    const currentLocation = router.asPath;
 
     if (currentLocation.indexOf("login") === -1 && currentLocation.indexOf("register") === -1) {
       localStorage.setItem("currentLocation", currentLocation);
     }
-  }, []);
+  }, [router.asPath]);
 
   async function setCreds(newCredentials: Credentials) {
     await dispatch(setCredentials(newCredentials));
