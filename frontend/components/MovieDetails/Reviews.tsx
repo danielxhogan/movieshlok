@@ -49,6 +49,8 @@ export default function Reviews() {
         if (typeof topic === "string") {
           console.log(`topic: ${topic}`);
           params.append("topic", topic);
+        } else {
+          return;
         }
 
         const request = new Request(registerWsUrl,
@@ -61,16 +63,20 @@ export default function Reviews() {
           }
         );
 
-        const response = await fetch(request);
-        if (!response.ok) { return; }
-        const data = await response.json();
+        try {
+          const response = await fetch(request);
+          if (!response.ok) { return; }
+          const data = await response.json();
 
-        const ws = new WebSocket(data.ws_url);
-        ws.onopen = () => { console.log(`connected, uuid: ${data.uuid}`); };
-        ws.onmessage = (msg) => { onNewReview(msg.data); }
+          const ws = new WebSocket(data.ws_url);
+          ws.onopen = () => { console.log(`connected, uuid: ${data.uuid}`); };
+          ws.onmessage = (msg) => { onNewReview(msg.data); }
 
-        setWebsocket(ws);
-        setUuid(data.uuid);
+          setWebsocket(ws);
+          setUuid(data.uuid);
+        } catch (err) {
+          return;
+        }
       }
     }
 
