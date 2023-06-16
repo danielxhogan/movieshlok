@@ -17,8 +17,7 @@ import Image from "next/image";
 
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
-// const TMDB_IMAGE_URL = publicRuntimeConfig.TMDB_IMAGE_URL;
-const TMDB_IMAGE_URL = process.env.TMDB_IMAGE_URL;
+const TMDB_IMAGE_URL = publicRuntimeConfig.TMDB_IMAGE_URL;
 
 // import { GetServerSideProps } from "next";
 // import { wrapper } from "@/redux/store";
