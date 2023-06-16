@@ -14,6 +14,7 @@ import { selectMovieDetails } from "@/redux/reducers/tmdb";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import { Spinner } from "@chakra-ui/react";
 
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
@@ -40,26 +41,34 @@ export default function MovieDetailsPage() {
 
     <div className={styles["movie-details"]}>
       <Searchbar />
-      <Hero />
 
-      <div className={styles["sub-hero"]}>
-        <div className={styles["movie-poster"]}>
-        {movieDetails.data.poster_path &&
-          <Image
-            src={`${TMDB_IMAGE_URL}/w342${movieDetails.data.poster_path}`}
-            className={styles["backdrop"]}
-            width={300}
-            height={500}
-            alt="backdrop">
-          </Image>
-        }
+      { movieDetails.status === "fulfilled" ? <>
+        <Hero />
+
+        <div className={styles["sub-hero"]}>
+          <div className={styles["movie-poster"]}>
+          {movieDetails.data.poster_path &&
+            <Image
+              src={`${TMDB_IMAGE_URL}/w342${movieDetails.data.poster_path}`}
+              className={styles["backdrop"]}
+              width={300}
+              height={500}
+              alt="backdrop">
+            </Image>
+          }
+          </div>
+          <div className={styles["movie-content"]}>
+            <MovieData />
+            <Ratings />
+            <Reviews />
+          </div>
         </div>
-        <div className={styles["movie-content"]}>
-          <MovieData />
-          <Ratings />
-          <Reviews />
+      </> : <>
+        <div className={styles["spinner"]}>
+          <Spinner size='xl' />
         </div>
-      </div>
+      </>}
+
 
     </div>
   </div>

@@ -3,7 +3,11 @@
 ## Overview
 Movieshlok is website that lets users search for movies and view
 details about them. It also let's users create accounts, log in,
-and, if logged in, leave reviews of movies. The frontend was built with html, css, typescript, react, next.js, and chakra ui. The backend api was build with rust, warp, and tokio. It uses diesel orm to connect to and query a postgres database and sends api requests to the tmdb api for movie data.
+and, if logged in, leave reviews of movies. The frontend was built
+with html, css, typescript, react, next.js, and chakra ui. The
+backend api was build with rust, warp, and tokio. It uses diesel
+orm to connect to and query a postgres database and sends api
+requests to the tmdb api for movie data.
 
 ## The website
 Originally I planned to dockerize each seperate part of the app.
@@ -14,10 +18,10 @@ and start the containers so there would be no setup. However, I
 ran into a bunch of issues the more complex the app became and
 because of reasons, the app doesn't want to behave the same when
 it's run in a container as it does when running directly on the
-host system. So my solution for you to be able to see the 
+my computer. So my solution for you to be able to see the 
 website in action is to just host it. I created a droplet on
-digital ocean and am running the website on server with ip 
-address 24.199.120.171. If enter it your browser, you should be
+digital ocean and am running the website on a server with ip 
+address 24.199.120.171. If enter it into your browser, you should be
 taken to the home page.
 
 The home page is mostly blank at this point but you should see

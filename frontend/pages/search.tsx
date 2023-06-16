@@ -8,10 +8,12 @@ import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { getSearchResults, SearchParams } from "@/redux/actions/tmdb";
 import { selectSearchResults, SearchResult, KnownFor } from "@/redux/reducers/tmdb";
 
-import { useEffect, useState } from "react";
-import { Divider, Button } from "@chakra-ui/react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/router";
+
+import { useEffect, useState } from "react";
+import { Divider, Button, Spinner } from "@chakra-ui/react";
 
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
@@ -25,45 +27,54 @@ export enum FilterResults {
 
 
 export default function SearchPage() {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const searchResults = useAppSelector(selectSearchResults);
 
-  let defaultFilter: FilterResults;
-  if (searchResults.filter !== null) { defaultFilter = searchResults.filter; }
-  else { defaultFilter = FilterResults.ALL; }
-
-  const [ filter, setFilter ] = useState(defaultFilter);
-  const [ searchQuery, setSearchQuery ] = useState(searchResults.query);
+  const [ searchQuery, setSearchQuery ] = useState("");
+  const [ filter, setFilter ] = useState(FilterResults.ALL);
 
   function setParentSeachQuery(value: string) {
       setSearchQuery(value);
   }
 
+  // get search results on page load based on query parameters
+  // and set filter and searchQuery
+  useEffect(() => {
+    let query = router.query.query;
+    let filter = router.query.filter;
+    let page = router.query.page;
 
-  function dispatchGetSearchResults(page: string, newFilter: FilterResults | null = null) {
-    if (searchQuery !== "") {
-      let filterUsing: FilterResults;
+    if (typeof query === "string" &&
+        typeof filter === "string" &&
+        typeof page === "string") {
+          let filterResults: FilterResults;
 
-      if (newFilter !== null) {
-        filterUsing = newFilter;
-      } else {
-        filterUsing = filter;
-      }
+          switch (filter) {
+            case "0": filterResults = FilterResults.ALL; break;
+            case "1": filterResults = FilterResults.MOVIES; break;
+            case "2": filterResults = FilterResults.CAST_AND_CREW; break;
+            default: filterResults = FilterResults.ALL; break;
+          }
 
-      const searchParams: SearchParams = {
-        query: searchQuery,
-        page,
-        filter: filterUsing
-      }
+          setFilter(filterResults);
 
-      dispatch(getSearchResults(searchParams));
-    }
-  }
+          const searchParams: SearchParams = {
+            query,
+            page,
+            filter: filterResults
+          }
+
+          dispatch(getSearchResults(searchParams));
+        }
+  }, [dispatch, router.query.filter, router.query.page, router.query.query]);
 
   function onClickFilterButton(newFilter: FilterResults) {
+    console.log(newFilter);
     if (newFilter !== filter) {
-      setFilter(newFilter);
-      dispatchGetSearchResults("1", newFilter);
+      // setFilter(newFilter);
+      // dispatchGetSearchResults("1", newFilter);
+      router.push(`/search?query=${searchQuery}&filter=${newFilter}&page=1`);
     }
   }
 
@@ -236,20 +247,30 @@ export default function SearchPage() {
 
           </div>
 
-          { searchResults.data.results && sortAndMakeSearchResults([...searchResults.data.results])}
+          { searchResults.status === "loading" ?
+            <div className={styles["spinner"]}>
+              <Spinner size='xl' />
+            </div>
+            :
+            <>
+            { searchResults.data.results && sortAndMakeSearchResults([...searchResults.data.results]) }
 
-          { searchResults.data.page &&
-            searchResults.data.total_pages &&
-            parseInt(searchResults.data.total_pages) > 1 &&
+            { searchResults.data.page &&
+              searchResults.data.total_pages &&
+              parseInt(searchResults.data.total_pages) > 1 &&
 
-            <Pagination
-              useCase={UseCases.SEARCH_RESULTS}
-              currentPage={searchResults.data.page}
-              totalPages={searchResults.data.total_pages}
-              searchQuery={searchQuery}
-              filter={filter}
-            />
+              <Pagination
+                useCase={UseCases.SEARCH_RESULTS}
+                currentPage={searchResults.data.page}
+                totalPages={searchResults.data.total_pages}
+                searchQuery={searchQuery}
+                filter={filter}
+              />
+            }
+            </>
           }
+            
+
         </div>
 
         <div className={styles["filter"]}>

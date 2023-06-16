@@ -38,9 +38,9 @@
   text-decoration: underline;
 }
 
-.mag-glass {
+/* .mag-glass {
   display: none;
-}
+} */
 
 .dropdown {
   display: flex;
@@ -100,14 +100,14 @@
     display: none;
   }
 
-  .mag-glass {
+  /* .mag-glass {
     display: inline;
     margin-right: 10px;
   }
 
   .mag-glass > a:hover {
     text-decoration: none;
-  }
+  } */
 
   .small-auth-menu {
     display: block;

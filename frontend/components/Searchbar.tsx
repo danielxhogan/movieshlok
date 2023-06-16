@@ -1,5 +1,4 @@
-import { useAppSelector, useAppDispatch } from "@/redux/hooks";
-import { getSearchResults, SearchParams } from "@/redux/actions/tmdb";
+import { useAppSelector } from "@/redux/hooks";
 import { selectSearchResults } from "@/redux/reducers/tmdb";
 import { FilterResults } from "@/pages/search";
 
@@ -15,16 +14,25 @@ interface Props {
 
 export default function Searchbar(props: Props) {
   const searchResults = useAppSelector(selectSearchResults);
-  const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const [ searchQuery, setSearchQuery ] = useState(searchResults.query);
+  let defaultSearchQuery: string;
+
+  if (typeof router.query.query === "string") {
+    defaultSearchQuery = router.query.query;
+  } else {
+    defaultSearchQuery = "";
+  }
+
+  const [ searchQuery, setSearchQuery ] = useState(defaultSearchQuery);
+
 
   useEffect(() => {
     if (searchResults.status === "fulfilled") {
-      onChangeSearchQuery(searchResults.query);
+      setSearchQuery(searchResults.query);
     }
   }, [searchResults])
+
 
   function onChangeSearchQuery(value: string) {
     setSearchQuery(value);
@@ -41,19 +49,9 @@ export default function Searchbar(props: Props) {
     else { defaultFilter = FilterResults.ALL; }
 
     if (searchQuery !== "") {
-      const searchParams: SearchParams = {
-        query: searchQuery,
-        page: "1",
-        filter: defaultFilter 
-      };
-
-      dispatch(getSearchResults(searchParams));
-      if (!window.location.href.includes("search")) {
-        router.push("/search");
-      }
+      router.push(`/search?query=${searchQuery}&filter=${defaultFilter}&page=1`);
     }
   }
-
 
   return <>
     <form onSubmit={onSubmitSearchForm}>

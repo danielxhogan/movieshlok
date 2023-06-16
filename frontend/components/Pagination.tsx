@@ -3,6 +3,8 @@ import { FilterResults } from "@/pages/search";
 import { getSearchResults, SearchParams } from "@/redux/actions/tmdb";
 import { useAppDispatch } from "@/redux/hooks";
 
+import { useRouter } from "next/router";
+
 export enum UseCases {
   SEARCH_RESULTS
 }
@@ -18,16 +20,18 @@ interface SearchResultsData {
 type Props = SearchResultsData;
 
 export default function Pagination(props: Props) {
+  const router = useRouter();
   const dispatch = useAppDispatch();
 
   function onClickPaginationButton(page: string) {
-    const searchParams: SearchParams = {
-      query: props.searchQuery,
-      page,
-      filter: props.filter
-  }
+    router.push(`/search?query=${props.searchQuery}&filter=${props.filter}&page=${page}`);
+  //   const searchParams: SearchParams = {
+  //     query: props.searchQuery,
+  //     page,
+  //     filter: props.filter
+  // }
 
-  dispatch(getSearchResults(searchParams));
+  // dispatch(getSearchResults(searchParams));
 
   }
 

@@ -102,21 +102,12 @@ export default function Navbar() {
               <Link href={`/u/${credentials.username}/calendar`}> Calendar </Link>
           </>: <></> }
 
-          {/* large screen */}
-          <Link href="/search"> Search </Link>
-
         </div>
       </div>
 
       <div className={styles["dropdown"]}>
 
         {/* small screen */}
-        <div className={styles["mag-glass"]}>
-          <Link href="/search">
-            <i className={`fa-solid fa-magnifying-glass fa-xl ${styles["mag-glass"]}`}></i>
-          </Link>
-        </div>
-
         { authenticated && credentials.username ?
         <div className={styles["auth-menu"]}>
 

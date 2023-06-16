@@ -164,6 +164,11 @@ export default function Reviews() {
 
   }
 
+  // this useEffect detects any changes in newReview. When a new reveiw
+  // is detected, it creates a new Review type object and iserts it into
+  // the array of reviews. It then sends all the data to the emit-review
+  // endpoint so the server can send the new review to any other client
+  // on the same movie details page.
   useEffect(() => {
     if (newReview.status === "fulfilled" &&
         newReview.success === true &&

@@ -6,11 +6,13 @@ export default function MovieContent() {
   const movieDetails = useAppSelector(selectMovieDetails);
 
   return <div className={`${styles["wrapper"]} block`}>
-    { movieDetails.data.title &&
-      <h1>{movieDetails.data.title}</h1>
-    }
-    { movieDetails.data.overview &&
-      <p>{movieDetails.data.overview}</p>
-    }
-  </div>
+
+      { movieDetails.data.title &&
+        <h1>{movieDetails.data.title}</h1>
+      }
+      { movieDetails.data.overview &&
+        <p>{movieDetails.data.overview}</p>
+      }
+
+    </div>
 }

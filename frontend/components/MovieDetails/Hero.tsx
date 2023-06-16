@@ -23,21 +23,9 @@ const TMDB_IMAGE_URL = publicRuntimeConfig.TMDB_IMAGE_URL;
 
 export default function Hero() {
   const movieDetails = useAppSelector(selectMovieDetails);
-  const [ loading, setLoading ] = useState(true);
 
-  const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-
-  // if there are movieDetails from a previous search result, the movieId
-  // in the redux store will not match the movieId in the query param
-  useEffect(() => {
-    if (router.query.movieId !== movieDetails.message) {
-      setLoading(true);
-    } else {
-      setLoading(false);
-    }
-  }, [movieDetails, router.query])
 
   let trailerPath = null;
   let trailerSite = null;
@@ -54,14 +42,7 @@ export default function Hero() {
     }
   }
 
-  return <>
-    { loading ?
-    // <h1>Loading...</h1>
-    <div className={styles["spinner"]}>
-      <Spinner size='xl' />
-    </div>
-    :
-    <div className={styles["wrapper"]}>
+  return <div className={styles["wrapper"]}>
     { trailerPath && trailerSite === "YouTube" && <><Button
       colorScheme='teal' variant='outline'
       className={styles["trailer-button"]}
@@ -69,22 +50,22 @@ export default function Hero() {
       Watch Trailer
       </Button>
 
-    <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalCloseButton />
-        <ModalBody>
-            <iframe
-              className={styles["trailer"]}
-              src={`https://www.youtube.com/embed/${trailerPath}`}
-              title="YouTube video player"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen>
-            </iframe>
-        </ModalBody>
-      </ModalContent>
-    </Modal></>
+      <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalCloseButton />
+          <ModalBody>
+              <iframe
+                className={styles["trailer"]}
+                src={`https://www.youtube.com/embed/${trailerPath}`}
+                title="YouTube video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen>
+              </iframe>
+          </ModalBody>
+        </ModalContent>
+      </Modal></>
     }
 
     {movieDetails.data.backdrop_path &&
@@ -99,6 +80,5 @@ export default function Hero() {
     <div className={styles["movie-title"]}>
         <h1>{ movieDetails.data.title }</h1>
     </div>
-    </div>}
-  </>
+  </div>
 }

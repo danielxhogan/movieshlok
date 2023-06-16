@@ -3,6 +3,11 @@
   min-height: 100vh;
 }
 
+.spinner {
+  display: flex;
+  justify-content: center;
+}
+
 .search-page {
   width: 80%;
   margin: 30px auto 0;
