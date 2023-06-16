@@ -10,8 +10,7 @@ import { useRouter } from 'next/router';
 
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
-// const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
-const BACKEND_URL = `http://${process.env.BACKEND_HOST}:${process.env.BACKEND_PORT}`;
+const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
 
 
 export default function LoginPage() {
