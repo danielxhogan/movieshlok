@@ -5,6 +5,7 @@ import Hero from "@/components/MovieDetails/Hero";
 import MovieData from "@/components/MovieDetails/MovieData";
 import Ratings from "@/components/MovieDetails/Ratings";
 import Reviews from "@/components/MovieDetails/Reviews";
+import { Footer } from "@/components/Footer";
 
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { getMovieDetails } from "@/redux/actions/tmdb";
@@ -71,6 +72,7 @@ export default function MovieDetailsPage() {
 
 
     </div>
+    { movieDetails.status === "fulfilled" && <Footer singlePage={false}/> }
   </div>
 }
 

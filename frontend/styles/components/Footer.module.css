@@ -1,0 +1,22 @@
+.wrapper {
+  background-color: var(--dark-grey);
+  height: 85px;
+  padding: 20px;
+  color: var(--light-grey);
+}
+
+.wrapper h2 {
+  font-family: 'Audiowide', cursive;
+  font-size: 1.5rem;
+}
+
+.wrapper p {
+  text-align: right;
+}
+
+.single-page {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+
+}

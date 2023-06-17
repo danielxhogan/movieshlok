@@ -1,6 +1,7 @@
 import styles from "@/styles/auth/register.module.css";
 import logo from "@/public/logo.png";
 import Navbar from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 
 import { FormEvent, useState } from "react";
 import { Input, Button } from '@chakra-ui/react';
@@ -110,5 +111,7 @@ export default function RegisterPage() {
       <p>Already have an account? <Link href="/auth/login"><span>Login</span></Link></p>
 
     </form>
+
+    <Footer singlePage={true} />
   </div>
 }
