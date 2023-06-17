@@ -8,6 +8,7 @@ diesel::table! {
         rating -> Nullable<Int4>,
         review -> Text,
         liked -> Nullable<Bool>,
+        created_at -> Int8,
     }
 }
 

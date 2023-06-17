@@ -33,7 +33,8 @@ impl ReviewsDbManager {
         reviews::movie_id,
         reviews::rating,
         reviews::review,
-        reviews::liked))
+        reviews::liked,
+        reviews::created_at))
       .filter(reviews::movie_id.eq(&reviews_movie_id.movie_id))
       .load::<SelectingReview>(&mut self.connection)
       .map_err(|err| {

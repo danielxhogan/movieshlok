@@ -18,6 +18,7 @@ export interface Review {
   rating?: number;
   review: string;
   liked?: boolean;
+  created_at: number;
 }
 
 // payload sent by getReviews action to reviewsSlice reducer
@@ -41,12 +42,13 @@ export interface NewReview {
 
 // if new review is created in the database, this is the returned review
 export interface ReturnedNewReview {
-  id: string,
-  user_id: string,
-  movie_id: string,
-  rating?: number,
-  review: string,
-  liked?: boolean
+  id: string;
+  user_id: string;
+  movie_id: string;
+  rating?: number;
+  review: string;
+  liked?: boolean;
+  created_at: number;
 }
 
 // payload sent by postReview action to newReviewSlice reducer

@@ -16,8 +16,8 @@ use tokio::sync::mpsc;
 use tokio_stream::wrappers::UnboundedReceiverStream;
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
+use chrono::Utc;
 use std::env;
-
 
 // STRUCTS FOR QUERYING DATABASE
 // **************************************************
@@ -69,7 +69,8 @@ struct WsEmitRequest {
   username: String,
   // review: SelectingReview,
   topic: String,
-  review: String
+  review: String,
+  created_at: String
 }
 
 #[derive(Serialize, Debug)]
@@ -148,10 +149,13 @@ async fn post_review(mut reviews_db_manager: ReviewsDbManager, new_review: Incom
 
     Ok(payload) => {
       let user_id = payload.claims.user_id;
+      let created_at = Utc::now().timestamp();
+
       let inserting_new_review = InsertingNewReview {
         user_id,
         movie_id: new_review.movie_id,
-        review: new_review.review
+        review: new_review.review,
+        created_at
       };
 
       let response = reviews_db_manager.post_review(inserting_new_review);
@@ -328,12 +332,13 @@ async fn emit_review(req: WsEmitRequest, client_list: ClientList)
 
     Ok(payload) => {
       let user_id = payload.claims.user_id;
-      let message = format!("id={};user_id={};username={};movie_id={};review={}",
+      let message = format!("id={};user_id={};username={};movie_id={};review={};created_at={}",
       req.id,
       user_id,
       req.username,
       req.topic,
-      req.review
+      req.review,
+      req.created_at
     );
 
       client_list.read().await.iter()

@@ -13,7 +13,7 @@
   transition: ease 0.2s;
 }
 
-.block:hover {
+.block-btn:hover {
   cursor: pointer;
   box-shadow: 0 0 10px var(--light-grey);
 }

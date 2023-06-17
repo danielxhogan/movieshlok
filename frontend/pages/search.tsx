@@ -106,17 +106,17 @@ export default function SearchPage() {
   function makeMovieResult(result: SearchResult) {
     const date = result.release_date ? reformatDate(result.release_date) : result.release_date;
 
-    return <div key={result.id} className="block">
+    return <div key={result.id} className="block block-btn">
       <Link href={`/details/movie/${result.id}`}>
         <span className={styles["result-title"]}>{ result.title }</span><br />
 
         <div className={styles["movie-result-content"]}>
             { result.poster_path &&
               <Image
-                src={`${TMDB_IMAGE_URL}/w92${result.poster_path}`}
+                src={`${TMDB_IMAGE_URL}/w185${result.poster_path}`}
                 className={styles["movie-poster-image"]}
-                width={75}
-                height={225}
+                width={200}
+                height={1}
                 alt="movie poster"
               />
             }
@@ -137,6 +137,14 @@ export default function SearchPage() {
     const knownForText = knownFor.map(( movie, idx ) => {
       if (idx >= 10 || movie.media_type !== "movie") { return; }
       else {
+        let movie_title: string;
+        if (movie.title.length > 30) {
+          movie_title = movie.title.substring(0, 30);
+          movie_title = `${movie_title}...`;
+        } else {
+          movie_title = movie.title;
+        }
+
         return (
         <Link key={movie.id} href={`/details/movie/${movie.id}`}>
           <Button
@@ -144,7 +152,7 @@ export default function SearchPage() {
             size="sm"
             variant="outline"
             className={styles["know-for-item"]}>
-            {movie.title} 
+            {movie_title} 
           </Button>
         </Link>
         )
@@ -155,7 +163,7 @@ export default function SearchPage() {
   }
 
   function makePersonResult(result: SearchResult) {
-    return <div key={result.id} className="block">
+    return <div key={result.id} className="block block-btn">
       <Link href={`/details/person/${result.id}`}>
         <span className={styles["result-title"]}>{ result.name }</span><br />
 
@@ -164,8 +172,8 @@ export default function SearchPage() {
             <Image
               src={`${TMDB_IMAGE_URL}/w185${result.profile_path}`}
               className={styles["cast-crew-profile"]}
-              width={75}
-              height={225}
+              width={200}
+              height={1}
               alt="cast & crew profile"
             />
           }
@@ -182,7 +190,6 @@ export default function SearchPage() {
 
   function makeSearchResult(result: SearchResult) {
     switch (filter) {
-
       case FilterResults.ALL:
         switch (result.media_type) {
           case "movie": { return makeMovieResult(result); }
@@ -191,19 +198,33 @@ export default function SearchPage() {
         break;
 
       case FilterResults.MOVIES: { return makeMovieResult(result); }
-
       case FilterResults.CAST_AND_CREW: { return makePersonResult(result); }
     }
   }
 
   function sortAndMakeSearchResults(results: [SearchResult]) {
-    results.sort((result1: {popularity: number;}, result2: {popularity: number;}) => {
-      if (result1.popularity < result2.popularity) { return  1; }
-      if (result1.popularity > result2.popularity) { return -1; }
-      return 0;
-    });
+    if (results.length === 0) {
+      return <>
+        <h2 className={styles["no-results"]}>Sorry, No Results</h2>
+        <Image
+          src="/mandy-creeps.png"
+          className={styles["no-results-image"]}
+          width={1000}
+          height={100}
+          alt="no-results"
+        />
+      </>
 
-    return results.map(result => makeSearchResult(result));
+    } else {
+      results.sort((result1: {popularity: number;}, result2: {popularity: number;}) => {
+        if (result1.popularity < result2.popularity) { return  1; }
+        if (result1.popularity > result2.popularity) { return -1; }
+        return 0;
+      });
+
+      return results.map(result => makeSearchResult(result));
+
+    }
   }
 
 

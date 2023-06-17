@@ -15,5 +15,6 @@ CREATE TABLE reviews (
   movie_id VARCHAR(255) NOT NULL,
   rating INTEGER,
   review TEXT NOT NULL,
-  liked BOOLEAN
+  liked BOOLEAN,
+  created_at BIGINT  NOT NULL
 );

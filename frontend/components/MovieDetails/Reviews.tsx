@@ -5,7 +5,8 @@ import { Review } from "@/redux/actions/reviews";
 import {
   selectReveiws,
   selectNewReview,
-  addNewReview
+  addNewReview,
+  resetNewReview
 } from "@/redux/reducers/reviews";
 
 import { useState, useEffect } from "react";
@@ -27,7 +28,6 @@ export default function Reviews() {
   const [ uuid, setUuid ] = useState<string | null>(null);
 
 
-  
   // this useEffect is for handling connection and disconnection process for websockets
   useEffect(() => {
     // this function is called on page mount, it registers users on server,
@@ -113,7 +113,7 @@ export default function Reviews() {
         fetch(request);
       }
     });
-  }, [credentials.jwt_token, router.query.movieId, uuid, websocket]);
+  }, [credentials.jwt_token, router.query.movieId, uuid, websocket, dispatch]);
 
   // this is the onmessage functions assigned to the websocket object.
   // It takes a string from the server with all the relevant data for
@@ -127,6 +127,7 @@ export default function Reviews() {
     let username: string | null = null;
     let movie_id: string | null = null;
     let review: string | null = null;
+    let created_at: number = 0;
     const newReviewArray = newReview.split(";");
 
     newReviewArray.forEach(reviewField => {
@@ -146,6 +147,9 @@ export default function Reviews() {
 
       } else if (reviewFieldArray[0] === "review") {
         review = reviewFieldArray[1];
+
+      } else if (reviewFieldArray[0] === "created_at") {
+        created_at = parseInt(reviewFieldArray[1]);
       }
     });
 
@@ -156,7 +160,8 @@ export default function Reviews() {
         user_id,
         username,
         movie_id,
-        review
+        review,
+        created_at
       }
 
       dispatch(addNewReview({ newReview: insertingNewReview }));
@@ -181,7 +186,8 @@ export default function Reviews() {
         user_id: newReview.data.user_id,
         username: credentials.username,
         movie_id: newReview.data.movie_id,
-        review: newReview.data.review
+        review: newReview.data.review,
+        created_at: newReview.data.created_at
       };
 
       dispatch(addNewReview({ newReview: insertingNewReview }));
@@ -197,6 +203,7 @@ export default function Reviews() {
       params.append("username", credentials.username);
       params.append("topic", newReview.data.movie_id);
       params.append("review", newReview.data.review);
+      params.append("created_at", newReview.data.created_at.toString());
 
       const request = new Request(emitReviewUrl,
         {
@@ -209,19 +216,35 @@ export default function Reviews() {
       );
 
       fetch(request);
+      dispatch(resetNewReview());
     }
   }, [credentials.jwt_token, credentials.username, dispatch, newReview])
 
 
   function makeReview(review: Review) {
-    return <div key={review.id} className="block">
+    return <div key={review.id} className="block block-btn">
       <h3 className={styles["username"]}>{review.username}</h3>
       <p>{review.review}</p>
     </div>
   }
 
+  function sortAndMakeReviews(reviews: [Review]) {
+    if (reviews.length === 0) {
+        return <h2 className={styles["no-reviews"]}>Be the first to review</h2>
+
+    } else {
+      reviews.sort((review1: Review, review2: Review) => {
+        if (review1.created_at < review2.created_at) { return  1; }
+        if (review1.created_at > review2.created_at) { return -1; }
+        return 0;
+      });
+
+      return reviews.map(review => makeReview(review));
+    }
+  }
+
   return <div className={styles["wrapper"]}>
     <h2 className={styles["section-title"]}>Reviews</h2>
-    { reviews.data.reviews && reviews.data.reviews.map(makeReview)}
+    { reviews.data.reviews && sortAndMakeReviews([...reviews.data.reviews])}
   </div>
 }

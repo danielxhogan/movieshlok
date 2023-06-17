@@ -1,6 +1,5 @@
 import styles from "@/styles/components/Pagination.module.css";
 import { FilterResults } from "@/pages/search";
-import { getSearchResults, SearchParams } from "@/redux/actions/tmdb";
 import { useAppDispatch } from "@/redux/hooks";
 
 import { useRouter } from "next/router";

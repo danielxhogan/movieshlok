@@ -8,9 +8,8 @@ use warp::{Filter, reject};
 use jsonwebtoken::{encode, Header, EncodingKey};
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
-use std::env;
 use chrono::Utc;
-
+use std::env;
 
 #[derive(Debug, Serialize, Clone)]
 pub struct RegisterResponse {
@@ -29,7 +28,6 @@ pub struct LoginResponse {
   pub username: String
 }
 
-
 fn with_auth_db_manager(pool: PgPool)
 -> impl Filter<Extract = (AuthDbManager,), Error = warp::Rejection> + Clone
 {
@@ -43,13 +41,13 @@ fn with_auth_db_manager(pool: PgPool)
     }})
 }
 
+
 pub fn auth_filters(pool: PgPool,)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
   register_filter(pool.clone())
   .or(login_filter(pool))
 }
-
 
 pub fn register_filter(pool: PgPool,)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
@@ -70,7 +68,6 @@ async fn register_user(mut auth_db_manager: AuthDbManager, new_user: NewUser)
 
   respond(response, warp::http::StatusCode::CREATED)
 }
-
 
 pub fn login_filter(pool: PgPool,)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone

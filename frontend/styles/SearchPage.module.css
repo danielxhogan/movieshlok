@@ -3,11 +3,6 @@
   min-height: 100vh;
 }
 
-.spinner {
-  display: flex;
-  justify-content: center;
-}
-
 .search-page {
   width: 80%;
   margin: 30px auto 0;
@@ -24,6 +19,29 @@
   padding: 20px 20px 0 0;
 }
 
+.horizontal-filter {
+  display: none;
+}
+
+.filter-button {
+}
+
+.spinner {
+  display: flex;
+  justify-content: center;
+}
+
+.no-results {
+  text-align: center;
+  font-size: 1.5rem;
+  font-family: 'Audiowide', cursive;
+}
+
+.no-results-image {
+  margin: auto;
+  border-radius: 5px;
+}
+
 .result-title {
   font-size: 1.5rem;
 }
@@ -35,16 +53,16 @@
 .movie-result-content {
   display: flex;
   gap: 15px;
-  justify-content: space-between;
+  justify-content: left;
 }
 
 .movie-poster-image {
-  width: 100px;
-  height: auto;
+  width: 200px;
+  height: 300px;
 }
 
 .movie-details {
-  width: 80%;
+  /* width: 80%; */
 }
 
 .person-result-content {
@@ -53,8 +71,8 @@
 }
 
 .cast-crew-profile {
-  width: auto;
-  height: auto;
+  width: 200px;
+  height: 300px;
 }
 
 .known-for {
@@ -68,7 +86,6 @@
   padding-bottom: 10px;
 }
 
-
 .filter {
   height: 220px;
   font-family: 'Audiowide', cursive;
@@ -79,7 +96,6 @@
   margin-top: 20px;
   padding: 10px;
 }
-
 
 .filter-buttons {
   display: flex;
@@ -92,16 +108,13 @@
   text-decoration: none;
 }
 
-.filter-button {
-}
-
-.horizontal-filter {
-  display: none;
-}
-
 @media only screen and (max-width: 1050px) {
-  .filter {
-    display: none;
+  .content {
+    flex-direction: column;
+  }
+
+  .results {
+    width: 100%;
   }
 
   .horizontal-filter {
@@ -117,12 +130,8 @@
     text-decoration: none;
   }
 
-  .content {
-    flex-direction: column;
-  }
-
-  .results {
-    width: 100%;
+  .filter {
+    display: none;
   }
 }
 

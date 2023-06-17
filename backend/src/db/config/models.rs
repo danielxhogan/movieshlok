@@ -40,7 +40,9 @@ pub struct Review {
     #[diesel(sql_type = Nullable<Int4>)]
     pub rating: Option<i32>,
     pub review: String,
-    pub liked: Option<bool>
+    pub liked: Option<bool>,
+    #[diesel(sql_type = Int8)]
+    pub created_at: i64
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -57,7 +59,9 @@ pub struct SelectingReview {
     #[diesel(sql_type = Nullable<Int4>)]
     pub rating: Option<i32>,
     pub review: String,
-    pub liked: Option<bool>
+    pub liked: Option<bool>,
+    #[diesel(sql_type = Int8)]
+    pub created_at: i64
 }
 
 #[derive(Deserialize, Insertable, Debug)]
@@ -65,5 +69,7 @@ pub struct SelectingReview {
 pub struct InsertingNewReview {
     pub user_id: Uuid,
     pub movie_id: String,
-    pub review: String
+    pub review: String,
+    #[diesel(sql_type = Int8)]
+    pub created_at: i64
 }
