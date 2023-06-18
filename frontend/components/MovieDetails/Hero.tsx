@@ -1,9 +1,7 @@
 import styles from "@/styles/MovieDetails/Hero.module.css";
 import { useAppSelector } from "@/redux/hooks";
-import { selectMovieDetails } from "@/redux/reducers/tmdb";
+import { selectMovieDetails, MovieImage } from "@/redux/reducers/tmdb";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
 import Image from "next/image";
 import {
   useDisclosure,
@@ -12,8 +10,7 @@ import {
   ModalOverlay,
   ModalContent,
   ModalBody,
-  ModalCloseButton,
-  Spinner
+  ModalCloseButton
 } from "@chakra-ui/react";
 
 import getConfig from "next/config";
@@ -25,7 +22,6 @@ export default function Hero() {
   const movieDetails = useAppSelector(selectMovieDetails);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
-
 
   let trailerPath = null;
   let trailerSite = null;
@@ -40,6 +36,42 @@ export default function Hero() {
         break;
       }
     }
+  }
+
+  function makeTitle() {
+    let year: string = "";
+    let directors: string[] = [];
+    let director: string = "";
+
+    if (movieDetails.data.release_date) {
+      year = movieDetails.data.release_date.substring(0, 4);
+    }
+
+    movieDetails.data.credits?.crew?.forEach(crewMember => {
+      if (crewMember.department === "Directing") {
+        crewMember.name && directors.push(crewMember.name);
+      }
+    });
+
+    if (directors.length > 0) {
+      director = directors[0];
+    }
+
+    
+    return <div className={styles["title-text"]}>
+      <h1>
+        <span className={styles["title"]}>
+          { movieDetails.data.title },
+        </span>
+        <span className={styles["year"]}>
+          { year }
+        </span>
+      </h1>
+      <h2>
+        directed by
+        <span className={styles["director"]}> {director}</span>
+      </h2>
+    </div>
   }
 
   return <div className={styles["wrapper"]}>
@@ -77,8 +109,22 @@ export default function Hero() {
         alt="backdrop">
       </Image>
     }
-    <div className={styles["movie-title"]}>
-        <h1>{ movieDetails.data.title }</h1>
+
+    <div className={styles["title-section"]}>
+
+      <div className={styles["movie-poster-div"]}>
+      { movieDetails.data.poster_path &&
+        <Image
+          src={`${TMDB_IMAGE_URL}/w342${movieDetails.data.poster_path}`}
+          className={styles["movie-poster"]}
+          width={200}
+          height={500}
+          alt="backdrop">
+        </Image>
+      }
+      </div>
+
+      { makeTitle() }
     </div>
   </div>
 }

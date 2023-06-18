@@ -1,5 +1,6 @@
 .wrapper {
-  margin-top: 30px;
+  margin: 30px 0;
+  /* background-color: black; */
 }
 
 .trailer {
@@ -13,11 +14,51 @@
   box-shadow: 10px 10px #888888;
 }
 
-.movie-title {
-  align-items: center;
+.title-section {
+  text-align: center;
 }
 
-.movie-title h1 {
-  text-align: center;
+.movie-poster-div {
+  display: none;
+}
+
+.title {
   font-size: 3rem;
+  font-weight: 600;
+  padding: 0 5px;
+}
+
+.year {
+  font-size: 2.3rem;
+  padding: 0 5px;
+}
+
+.title-section h2 {
+  font-size: 1.2rem;
+  font-style: italic;
+}
+
+.director {
+  font-weight: 600;
+}
+
+@media screen and (max-width: 1000px) {
+  .title-section {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 20px 0 0;
+  }
+
+  .title-text {
+    align-self: center;
+  }
+
+  .movie-poster-div {
+    display: inline;
+  }
+
+  .movie-poster {
+    border-radius: 10px;
+  }
 }

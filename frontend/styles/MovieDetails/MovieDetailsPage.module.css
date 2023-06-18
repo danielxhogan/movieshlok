@@ -20,16 +20,11 @@
 }
 
 .movie-poster {
-  /* min-width: 150px; */
-}
-
-.backdrop {
   border-radius: 10px;
 }
 
 .movie-content {
   width: 80%;
-  /* min-width: 700px; */
   margin: auto;
 }
 
@@ -40,7 +35,7 @@
 }
 
 @media screen and (max-width: 1000px) {
-  .movie-poster {
+  .movie-poster-div {
     display: none;
   }
 

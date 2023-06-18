@@ -1,4 +1,4 @@
-import styles from "@/styles/MovieDetails/MovieDetails.module.css";
+import styles from "@/styles/MovieDetails/MovieDetailsPage.module.css";
 import Navbar from "@/components/Navbar"
 import Searchbar from "@/components/Searchbar";
 import Hero from "@/components/MovieDetails/Hero";
@@ -47,11 +47,11 @@ export default function MovieDetailsPage() {
         <Hero />
 
         <div className={styles["sub-hero"]}>
-          <div className={styles["movie-poster"]}>
-          {movieDetails.data.poster_path &&
+          <div className={styles["movie-poster-div"]}>
+          { movieDetails.data.poster_path &&
             <Image
               src={`${TMDB_IMAGE_URL}/w342${movieDetails.data.poster_path}`}
-              className={styles["backdrop"]}
+              className={styles["movie-poster"]}
               width={300}
               height={500}
               alt="backdrop">

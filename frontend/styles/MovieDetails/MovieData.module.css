@@ -1,4 +1,21 @@
 .wrapper {
-  /* border: 1px solid black; */
   height: 500px;
+}
+
+.tagline {
+  font-size: 1.4rem;
+  font-style: italic;
+  font-weight: 600;
+  text-align: center;
+  /* text-decoration: underline; */
+}
+
+.hr {
+  color: black;
+  width: 10%;
+  height: 20px;
+}
+
+.overview {
+  font-size: 1.3rem;
 }

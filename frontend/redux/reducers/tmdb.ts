@@ -33,7 +33,7 @@ export interface Language {
 }
 
 // VIDEOS
-export interface VideoResult {
+export interface Video {
   iso_639_1?: string;
   iso_3166_1?: string;
   name?: string;
@@ -46,9 +46,56 @@ export interface VideoResult {
   id?: string;
 }
 
-export interface Video {
+export interface Videos {
   id?: number;
-  results?: [VideoResult];
+  results?: [Video];
+}
+
+// IMAGES
+export interface MovieImage {
+  aspect_ration?: number;
+  height?: number;
+  iso_639_1?: string;
+  file_path?: string;
+  vote_average?: number;
+  vote_count?: number;
+  width?: number;
+}
+
+interface Images {
+  id?: number;
+  backdrops?: [MovieImage];
+  logos?: [MovieImage]
+}
+
+// CREDITS
+interface CastCrewMember {
+
+  // cast & crew
+  adult?: boolean;
+  gener?: number;
+  id?: number;
+  known_for_department?: string;
+  name?: string;
+  original_name?: string;
+  popularity?: number;
+  profile_path?: string;
+  credit_id?: string;
+
+  // cast
+  cast_id?: number;
+  character?: string;
+  order?: number;
+
+  // crew
+  department?: string;
+  job?: string;
+}
+
+interface Credits {
+  id?: number;
+  cast?: [CastCrewMember];
+  crew?: [CastCrewMember];
 }
 
 // MAIN RESPONSE
@@ -81,7 +128,9 @@ export interface MovieDetails {
     video?: boolean;
     vote_average?: number;
     vote_count?: number;
-    videos?: Video;
+    videos?: Videos;
+    images?: Images;
+    credits?: Credits;
   }
 }
 
@@ -92,7 +141,6 @@ const initialMovieDetailsState: MovieDetails = {
   message: "",
   data: {}
 }
-
 
 // SEARCH
 // **************************************************

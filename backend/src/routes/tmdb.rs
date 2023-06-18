@@ -45,7 +45,7 @@ struct Language {
 
 // VIDEOS
 #[derive(Serialize, Deserialize, Debug)]
-struct VideoResult {
+struct Video {
   iso_639_1: Option<String>,
   iso_3166_1: Option<String>,
   name: Option<String>,
@@ -59,9 +59,60 @@ struct VideoResult {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct Video {
+struct Videos {
   id: Option<i32>,
-  results: Option<Box<[VideoResult]>>
+  results: Option<Box<[Video]>>
+}
+// IMAGES
+#[derive(Serialize, Deserialize, Debug)]
+struct Image {
+  aspect_ration: Option<f32>,
+  height: Option<i32>,
+  iso_639_1: Option<String>,
+  file_path: Option<String>,
+  vote_average: Option<f32>,
+  vote_count: Option<i32>,
+  width: Option<i32>
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Images {
+  id: Option<i32>,
+  backdrops: Option<Box<[Image]>>,
+  logos: Option<Box<[Image]>>,
+  // posters: Option<Box<[Image]>>
+}
+
+// CREDITS
+#[derive(Serialize, Deserialize, Debug)]
+struct CastCrewMember {
+
+  // cast & crew
+  adult: Option<bool>,
+  gender: Option<i32>,
+  id: Option<i32>,
+  known_for_department: Option<String>,
+  name: Option<String>,
+  original_name: Option<String>,
+  popularity: Option<f32>,
+  profile_path: Option<String>,
+  credit_id: Option<String>,
+
+  // cast
+  cast_id: Option<i32>,
+  character: Option<String>,
+  order: Option<i32>,
+
+  // crew
+  department: Option<String>,
+  job: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Credits {
+  id: Option<i32>,
+  cast: Option<Box<[CastCrewMember]>>,
+  crew: Option<Box<[CastCrewMember]>>
 }
 
 // MAIN RESPONSE
@@ -92,7 +143,9 @@ struct MovieDetails {
   video: Option<bool>,
   vote_average: Option<f32>,
   vote_count: Option<i32>,
-  videos: Option<Video>
+  videos: Option<Videos>,
+  images: Option<Images>,
+  credits: Option<Credits>
 }
 
 
@@ -186,7 +239,7 @@ async fn movie_details(movie_details_params: MovieDetailsParams)
   let tmdb_base_url = env::var("TMDB_BASE_URL").unwrap();
   let tmdb_api_key = env::var("TMDB_API_KEY").unwrap();
 
-  let movie_details_url = format!("{}/movie/{}?api_key={}&language=en-US&append_to_response=videos",
+  let movie_details_url = format!("{}/movie/{}?api_key={}&language=en-US&append_to_response=videos,images,credits&include_image_language=en,null",
     &tmdb_base_url,
     &movie_details_params.movie_id,
     &tmdb_api_key);
