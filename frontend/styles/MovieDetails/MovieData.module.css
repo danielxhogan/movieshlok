@@ -1,5 +1,5 @@
 .wrapper {
-  height: 500px;
+  /* height: 500px; */
 }
 
 .tagline {
@@ -7,7 +7,6 @@
   font-style: italic;
   font-weight: 600;
   text-align: center;
-  /* text-decoration: underline; */
 }
 
 .hr {
@@ -18,4 +17,12 @@
 
 .overview {
   font-size: 1.3rem;
+}
+
+.tab-list {
+  font-family: 'Audiowide', cursive;
+}
+
+.cast-crew-button {
+  margin: 5px;
 }

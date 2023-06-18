@@ -69,7 +69,7 @@ interface Images {
 }
 
 // CREDITS
-interface CastCrewMember {
+export interface CastCrewMember {
 
   // cast & crew
   adult?: boolean;

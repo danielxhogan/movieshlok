@@ -48,7 +48,7 @@ export default function Hero() {
     }
 
     movieDetails.data.credits?.crew?.forEach(crewMember => {
-      if (crewMember.department === "Directing") {
+      if (crewMember.job === "Director") {
         crewMember.name && directors.push(crewMember.name);
       }
     });
