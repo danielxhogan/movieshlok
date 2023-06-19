@@ -9,7 +9,7 @@ import {
   resetNewReview
 } from "@/redux/reducers/reviews";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 
 import getConfig from "next/config";
@@ -24,103 +24,12 @@ export default function Reviews() {
   const reviews = useAppSelector(selectReveiws);
   const newReview = useAppSelector(selectNewReview);
 
-  const [ websocket, setWebsocket ] = useState<WebSocket | null>(null);
-  const [ uuid, setUuid ] = useState<string | null>(null);
-
-
-  // this useEffect is for handling connection and disconnection process for websockets
-  useEffect(() => {
-    // this function is called on page mount, it registers users on server,
-    // establishes websocket connection and attaches the onmessage handler
-    // function when a message is recieved on the ws channel.
-    async function wsSetup() {
-      if (!websocket && !uuid) {
-        const registerWsUrl = `${BACKEND_URL}/ws-register`;
-
-        const headers = new Headers();
-        headers.append("Content-Type", "application/x-www-form-urlencoded");
-
-        const params = new URLSearchParams();
-        if (credentials.jwt_token) {
-          params.append("jwt_token", credentials.jwt_token);
-        }
-
-        const topic = router.query.movieId;
-        if (typeof topic === "string") {
-          console.log(`topic: ${topic}`);
-          params.append("topic", topic);
-        } else {
-          return;
-        }
-
-        const request = new Request(registerWsUrl,
-          {
-            headers,
-            credentials: "include",
-            mode: "cors",
-            body: params,
-            method: "POST"
-          }
-        );
-
-        try {
-          const response = await fetch(request);
-          if (!response.ok) { return; }
-          const data = await response.json();
-
-          const ws = new WebSocket(data.ws_url);
-          ws.onopen = () => { console.log(`connected, uuid: ${data.uuid}`); };
-          ws.onmessage = (msg) => { onNewReview(msg.data); }
-
-          setWebsocket(ws);
-          setUuid(data.uuid);
-        } catch (err) {
-          return;
-        }
-      }
-    }
-
-    wsSetup();
-
-    // this useEffect return function is called when the component unmounts
-    // as in, user has navigated away from the page. It sends a request to
-    // the ws-unregister endpoint with the uuid for the websocket connection
-    // created in the function above when the page first loaded.
-    return (() => {
-      if (websocket && uuid) {
-        setWebsocket(null);
-        setUuid(null);
-
-        const unregisterWsUrl = `${BACKEND_URL}/ws-unregister`;
-
-        const headers = new Headers();
-        headers.append("Content-Type", "application/x-www-form-urlencoded");
-
-        const params = new URLSearchParams();
-        console.log(`disconnecting, uuid: ${uuid}`);
-        params.append("uuid", uuid);
-
-        const request = new Request(unregisterWsUrl,
-          {
-            headers,
-            credentials: "include",
-            mode: "cors",
-            body: params,
-            method: "POST"
-          }
-        );
-
-        fetch(request);
-      }
-    });
-  }, [credentials.jwt_token, router.query.movieId, uuid, websocket, dispatch]);
-
   // this is the onmessage functions assigned to the websocket object.
   // It takes a string from the server with all the relevant data for
   // creating a new Review type object, parses the data out of the string,
   // and inserts it into the array of Reviews stored in the redux store by
   // passing it into the addNewReveiw redux action.
-  function onNewReview(newReview: string) {
+  const onNewReview = useCallback((newReview: string) => {
     console.log("onNewReview");
     let id: string | null = null
     let user_id: string | null = null;
@@ -167,7 +76,105 @@ export default function Reviews() {
       dispatch(addNewReview({ newReview: insertingNewReview }));
     }
 
-  }
+  }, [dispatch]);
+
+  // this useEffect is for handling connection and disconnection process for websockets
+  useEffect(() => {
+    // this function is called on page mount, it registers users on server,
+    // establishes websocket connection and attaches the onmessage handler
+    // function when a message is recieved on the ws channel.
+    async function wsSetup() {
+      const registerWsUrl = `${BACKEND_URL}/ws-register`;
+
+      const headers = new Headers();
+      headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+      // add params
+      const params = new URLSearchParams();
+
+      // add credentials if logged in
+      if (credentials.jwt_token) {
+        params.append("jwt_token", credentials.jwt_token);
+      }
+
+      // add movieId as topic
+      const topic = router.query.movieId;
+      if (typeof topic === "string") {
+        console.log(`topic: ${topic}`);
+        params.append("topic", topic);
+      } else {
+        return;
+      }
+
+      // add ws-uuid to check if already connected
+      const ws_uuid = localStorage.getItem("ws-uuid");
+      if (ws_uuid) {
+        params.append("uuid", ws_uuid);
+      }
+
+      const request = new Request(registerWsUrl,
+        {
+          headers,
+          credentials: "include",
+          mode: "cors",
+          body: params,
+          method: "POST"
+        }
+      );
+
+      try {
+        const response = await fetch(request);
+        const data = await response.json();
+
+        if (!response.ok) {
+          console.log(`ws-uuid: ${ws_uuid}, message: ${data.message}`)
+          return;
+        }
+
+        const ws = new WebSocket(data.ws_url);
+        ws.onopen = () => { console.log(`connected, uuid: ${data.uuid}`); };
+        ws.onmessage = (msg) => { onNewReview(msg.data); }
+
+        localStorage.setItem("ws-uuid", data.uuid);
+
+      } catch (err) {
+        return;
+      }
+    }
+
+    wsSetup();
+
+    // this useEffect return function is called when the component unmounts
+    // as in, user has navigated away from the page. It sends a request to
+    // the ws-unregister endpoint with the uuid for the websocket connection
+    // created in the function above when the page first loaded.
+    return (() => {
+      const ws_uuid = localStorage.getItem("ws-uuid");
+      if (ws_uuid) {
+        const unregisterWsUrl = `${BACKEND_URL}/ws-unregister`;
+
+        const headers = new Headers();
+        headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+        const params = new URLSearchParams();
+        console.log(`disconnecting, uuid: ${ws_uuid}`);
+        params.append("uuid", ws_uuid);
+
+        const request = new Request(unregisterWsUrl,
+          {
+            headers,
+            credentials: "include",
+            mode: "cors",
+            body: params,
+            method: "POST"
+          }
+        );
+
+        fetch(request);
+        localStorage.setItem("ws-uuid", "");
+      }
+    });
+  }, [credentials.jwt_token, router.query.movieId, dispatch, onNewReview]);
 
   // this useEffect detects any changes in newReview. When a new reveiw
   // is detected, it creates a new Review type object and iserts it into
@@ -219,13 +226,15 @@ export default function Reviews() {
       dispatch(resetNewReview());
 
     } else if (newReview.code === 401) {
-      dispatch(resetNewReview());
       document.cookie = "username=";
       document.cookie = "jwt_token=";
+
       dispatch(unsetCredentials());
+      dispatch(resetNewReview());
+
       router.push("/auth/login");
     }
-  }, [credentials.jwt_token, credentials.username, dispatch, newReview])
+  }, [credentials.jwt_token, credentials.username, dispatch, newReview, router])
 
 
   function makeReview(review: Review) {
@@ -235,7 +244,7 @@ export default function Reviews() {
     </div>
   }
 
-  function sortAndMakeReviews(reviews: [Review]) {
+  function sortAndMakeReviews(reviews: Review[]) {
     if (reviews.length === 0) {
         return <h2 className={styles["no-reviews"]}>Be the first to review</h2>
 

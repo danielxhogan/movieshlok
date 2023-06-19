@@ -42,7 +42,8 @@ struct IncomingNewReview {
 #[derive(Deserialize, Debug)]
 struct WsRegisterRequest {
   jwt_token: Option<String>,
-  topic: String
+  topic: String,
+  uuid: Option<String>
 }
 
 #[derive(Serialize, Debug)]
@@ -188,6 +189,20 @@ fn register_ws_client_filters(client_list: ClientList)
 async fn register_ws_client(req: WsRegisterRequest, client_list: ClientList)
 -> Result<impl warp::Reply, warp::Rejection>
 {
+  match req.uuid {
+    Some(uuid) => {
+      let client = client_list.read().await.get(&uuid).cloned();
+      match client {
+        Some(_) => {
+          let err = AppError::new("websocket client already registed", ErrorType::WSClientAlreadyRegisted);
+          return respond(Err(err), warp::http::StatusCode::CONFLICT);
+        },
+        None => {}
+      }
+    },
+    None => {}
+  }
+
   let mut user_id: Option<Uuid> = None;
 
   // authentication is not required to register, it is only required to emit
@@ -289,7 +304,7 @@ async fn client_connection(ws: WebSocket, uuid: String, client_list: ClientList,
   client.sender = Some(client_sender);
   client_list.write().await.insert(uuid.clone(), client);
 
-   // println!("{} connected", uuid);
+   println!("{} connected", uuid);
 
   while let Some(result) = client_ws_rcv.next().await {
       // let msg = match result {
@@ -304,7 +319,7 @@ async fn client_connection(ws: WebSocket, uuid: String, client_list: ClientList,
   }
 
   client_list.write().await.remove(&uuid);
-   // println!("{} disconnected", uuid);
+   println!("{} disconnected", uuid);
 }
 
 fn emit_review_filters(client_list: ClientList)

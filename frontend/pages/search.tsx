@@ -72,10 +72,7 @@ export default function SearchPage() {
   }, [dispatch, router.query.filter, router.query.page, router.query.query]);
 
   function onClickFilterButton(newFilter: FilterResults) {
-    console.log(newFilter);
     if (newFilter !== filter) {
-      // setFilter(newFilter);
-      // dispatchGetSearchResults("1", newFilter);
       router.push(`/search?query=${searchQuery}&filter=${newFilter}&page=1`);
     }
   }
