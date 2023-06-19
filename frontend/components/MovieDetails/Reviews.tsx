@@ -1,6 +1,6 @@
 import styles from "@/styles/MovieDetails/Reviews.module.css";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
-import { selectCredentials } from "@/redux/reducers/auth";
+import { selectCredentials, unsetCredentials } from "@/redux/reducers/auth";
 import { Review } from "@/redux/actions/reviews";
 import {
   selectReveiws,
@@ -217,6 +217,13 @@ export default function Reviews() {
 
       fetch(request);
       dispatch(resetNewReview());
+
+    } else if (newReview.code === 401) {
+      dispatch(resetNewReview());
+      document.cookie = "username=";
+      document.cookie = "jwt_token=";
+      dispatch(unsetCredentials());
+      router.push("/auth/login");
     }
   }, [credentials.jwt_token, credentials.username, dispatch, newReview])
 

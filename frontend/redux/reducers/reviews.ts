@@ -34,6 +34,7 @@ const initialReviewsState: Reviews = {
 interface NewReview {
   status: Status;
   success: boolean | null;
+  code: number | null;
   message: string;
   data: ReturnedNewReview | null;
 }
@@ -42,6 +43,7 @@ interface NewReview {
 const initialNewReviewState: NewReview = {
   status: "idle",
   success: null,
+  code: null,
   message: "",
   data: null
 }
@@ -93,6 +95,7 @@ export const newReviewSlice = createSlice({
     resetNewReview(state) {
       state.status = "idle",
       state.success = null,
+      state.code = null,
       state.message = "",
       state.data = null
     }
@@ -102,12 +105,14 @@ export const newReviewSlice = createSlice({
       .addCase(postReview.pending, (state) => {
         state.status = "loading",
         state.success = null,
+        state.code = null,
         state.message = "",
         state.data = null
       })
       .addCase(postReview.fulfilled, (state, action) => {
         state.status = "fulfilled",
         state.success = action.payload.success,
+        state.code = action.payload.code,
         state.message = action.payload.message,
         state.data = action.payload.data
       })

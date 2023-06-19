@@ -54,6 +54,7 @@ export interface ReturnedNewReview {
 // payload sent by postReview action to newReviewSlice reducer
 interface NewReviewPayload {
   success: boolean;
+  code: number;
   message: string;
   data: ReturnedNewReview | null
 }
@@ -138,12 +139,14 @@ export const postReview = createAsyncThunk(
 
       return {
         success: true,
+        code: response.status,
         message: "ok",
         data
       }
     } else if (response.status >= 500) {
       return {
         success: false,
+        code: response.status,
         message: "server error",
         data: null
       }
@@ -151,6 +154,7 @@ export const postReview = createAsyncThunk(
       const data = await response.json();
       return {
         success: false,
+        code: response.status,
         message: data.message,
         data: null
       }
