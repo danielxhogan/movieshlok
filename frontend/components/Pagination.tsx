@@ -62,6 +62,7 @@ export default function Pagination(props: Props) {
 
           linksArray.push(
               <span
+                key={i}
                 onClick={ () => onClickPaginationButton(pageString) }
                 className={
                   (i+1) === currentPage_number

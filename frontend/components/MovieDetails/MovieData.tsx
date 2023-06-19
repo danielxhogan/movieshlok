@@ -48,7 +48,7 @@ export default function MovieContent() {
         }
 
     }
-    return <>
+    return <span key={castCrewMember.credit_id}>
       <Tooltip label={role} placement="top">
         <Button
           colorScheme='teal' variant='outline'
@@ -59,7 +59,7 @@ export default function MovieContent() {
         </Button>
 
       </Tooltip>
-    </>
+    </span>
   }
 
   return <div className={`${styles["wrapper"]} block`}>
