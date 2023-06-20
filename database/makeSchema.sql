@@ -13,8 +13,21 @@ CREATE TABLE reviews (
   id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id uuid NOT NULL references users(id),
   movie_id VARCHAR(255) NOT NULL,
-  rating INTEGER,
   review TEXT NOT NULL,
-  liked BOOLEAN,
-  created_at BIGINT  NOT NULL
+  rating INTEGER NOT NULL,
+  created_at BIGINT NOT NULL
+);
+
+CREATE TABLE ratings (
+  id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id uuid NOT NULL references users(id),
+  movie_id VARCHAR(255) NOT NULL,
+  rating INTEGER NOT NULL
+);
+
+CREATE TABLE likes (
+  id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id uuid NOT NULL references users(id),
+  movie_id VARCHAR(255) NOT NULL,
+  liked BOOLEAN NOT NULL
 );

@@ -1,8 +1,10 @@
+import { Rating } from "@/components/Stars";
+
+import { createAsyncThunk } from "@reduxjs/toolkit";
+
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
 const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
-
-import { createAsyncThunk } from "@reduxjs/toolkit";
 
 // TYPES
 // *****************************
@@ -35,9 +37,10 @@ interface ReviewsResultsPayload {
 
 // passed in when postReview action is dispatched
 export interface NewReview {
+  jwt_token: string;
   movieId: string;
   review: string;
-  jwt_token: string;
+  rating: Rating;
 }
 
 // if new review is created in the database, this is the returned review
@@ -118,9 +121,10 @@ export const postReview = createAsyncThunk(
     headers.append("Cookie", `jwt_token=${newReview.jwt_token}`)
 
     const params = new URLSearchParams();
+    params.append("jwt_token", newReview.jwt_token);
     params.append("movie_id", newReview.movieId);
     params.append("review", newReview.review);
-    params.append("jwt_token", newReview.jwt_token);
+    params.append("rating", newReview.rating.toString());
 
     const request = new Request(postReviewUrl,
       {

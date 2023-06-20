@@ -1,5 +1,5 @@
 import styles from "@/styles/MovieDetails/Ratings.module.css";
-import Stars from "@/components/Stars";
+import Stars, { Rating } from "@/components/Stars";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { selectCredentials } from "@/redux/reducers/auth";
 import { selectMovieDetails } from "@/redux/reducers/tmdb";
@@ -22,19 +22,8 @@ import {
   ModalFooter
 } from "@chakra-ui/react";
 
-enum Rating {
-  ZERO,
-  POINT_FIVE,
-  ONE,
-  ONE_POINT_FIVE,
-  TWO,
-  TWO_POINT_FIVE,
-  THREE,
-  THREE_POINT_FIVE,
-  FOUR,
-  FOUR_POINT_FIVE,
-  FIVE
-}
+const SHOWN = "shown";
+const HIDDEN = "hidden";
 
 export default function Ratings() {
   const dispatch = useAppDispatch();
@@ -43,10 +32,11 @@ export default function Ratings() {
 
   const [ rating, setRating ] = useState(Rating.ZERO);
   const [ reviewRating, setReviewRating] = useState(Rating.ZERO);
-
-  const [ currentRating, setCurrentRating ] = useState(Rating.ZERO);
-  const [ newRating, setNewRating ] = useState(currentRating);
   const [ newReviewText, setNewReviewText ] = useState("");
+
+  const [ liked, setLiked ] = useState(false);
+  const [ likedClass, setLikedClass ] = useState(HIDDEN);
+  const [ unlikedClass, setUnlikedClass ] = useState(SHOWN);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -71,31 +61,70 @@ export default function Ratings() {
       ) {
       const movieId = movieDetails.data.id.toString();
       const newReview: NewReview = {
+        jwt_token: credentials.jwt_token,
         movieId,
         review: newReviewText,
-        jwt_token: credentials.jwt_token
+        rating
       };
 
       dispatch(postReview(newReview));
     }
   }
 
+  function toggleLike() {
+    switch(liked) {
+      case true:
+        setLiked(false);
+        setLikedClass(HIDDEN);
+        setUnlikedClass(SHOWN);
+        break;
+      case false:
+        setLiked(true);
+        setLikedClass(SHOWN);
+        setUnlikedClass(HIDDEN);
+        break;
+    }
+  }
 
   return <div className={`${styles["wrapper"]} block`}>
     { credentials.jwt_token ? <>
-      <Button
-        colorScheme="teal" variant="outline"
-        className={styles["trailer-button"]}
-        onClick={onOpen}>
-        Leave Review
-      </Button>
+      <div className={styles["rating-review"]}>
+        <Stars
+          id="rating"
+          initialRating={rating}
+          setParentRating={setRating}
+        />
+        <Button
+          colorScheme="teal" variant="outline"
+          className={styles["trailer-button"]}
+          onClick={onOpen}>
+          Leave Review
+        </Button>
+      </div>
 
-      <Stars
-        id="rating"
-        initialCurrentRating={currentRating}
-        setParentCurrentRating={setCurrentRating}
-      />
+      <div className={styles["like"]} onClick={toggleLike}>
+        <div className={styles["heart"]}>
+          <i className={`${styles[unlikedClass]} fa-regular fa-heart fa-2xl`}></i>
+          <i className={`${styles[likedClass]} fa-solid fa-heart fa-2xl`}></i>
+        </div>
+        <span>Like</span>
+      </div>
 
+      <div className={styles["add-to-list"]}>
+        <Button
+          colorScheme="teal" variant="outline"
+          className={styles["trailer-button"]}
+          >
+          Add to Watchlist
+        </Button>
+
+        <Button
+          colorScheme="teal" variant="outline"
+          className={styles["trailer-button"]}
+          >
+          Add to other list
+        </Button>
+      </div>
 
       <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
         <ModalOverlay />
@@ -110,8 +139,8 @@ export default function Ratings() {
                 <i>What did you think?</i>
                 <Stars
                   id="review"
-                  initialCurrentRating={currentRating}
-                  setParentCurrentRating={setCurrentRating}
+                  initialRating={rating}
+                  setParentRating={setRating}
                 />
               </FormLabel>
               <Textarea
@@ -123,7 +152,12 @@ export default function Ratings() {
           </ModalBody>
 
           <ModalFooter>
+          <span className={styles["heart"]} onClick={toggleLike}>
+            <i className={`${styles[unlikedClass]} fa-regular fa-heart fa-2xl`}></i>
+            <i className={`${styles[likedClass]} fa-solid fa-heart fa-2xl`}></i>
+          </span>
             <Button
+              className={styles["submit-review"]}
               colorScheme="teal" variant="outline"
               mr={3}
               onClick={onClickCloseReviewModal}

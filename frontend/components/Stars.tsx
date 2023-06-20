@@ -1,7 +1,7 @@
 import styles from "@/styles/components/Stars.module.css";
 import { useState, useEffect } from "react";
 
-enum Rating {
+export enum Rating {
   ZERO,
   POINT_FIVE,
   ONE,
@@ -17,14 +17,13 @@ enum Rating {
 
 interface Props {
   id: string;
-  initialCurrentRating: Rating;
-  setParentCurrentRating: Function;
-  // setParentNewRating: Function;
+  initialRating: Rating;
+  setParentRating: Function;
 }
 
 
 export default function Stars(props: Props) {
-  const [ currentRating, setCurrentRating ] = useState(props.initialCurrentRating);
+  const [ currentRating, setCurrentRating ] = useState(props.initialRating);
   const [ newRating, setNewRating ] = useState(currentRating);
 
   useEffect(() => {
@@ -226,7 +225,7 @@ export default function Stars(props: Props) {
 
   function onClickStars() {
     setCurrentRating(newRating);
-    props.setParentCurrentRating(newRating);
+    props.setParentRating(newRating);
   }
 
   return <span id="stars"

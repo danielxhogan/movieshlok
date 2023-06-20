@@ -34,7 +34,9 @@ struct GetReviewsResponse {
 struct IncomingNewReview {
     pub jwt_token: String,
     pub movie_id: String,
-    pub review: String
+    pub review: String,
+    pub rating: i32
+
 }
 
 // STRUCTS FOR MANAGING WEBSOCKETS
@@ -133,13 +135,11 @@ fn post_review_filters(pool: PgPool)
 {
   warp::path!("review")
     .and(warp::post())
-    // .and(warp::cookie("jwt_token"))
     .and(with_reviews_db_manager(pool))
     .and(with_form_body::<IncomingNewReview>())
     .and_then(post_review)
 }
 
-// async fn post_review(jwt_token: String, mut reviews_db_manager: ReviewsDbManager, new_review: IncomingNewReview)
 async fn post_review(mut reviews_db_manager: ReviewsDbManager, new_review: IncomingNewReview)
 -> Result<impl warp::Reply, warp::Rejection>
 {
@@ -147,22 +147,23 @@ async fn post_review(mut reviews_db_manager: ReviewsDbManager, new_review: Incom
 
   match payload {
     Err(err) => { return respond(Err(err), warp::http::StatusCode::UNAUTHORIZED) },
+    Ok(_) => ()
+  }
 
-    Ok(payload) => {
-      let user_id = payload.claims.user_id;
-      let created_at = Utc::now().timestamp();
+  let payload = payload.unwrap();
+  let user_id = payload.claims.user_id;
+  let created_at = Utc::now().timestamp();
 
-      let inserting_new_review = InsertingNewReview {
-        user_id,
-        movie_id: new_review.movie_id,
-        review: new_review.review,
-        created_at
-      };
-
-      let response = reviews_db_manager.post_review(inserting_new_review);
-      return respond(response, warp::http::StatusCode::CREATED);
-    }
+  let inserting_new_review = InsertingNewReview {
+    user_id,
+    movie_id: new_review.movie_id,
+    review: new_review.review,
+    rating: new_review.rating,
+    created_at
   };
+
+  let response = reviews_db_manager.post_review(inserting_new_review);
+  return respond(response, warp::http::StatusCode::CREATED);
 }
 
 // ENPOINTS FOR MANAGING WEBSOCKETS

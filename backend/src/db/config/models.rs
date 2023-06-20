@@ -1,4 +1,4 @@
-use crate::db::config::schema::{users, reviews};
+use crate::db::config::schema::{users, reviews, ratings, likes};
 
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -37,10 +37,9 @@ pub struct Review {
     pub id: Uuid,
     pub user_id: Uuid,
     pub movie_id: String,
-    #[diesel(sql_type = Nullable<Int4>)]
-    pub rating: Option<i32>,
     pub review: String,
-    pub liked: Option<bool>,
+    #[diesel(sql_type = Int4)]
+    pub rating: i32,
     #[diesel(sql_type = Int8)]
     pub created_at: i64
 }
@@ -56,10 +55,9 @@ pub struct SelectingReview {
     pub user_id: Uuid,
     pub username: String,
     pub movie_id: String,
-    #[diesel(sql_type = Nullable<Int4>)]
-    pub rating: Option<i32>,
+    #[diesel(sql_type = Int4)]
+    pub rating: i32,
     pub review: String,
-    pub liked: Option<bool>,
     #[diesel(sql_type = Int8)]
     pub created_at: i64
 }
@@ -70,6 +68,45 @@ pub struct InsertingNewReview {
     pub user_id: Uuid,
     pub movie_id: String,
     pub review: String,
+    pub rating: i32,
     #[diesel(sql_type = Int8)]
     pub created_at: i64
+}
+
+// RATINGS
+// ***********************************************
+#[derive(Queryable, Serialize, Deserialize)]
+struct Rating {
+    pub id: Uuid,
+    pub user_id: Uuid,
+    pub movie_id: String,
+    #[diesel(sql_type = Int4)]
+    pub rating: i32
+}
+
+#[derive(Deserialize, Insertable, Debug)]
+#[diesel(table_name = ratings)]
+struct NewRating {
+    pub user_id: Uuid,
+    pub movie_id: String,
+    #[diesel(sql_type = Int4)]
+    pub rating: i32
+}
+
+// LIKES
+// ***********************************************
+#[derive(Queryable, Serialize, Deserialize)]
+struct Like {
+    pub id: Uuid,
+    pub user_id: Uuid,
+    pub movie_id: String,
+    pub liked: bool
+}
+
+#[derive(Deserialize, Insertable, Debug)]
+#[diesel(table_name = likes)]
+struct NewLike {
+    pub user_id: Uuid,
+    pub movie_id: String,
+    pub liked: bool
 }

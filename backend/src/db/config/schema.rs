@@ -1,13 +1,30 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
+    likes (id) {
+        id -> Uuid,
+        user_id -> Uuid,
+        movie_id -> Varchar,
+        liked -> Bool,
+    }
+}
+
+diesel::table! {
+    ratings (id) {
+        id -> Uuid,
+        user_id -> Uuid,
+        movie_id -> Varchar,
+        rating -> Int4,
+    }
+}
+
+diesel::table! {
     reviews (id) {
         id -> Uuid,
         user_id -> Uuid,
         movie_id -> Varchar,
-        rating -> Nullable<Int4>,
         review -> Text,
-        liked -> Nullable<Bool>,
+        rating -> Int4,
         created_at -> Int8,
     }
 }
@@ -23,9 +40,13 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(likes -> users (user_id));
+diesel::joinable!(ratings -> users (user_id));
 diesel::joinable!(reviews -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
+    likes,
+    ratings,
     reviews,
     users,
 );
