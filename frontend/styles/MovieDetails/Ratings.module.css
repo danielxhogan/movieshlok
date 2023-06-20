@@ -1,6 +1,4 @@
 .wrapper {
-  /* border: 1px solid black;
-  height: 500px; */
 }
 
 .section-title {
@@ -9,4 +7,21 @@
 
 .year {
   font-weight:400;
+}
+
+.rating-label {
+  display: flex !important;
+  justify-content: space-between;
+}
+
+.star:hover {
+  cursor: pointer;
+}
+
+.dim-star {
+  color: var(--light-grey);
+}
+
+.half-star {
+  width: 36px;
 }
