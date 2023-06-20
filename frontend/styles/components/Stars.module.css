@@ -1,0 +1,7 @@
+.stars:hover {
+  cursor: pointer;
+}
+
+.half-star {
+  width: 36px;
+}
