@@ -64,7 +64,8 @@ export default function Ratings() {
         jwt_token: credentials.jwt_token,
         movieId,
         review: newReviewText,
-        rating
+        rating,
+        liked
       };
 
       dispatch(postReview(newReview));

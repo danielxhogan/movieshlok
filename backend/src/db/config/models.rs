@@ -76,7 +76,7 @@ pub struct InsertingNewReview {
 // RATINGS
 // ***********************************************
 #[derive(Queryable, Serialize, Deserialize)]
-struct Rating {
+pub struct Rating {
     pub id: Uuid,
     pub user_id: Uuid,
     pub movie_id: String,
@@ -86,7 +86,7 @@ struct Rating {
 
 #[derive(Deserialize, Insertable, Debug)]
 #[diesel(table_name = ratings)]
-struct NewRating {
+pub struct NewRating {
     pub user_id: Uuid,
     pub movie_id: String,
     #[diesel(sql_type = Int4)]
@@ -96,7 +96,7 @@ struct NewRating {
 // LIKES
 // ***********************************************
 #[derive(Queryable, Serialize, Deserialize)]
-struct Like {
+pub struct Like {
     pub id: Uuid,
     pub user_id: Uuid,
     pub movie_id: String,
@@ -105,7 +105,7 @@ struct Like {
 
 #[derive(Deserialize, Insertable, Debug)]
 #[diesel(table_name = likes)]
-struct NewLike {
+pub struct NewLike {
     pub user_id: Uuid,
     pub movie_id: String,
     pub liked: bool

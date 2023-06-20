@@ -17,9 +17,8 @@ export interface Review {
   user_id: string;
   username: string;
   movie_id: string;
-  rating?: number;
+  rating: number;
   review: string;
-  liked?: boolean;
   created_at: number;
 }
 
@@ -41,6 +40,7 @@ export interface NewReview {
   movieId: string;
   review: string;
   rating: Rating;
+  liked: boolean;
 }
 
 // if new review is created in the database, this is the returned review
@@ -48,9 +48,8 @@ export interface ReturnedNewReview {
   id: string;
   user_id: string;
   movie_id: string;
-  rating?: number;
+  rating: number;
   review: string;
-  liked?: boolean;
   created_at: number;
 }
 
@@ -125,6 +124,7 @@ export const postReview = createAsyncThunk(
     params.append("movie_id", newReview.movieId);
     params.append("review", newReview.review);
     params.append("rating", newReview.rating.toString());
+    params.append("liked", newReview.liked.toString());
 
     const request = new Request(postReviewUrl,
       {

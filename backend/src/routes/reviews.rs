@@ -3,7 +3,8 @@ use crate::db::config::models::{
   ReviewsMovieId,
   SelectingReview,
   InsertingNewReview,
-  // Review
+  NewRating,
+  NewLike
 };
 use crate::db::reviews::ReviewsDbManager;
 use crate::routes::{with_form_body, auth_check, respond, with_clients};
@@ -35,7 +36,8 @@ struct IncomingNewReview {
     pub jwt_token: String,
     pub movie_id: String,
     pub review: String,
-    pub rating: i32
+    pub rating: i32,
+    pub liked: bool
 
 }
 
@@ -156,14 +158,42 @@ async fn post_review(mut reviews_db_manager: ReviewsDbManager, new_review: Incom
 
   let inserting_new_review = InsertingNewReview {
     user_id,
-    movie_id: new_review.movie_id,
+    movie_id: new_review.movie_id.clone(),
     review: new_review.review,
     rating: new_review.rating,
     created_at
   };
 
-  let response = reviews_db_manager.post_review(inserting_new_review);
-  return respond(response, warp::http::StatusCode::CREATED);
+  let new_rating = NewRating {
+    user_id,
+    movie_id: new_review.movie_id.clone(),
+    rating: new_review.rating
+  };
+
+  let new_like = NewLike {
+    user_id,
+    movie_id: new_review.movie_id,
+    liked: new_review.liked
+  };
+
+  let rating_response = reviews_db_manager.post_rating(new_rating);
+  match rating_response {
+    Err(err) => { return respond(Err(err), warp::http::StatusCode::BAD_REQUEST) },
+    Ok(_) => ()
+  }
+
+  let like_response = reviews_db_manager.post_like(new_like);
+  match like_response {
+    Err(err) => { return respond(Err(err), warp::http::StatusCode::BAD_REQUEST) },
+    Ok(_) => ()
+  }
+
+  let review_response = reviews_db_manager.post_review(inserting_new_review);
+  match review_response {
+    Err(err) => respond(Err(err), warp::http::StatusCode::BAD_REQUEST),
+    Ok(response) => respond(Ok(response), warp::http::StatusCode::CREATED)
+  }
+
 }
 
 // ENPOINTS FOR MANAGING WEBSOCKETS
