@@ -36,6 +36,7 @@ export default function Reviews() {
     let user_id: string | null = null;
     let username: string | null = null;
     let movie_id: string | null = null;
+    let rating: number | null = null;
     let review: string | null = null;
     let created_at: number = 0;
     const newReviewArray = newReview.split(";");
@@ -55,6 +56,9 @@ export default function Reviews() {
       } else if (reviewFieldArray[0] === "movie_id") {
         movie_id = reviewFieldArray[1];
 
+      } else if (reviewFieldArray[0] === "rating") {
+        rating = parseInt(reviewFieldArray[1]);
+
       } else if (reviewFieldArray[0] === "review") {
         review = reviewFieldArray[1];
 
@@ -63,13 +67,14 @@ export default function Reviews() {
       }
     });
 
-    if (id && user_id && username && movie_id && review) {
+    if (id && user_id && username && movie_id && rating && review) {
       console.log("creating new Review");
       const insertingNewReview: Review = {
         id,
         user_id,
         username,
         movie_id,
+        rating,
         review,
         created_at
       }
@@ -194,6 +199,7 @@ export default function Reviews() {
         user_id: newReview.data.user_id,
         username: credentials.username,
         movie_id: newReview.data.movie_id,
+        rating: newReview.data.rating,
         review: newReview.data.review,
         created_at: newReview.data.created_at
       };
@@ -210,6 +216,7 @@ export default function Reviews() {
       params.append("jwt_token", credentials.jwt_token);
       params.append("username", credentials.username);
       params.append("topic", newReview.data.movie_id);
+      params.append("rating", newReview.data.rating.toString());
       params.append("review", newReview.data.review);
       params.append("created_at", newReview.data.created_at.toString());
 

@@ -96,6 +96,7 @@ struct WsEmitRequest {
   jwt_token: String,
   username: String,
   topic: String,
+  rating: i32,
   review: String,
   created_at: String
 }
@@ -505,11 +506,12 @@ async fn emit_review(req: WsEmitRequest, client_list: ClientList)
 
     Ok(payload) => {
       let user_id = payload.claims.user_id;
-      let message = format!("id={};user_id={};username={};movie_id={};review={};created_at={}",
+      let message = format!("id={};user_id={};username={};movie_id={};rating={};review={};created_at={}",
       req.id,
       user_id,
       req.username,
       req.topic,
+      req.rating,
       req.review,
       req.created_at
     );
