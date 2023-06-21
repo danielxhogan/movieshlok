@@ -1,4 +1,5 @@
 import styles from "@/styles/MovieDetails/Reviews.module.css";
+import Stars from "@/components/Stars";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { selectCredentials, unsetCredentials } from "@/redux/reducers/auth";
 import { Review } from "@/redux/actions/reviews";
@@ -235,10 +236,20 @@ export default function Reviews() {
     }
   }, [credentials.jwt_token, credentials.username, dispatch, newReview, router])
 
-
   function makeReview(review: Review) {
     return <div key={review.id} className="block block-btn">
-      <h3 className={styles["username"]}>{review.username}</h3>
+
+      <div className={styles["review-title"]}>
+        <h3 className={styles["username"]}>{review.username}</h3>
+        <Stars
+          id="reviews"
+          initialRating={review.rating}
+          setParentRating={() => {}}
+          interactive={false}
+          size="lg"
+        />
+      </div>
+
       <p>{review.review}</p>
     </div>
   }

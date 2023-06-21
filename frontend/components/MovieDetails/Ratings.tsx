@@ -198,12 +198,16 @@ export default function Ratings() {
             id="rating"
             initialRating={ratingLike.data.rating}
             setParentRating={updateRating}
+            interactive={true}
+            size="2xl"
           />
         :
           <Stars
             id="rating"
             initialRating={Rating.ZERO}
             setParentRating={updateRating}
+            interactive={true}
+            size="2xl"
           />
         }
 
@@ -254,6 +258,8 @@ export default function Ratings() {
                   id="review"
                   initialRating={rating}
                   setParentRating={setReviewRating}
+                  interactive={true}
+                  size="2xl"
                 />
               </FormLabel>
               <Textarea

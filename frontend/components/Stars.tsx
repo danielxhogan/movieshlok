@@ -19,6 +19,8 @@ interface Props {
   id: string;
   initialRating: Rating;
   setParentRating: Function;
+  interactive: boolean;
+  size: string;
 }
 
 
@@ -27,6 +29,8 @@ export default function Stars(props: Props) {
   const [ newRating, setNewRating ] = useState(currentRating);
 
   useEffect(() => {
+    if ( !props.interactive ) { return; }
+
     let starOne: HTMLElement | null = null;
     let starTwo: HTMLElement | null = null;
     let starThree: HTMLElement | null = null;
@@ -134,91 +138,91 @@ export default function Stars(props: Props) {
     switch (rating) {
       case Rating.ZERO:
         return <>
-          <i id={`${props.id}-star-one`} className={`fa-regular fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-two`} className={`fa-regular fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-three`} className={`fa-regular fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-four`} className={`fa-regular fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-five`} className={`fa-regular fa-star fa-2xl`}></i>
+          <i id={`${props.id}-star-one`} className={`fa-regular fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-two`} className={`fa-regular fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-three`} className={`fa-regular fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-four`} className={`fa-regular fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-five`} className={`fa-regular fa-star fa-${props.size}`}></i>
         </>
       case Rating.POINT_FIVE:
         return <>
-          <i id={`${props.id}-star-one`} className={`${styles["half-star"]} fa-regular fa-star-half-stroke fa-2xl`}></i>
-          <i id={`${props.id}-star-two`} className={`fa-regular fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-three`} className={`fa-regular fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-four`} className={`fa-regular fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-five`} className={`fa-regular fa-star fa-2xl`}></i>
+          <i id={`${props.id}-star-one`} className={`${styles[`hs-${props.size}`]} fa-regular fa-star-half-stroke fa-${props.size}`}></i>
+          <i id={`${props.id}-star-two`} className={`fa-regular fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-three`} className={`fa-regular fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-four`} className={`fa-regular fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-five`} className={`fa-regular fa-star fa-${props.size}`}></i>
         </>
       case Rating.ONE:
         return <>
-          <i id={`${props.id}-star-one`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-two`} className={`fa-regular fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-three`} className={`fa-regular fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-four`} className={`fa-regular fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-five`} className={`fa-regular fa-star fa-2xl`}></i>
+          <i id={`${props.id}-star-one`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-two`} className={`fa-regular fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-three`} className={`fa-regular fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-four`} className={`fa-regular fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-five`} className={`fa-regular fa-star fa-${props.size}`}></i>
         </>
       case Rating.ONE_POINT_FIVE:
         return <>
-          <i id={`${props.id}-star-one`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-two`} className={`${styles["half-star"]} fa-solid fa-star-half-stroke fa-2xl`}></i>
-          <i id={`${props.id}-star-three`} className={`fa-regular fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-four`} className={`fa-regular fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-five`} className={`fa-regular fa-star fa-2xl`}></i>
+          <i id={`${props.id}-star-one`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-two`} className={`${styles[`hs-${props.size}`]} fa-solid fa-star-half-stroke fa-${props.size}`}></i>
+          <i id={`${props.id}-star-three`} className={`fa-regular fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-four`} className={`fa-regular fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-five`} className={`fa-regular fa-star fa-${props.size}`}></i>
         </>
       case Rating.TWO:
         return <>
-          <i id={`${props.id}-star-one`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-two`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-three`} className={`fa-regular fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-four`} className={`fa-regular fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-five`} className={`fa-regular fa-star fa-2xl`}></i>
+          <i id={`${props.id}-star-one`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-two`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-three`} className={`fa-regular fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-four`} className={`fa-regular fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-five`} className={`fa-regular fa-star fa-${props.size}`}></i>
         </>
       case Rating.TWO_POINT_FIVE:
         return <>
-          <i id={`${props.id}-star-one`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-two`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-three`} className={`${styles["half-star"]} fa-regular fa-star-half-stroke fa-2xl`}></i>
-          <i id={`${props.id}-star-four`} className={`fa-regular fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-five`} className={`fa-regular fa-star fa-2xl`}></i>
+          <i id={`${props.id}-star-one`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-two`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-three`} className={`${styles[`hs-${props.size}`]} fa-regular fa-star-half-stroke fa-${props.size}`}></i>
+          <i id={`${props.id}-star-four`} className={`fa-regular fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-five`} className={`fa-regular fa-star fa-${props.size}`}></i>
         </>
       case Rating.THREE:
         return <>
-          <i id={`${props.id}-star-one`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-two`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-three`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-four`} className={`fa-regular fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-five`} className={`fa-regular fa-star fa-2xl`}></i>
+          <i id={`${props.id}-star-one`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-two`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-three`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-four`} className={`fa-regular fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-five`} className={`fa-regular fa-star fa-${props.size}`}></i>
         </>
       case Rating.THREE_POINT_FIVE:
         return <>
-          <i id={`${props.id}-star-one`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-two`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-three`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-four`} className={`${styles["half-star"]} fa-solid fa-star-half-stroke fa-2xl`}></i>
-          <i id={`${props.id}-star-five`} className={`fa-regular fa-star fa-2xl`}></i>
+          <i id={`${props.id}-star-one`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-two`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-three`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-four`} className={`${styles[`hs-${props.size}`]} fa-solid fa-star-half-stroke fa-${props.size}`}></i>
+          <i id={`${props.id}-star-five`} className={`fa-regular fa-star fa-${props.size}`}></i>
         </>
       case Rating.FOUR:
         return <>
-          <i id={`${props.id}-star-one`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-two`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-three`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-four`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-five`} className={`fa-regular fa-star fa-2xl`}></i>
+          <i id={`${props.id}-star-one`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-two`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-three`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-four`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-five`} className={`fa-regular fa-star fa-${props.size}`}></i>
         </>
       case Rating.FOUR_POINT_FIVE:
         return <>
-          <i id={`${props.id}-star-one`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-two`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-three`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-four`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-five`} className={`${styles["half-star"]} fa-solid fa-star-half-stroke fa-2xl`}></i>
+          <i id={`${props.id}-star-one`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-two`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-three`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-four`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-five`} className={`${styles[`hs-${props.size}`]} fa-solid fa-star-half-stroke fa-${props.size}`}></i>
         </>
       case Rating.FIVE:
         return <>
-          <i id={`${props.id}-star-one`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-two`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-three`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-four`} className={`fa-solid fa-star fa-2xl`}></i>
-          <i id={`${props.id}-star-five`} className={`fa-solid fa-star fa-2xl`}></i>
+          <i id={`${props.id}-star-one`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-two`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-three`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-four`} className={`fa-solid fa-star fa-${props.size}`}></i>
+          <i id={`${props.id}-star-five`} className={`fa-solid fa-star fa-${props.size}`}></i>
         </>
     }
   }
@@ -228,11 +232,24 @@ export default function Stars(props: Props) {
     props.setParentRating(newRating);
   }
 
-  return <span id="stars"
-    className={styles["stars"]}
-    onMouseOut={() => setNewRating(currentRating)}
-    onClick={onClickStars}
-    >
-    { makeStars(newRating) }
-  </span>
+  return <>
+    { props.interactive
+    ?
+      <span id="stars"
+        className={styles["stars"]}
+        onMouseOut={() => setNewRating(currentRating)}
+        onClick={onClickStars}
+        >
+        { makeStars(newRating) }
+      </span>
+    
+    :
+      <span id="stars"
+        className={styles["stars"]}
+        >
+        { makeStars(newRating) }
+      </span>
+    
+    }
+  </>
 }
