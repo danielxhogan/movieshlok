@@ -64,12 +64,21 @@ export default function Ratings() {
         jwt_token: credentials.jwt_token,
         movieId,
         review: newReviewText,
-        rating,
+        rating: reviewRating,
         liked
       };
 
       dispatch(postReview(newReview));
     }
+  }
+
+  function updateRating(newRating: Rating) {
+    setRating(newRating);
+
+  }
+
+  function updateLike(likeStatus: boolean) {
+
   }
 
   function toggleLike() {
@@ -78,13 +87,20 @@ export default function Ratings() {
         setLiked(false);
         setLikedClass(HIDDEN);
         setUnlikedClass(SHOWN);
+        updateLike(false);
         break;
       case false:
         setLiked(true);
         setLikedClass(SHOWN);
         setUnlikedClass(HIDDEN);
+        updateLike(true);
         break;
     }
+  }
+
+  function onOpenModal() {
+    onOpen();
+    setReviewRating(rating);
   }
 
   return <div className={`${styles["wrapper"]} block`}>
@@ -93,12 +109,13 @@ export default function Ratings() {
         <Stars
           id="rating"
           initialRating={rating}
-          setParentRating={setRating}
+          setParentRating={updateRating}
         />
+
         <Button
           colorScheme="teal" variant="outline"
           className={styles["trailer-button"]}
-          onClick={onOpen}>
+          onClick={onOpenModal}>
           Leave Review
         </Button>
       </div>
@@ -141,7 +158,7 @@ export default function Ratings() {
                 <Stars
                   id="review"
                   initialRating={rating}
-                  setParentRating={setRating}
+                  setParentRating={setReviewRating}
                 />
               </FormLabel>
               <Textarea

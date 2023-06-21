@@ -38,7 +38,6 @@ struct IncomingNewReview {
     pub review: String,
     pub rating: i32,
     pub liked: bool
-
 }
 
 // STRUCTS FOR MANAGING WEBSOCKETS
@@ -72,7 +71,6 @@ struct WsEmitRequest {
   id: String,
   jwt_token: String,
   username: String,
-  // review: SelectingReview,
   topic: String,
   review: String,
   created_at: String
@@ -193,7 +191,6 @@ async fn post_review(mut reviews_db_manager: ReviewsDbManager, new_review: Incom
     Err(err) => respond(Err(err), warp::http::StatusCode::BAD_REQUEST),
     Ok(response) => respond(Ok(response), warp::http::StatusCode::CREATED)
   }
-
 }
 
 // ENPOINTS FOR MANAGING WEBSOCKETS
