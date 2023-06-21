@@ -31,6 +31,25 @@ interface ReviewsResultsPayload {
   };
 }
 
+// GET RATING AND LIKE FOR A MOVIE
+// ********************************
+export interface UserMovie {
+  jwt_token: string;
+  movie_id: string;
+}
+
+export interface RatingLikeResponse {
+  rating: Rating;
+  liked: boolean;
+}
+
+interface RatingLikePayload {
+  success: boolean;
+  message: string;
+  code: number;
+  data: RatingLikeResponse | null;
+}
+
 // CREATE A NEW REVIEW IN THE DATABASE TYPES
 // ******************************************
 
@@ -82,19 +101,18 @@ export const getReviews = createAsyncThunk(
 
     if (response.ok) {
       const data = await response.json();
-
       return {
         success: true,
         message: "ok",
         data
-      }
+      };
 
     } else if (response.status >= 500) {
       return {
         success: false,
         message: "server error",
         data: {}
-      }
+      };
 
     } else {
       const data = await response.json();
@@ -102,10 +120,56 @@ export const getReviews = createAsyncThunk(
         success: false,
         message: data.message,
         data: {}
-      }
+      };
     }
   }
-)
+);
+
+// GET RATING AND LIKE FOR A MOVIE
+// ********************************
+export const getRatingLike = createAsyncThunk(
+  "reviews/ratingLike",
+  async (userMovie: UserMovie): Promise<RatingLikePayload> => {
+    const ratingLikeUrl = `${BACKEND_URL}/rating-like`;
+
+    const headers = new Headers();
+    headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+    const params = new URLSearchParams();
+    params.append("jwt_token", userMovie.jwt_token);
+    params.append("movie_id", userMovie.movie_id);
+
+    const request = new Request(ratingLikeUrl, { headers, body:params, method: "POST" });
+    const response = await fetch(request);
+
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        success: true,
+        message: "ok",
+        code: response.status,
+        data
+      };
+
+    } else if (response.status >= 500) {
+      return {
+        success: false,
+        message: "server error",
+        code: response.status,
+        data: null
+      };
+
+    } else {
+      const data = await response.json();
+      return {
+        success: false,
+        message: data.message,
+        code: response.status,
+        data: null
+      };
+    }
+  }
+);
 
 // CREATE A NEW REVIEW IN THE DATABASE
 // ************************************
@@ -146,14 +210,16 @@ export const postReview = createAsyncThunk(
         code: response.status,
         message: "ok",
         data
-      }
+      };
+
     } else if (response.status >= 500) {
       return {
         success: false,
         code: response.status,
         message: "server error",
         data: null
-      }
+      };
+
     } else {
       const data = await response.json();
       return {
@@ -161,7 +227,7 @@ export const postReview = createAsyncThunk(
         code: response.status,
         message: data.message,
         data: null
-      }
+      };
     }
   }
 )

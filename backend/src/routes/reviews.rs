@@ -160,7 +160,7 @@ async fn get_reviews(mut reviews_db_manager: ReviewsDbManager, get_reviews_param
 fn get_rating_like_filters(pool: PgPool)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
-  warp::path!("get-rating")
+  warp::path!("rating-like")
     .and(warp::post())
     .and(with_reviews_db_manager(pool))
     .and(with_form_body::<IncomingUserMovie>())

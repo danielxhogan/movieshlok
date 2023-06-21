@@ -18,13 +18,13 @@ import {
   MenuDivider,
 } from '@chakra-ui/react'
 
-
 export default function Navbar() {
   const router = useRouter();
   const [ authenticated, setAuthenticated ] = useState(false);
 
   const dispatch = useAppDispatch();
   const credentials = useAppSelector(selectCredentials);
+
 
   // set current location in localStorage unless on login or register page
   // used to send user back to the page they were on after successful login

@@ -9,8 +9,8 @@ import {
   resetNewReview
 } from "@/redux/reducers/reviews";
 
-import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
+import { useEffect, useCallback } from "react";
 
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
@@ -226,12 +226,11 @@ export default function Reviews() {
       dispatch(resetNewReview());
 
     } else if (newReview.code === 401) {
-      document.cookie = "username=";
-      document.cookie = "jwt_token=";
-
-      dispatch(unsetCredentials());
       dispatch(resetNewReview());
 
+      dispatch(unsetCredentials());
+      document.cookie = "username=";
+      document.cookie = "jwt_token=";
       router.push("/auth/login");
     }
   }, [credentials.jwt_token, credentials.username, dispatch, newReview, router])

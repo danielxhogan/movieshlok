@@ -3,9 +3,11 @@ import Stars, { Rating } from "@/components/Stars";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { selectCredentials } from "@/redux/reducers/auth";
 import { selectMovieDetails } from "@/redux/reducers/tmdb";
+import { selectRatingLike } from "@/redux/reducers/reviews";
 import { postReview, NewReview } from "@/redux/actions/reviews";
 
-import { useState } from "react";
+import { useRouter } from "next/router";
+import { useCallback, useEffect, useState } from "react";
 
 import {
   useDisclosure,
@@ -29,10 +31,13 @@ const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeC
 const SHOWN = "shown";
 const HIDDEN = "hidden";
 
+
 export default function Ratings() {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const credentials = useAppSelector(selectCredentials);
   const movieDetails = useAppSelector(selectMovieDetails);
+  const ratingLike = useAppSelector(selectRatingLike);
 
   const [ rating, setRating ] = useState(Rating.ZERO);
   const [ reviewRating, setReviewRating] = useState(Rating.ZERO);
@@ -44,37 +49,30 @@ export default function Ratings() {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  function makeModalHeader() {
-    let year;
-    if (movieDetails.data.release_date) {
-      year = movieDetails.data.release_date.substring(0,4);
+  const setLikeTrue = useCallback(() => {
+        setLikedClass(SHOWN);
+        setUnlikedClass(HIDDEN);
+        setLiked(true);
+  }, []);
+
+  useEffect(() => {
+    if (ratingLike.status === "fulfilled") {
+      if (ratingLike.code === 401) {
+        dispatch(unsetCredentials());
+        document.cookie = "username=";
+        document.cookie = "jwt_token=";
+        router.push("/auth/login");
+
+      } else if (ratingLike.data) {
+        setRating(ratingLike.data.rating);
+        if (ratingLike.data.liked) {
+          setLikeTrue();
+        }
+
+      }
     }
-    return <>
-      {movieDetails.data.title} <span className={styles["year"]}>{year}</span>
-    </>
-  }
+  }, [dispatch, ratingLike, router, setLikeTrue]);
 
-  function onClickCloseReviewModal() {
-    onClose();
-
-    if (newReviewText !== "" &&
-        movieDetails.data &&
-        movieDetails.data.id &&
-        credentials.jwt_token &&
-        credentials.username
-      ) {
-      const movieId = movieDetails.data.id.toString();
-      const newReview: NewReview = {
-        jwt_token: credentials.jwt_token,
-        movieId,
-        review: newReviewText,
-        rating: reviewRating,
-        liked
-      };
-
-      dispatch(postReview(newReview));
-    }
-  }
 
   function updateRating(newRating: Rating) {
     setRating(newRating);
@@ -159,14 +157,55 @@ export default function Ratings() {
     setReviewRating(rating);
   }
 
+  function makeModalHeader() {
+    let year;
+    if (movieDetails.data.release_date) {
+      year = movieDetails.data.release_date.substring(0,4);
+    }
+    return <>
+      {movieDetails.data.title} <span className={styles["year"]}>{year}</span>
+    </>
+  }
+
+  function onClickCloseReviewModal() {
+    onClose();
+
+    if (newReviewText !== "" &&
+        movieDetails.data &&
+        movieDetails.data.id &&
+        credentials.jwt_token &&
+        credentials.username
+      ) {
+      const movieId = movieDetails.data.id.toString();
+      const newReview: NewReview = {
+        jwt_token: credentials.jwt_token,
+        movieId,
+        review: newReviewText,
+        rating: reviewRating,
+        liked
+      };
+
+      dispatch(postReview(newReview));
+    }
+  }
+
   return <div className={`${styles["wrapper"]} block`}>
     { credentials.jwt_token ? <>
       <div className={styles["rating-review"]}>
-        <Stars
-          id="rating"
-          initialRating={rating}
-          setParentRating={updateRating}
-        />
+        { ratingLike.data
+        ?
+          <Stars
+            id="rating"
+            initialRating={ratingLike.data.rating}
+            setParentRating={updateRating}
+          />
+        :
+          <Stars
+            id="rating"
+            initialRating={Rating.ZERO}
+            setParentRating={updateRating}
+          />
+        }
 
         <Button
           colorScheme="teal" variant="outline"

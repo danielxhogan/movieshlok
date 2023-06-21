@@ -1,6 +1,6 @@
 import { authSliceReducer } from "@/redux/reducers/auth";
 import { searchResultsReducer, movieDetailsReducer } from "@/redux/reducers/tmdb";
-import { reviewsReducer, newReviewReducer } from "@/redux/reducers/reviews";
+import { reviewsReducer, ratingLikeReducer, newReviewReducer } from "@/redux/reducers/reviews";
 import { combineReducers } from 'redux';
 
 export type Status = "fulfilled" | "loading" | "idle";
@@ -10,6 +10,7 @@ const reducers = combineReducers({
   searchResults: searchResultsReducer,
   movieDetails: movieDetailsReducer,
   reviews: reviewsReducer,
+  ratingLike: ratingLikeReducer,
   newReview: newReviewReducer
 });
 

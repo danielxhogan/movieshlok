@@ -1,4 +1,12 @@
-import { getReviews, postReview, Review, ReturnedNewReview } from "@/redux/actions/reviews";
+import {
+  getReviews,
+  getRatingLike,
+  postReview,
+  Review,
+  RatingLikeResponse,
+  ReturnedNewReview
+} from "@/redux/actions/reviews";
+
 import { Status } from "@/redux/reducers/index"
 import { AppState } from "@/redux/store";
 import { createSlice } from "@reduxjs/toolkit";
@@ -25,6 +33,26 @@ const initialReviewsState: Reviews = {
   success: null,
   message: "",
   data: {}
+}
+
+// GET RATING AND LIKE FOR A MOVIE
+// ********************************
+
+// type for value of rating/like in redux store
+interface RatingLike {
+  status: Status;
+  success: boolean | null;
+  message: string;
+  code: number | null;
+  data: RatingLikeResponse | null;
+}
+
+const intialRatingLikeState: RatingLike = {
+  status: "idle",
+  success: null,
+  message: "",
+  code: null,
+  data: null
 }
 
 // CREATE A NEW REVIEW IN THE DATABASE TYPES
@@ -83,6 +111,34 @@ export const { addNewReview } = reviewsSlice.actions;
 export const selectReveiws = (state: AppState) => state.reviews;
 export const reviewsReducer = reviewsSlice.reducer;
 
+// GET RATING AND LIKE FOR A MOVIE
+// ********************************
+export const ratingLikeSlice = createSlice({
+  name: "ratingLike",
+  initialState: intialRatingLikeState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(getRatingLike.pending, (state) => {
+        state.status = "loading",
+        state.success = null,
+        state.message = "",
+        state.code = null,
+        state.data = null
+      })
+      .addCase(getRatingLike.fulfilled, (state,action) => {
+        state.status = "fulfilled",
+        state.success = action.payload.success,
+        state.message = action.payload.message,
+        state.code = action.payload.code,
+        state.data = action.payload.data
+      })
+  }
+
+});
+
+export const selectRatingLike = (state: AppState) => state.ratingLike;
+export const ratingLikeReducer = ratingLikeSlice.reducer;
 
 // CREATE A NEW REVIEW IN THE DATABASE
 // ************************************

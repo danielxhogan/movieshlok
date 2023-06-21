@@ -9,7 +9,8 @@ import Footer from "@/components/Footer";
 
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { getMovieDetails } from "@/redux/actions/tmdb";
-import { getReviews } from "@/redux/actions/reviews";
+import { getReviews, getRatingLike, UserMovie } from "@/redux/actions/reviews";
+import { selectCredentials } from "@/redux/reducers/auth";
 import { selectMovieDetails } from "@/redux/reducers/tmdb";
 
 import { useEffect } from "react";
@@ -27,6 +28,7 @@ const TMDB_IMAGE_URL = publicRuntimeConfig.TMDB_IMAGE_URL;
 
 export default function MovieDetailsPage() {
   const dispatch = useAppDispatch();
+  const credentials = useAppSelector(selectCredentials);
   const movieDetails = useAppSelector(selectMovieDetails);
   const router = useRouter();
 
@@ -36,6 +38,17 @@ export default function MovieDetailsPage() {
       dispatch(getReviews(router.query.movieId));
     }
   }, [dispatch, router.query])
+
+  useEffect(() => {
+    if (credentials.jwt_token && router.query.movieId && typeof router.query.movieId === "string") {
+      const userMovie: UserMovie = {
+        jwt_token: credentials.jwt_token,
+        movie_id: router.query.movieId
+      };
+
+      dispatch(getRatingLike(userMovie));
+    }
+  })
 
   return <div className={styles["wrapper"]}>
     <Navbar />
