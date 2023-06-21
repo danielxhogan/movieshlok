@@ -5,7 +5,8 @@ import { useAppDispatch } from "@/redux/hooks";
 import { useRouter } from "next/router";
 
 export enum UseCases {
-  SEARCH_RESULTS
+  SEARCH_RESULTS,
+  REVIEWS
 }
 
 interface SearchResultsData {
@@ -16,91 +17,112 @@ interface SearchResultsData {
   filter: FilterResults;
 }
 
-type Props = SearchResultsData;
+interface ReviewsData {
+  useCase: UseCases.REVIEWS,
+  currentPage: number;
+  totalPages: number;
+  movieId: string;
+}
+
+type Props = SearchResultsData | ReviewsData;
 
 export default function Pagination(props: Props) {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  function onClickPaginationButton(page: string) {
-    router.push(`/search?query=${props.searchQuery}&filter=${props.filter}&page=${page}`);
+  function searchResultsOnClick(page: number) {
+    if (props.useCase === UseCases.SEARCH_RESULTS) {
+      router.push(`/search?query=${props.searchQuery}&filter=${props.filter}&page=${page}`);
+    }
   }
 
-  let currentPage_number;
-  let totalPages_number;
+  function makeLinksArray(startI: number, endI: number, currentPage: number, onClickFuncion: Function) {
+    const linksArray = [];
+
+    for (let i=startI; i<endI; i++) {
+      const pageNumber = i + 1;
+
+      linksArray.push(
+          <span
+            key={i}
+            onClick={ () => onClickFuncion(pageNumber) }
+            className={
+              (i+1) === currentPage
+              ?
+              `${styles["current-page"]} ${styles["page-button"]}`
+              :
+              `${styles["page-button"]}`}
+              >
+
+            { i + 1 }
+
+          </span>
+      )
+    }
+
+    return linksArray;
+  }
 
   function makeLinks() {
+    let currentPage: number;
+    let totalPages: number;
+
+    if (typeof props.currentPage === "string") {
+      currentPage = parseInt(props.currentPage);
+    } else {
+      currentPage = props.currentPage;
+    }
+
+    if (typeof props.totalPages === "string") {
+      totalPages = parseInt(props.totalPages);
+    } else {
+      totalPages = props.totalPages;
+    }
+
+    let startI;
+    let endI;
+
+    if (totalPages <= 5) {
+      startI = 0;
+      endI = totalPages;
+
+    } else if (currentPage <= 3) {
+      startI = 0;
+      endI = 5;
+
+    } else if ((totalPages - currentPage) <= 2) {
+      startI = totalPages - 5;
+      endI = totalPages;
+
+    } else {
+      startI = currentPage - 3;
+      endI = currentPage + 2;
+    }
+
     switch (props.useCase) {
-
       case UseCases.SEARCH_RESULTS:
-        currentPage_number = parseInt(props.currentPage);
-        totalPages_number = parseInt(props.totalPages);
-
-        const linksArray = [];
-        let startI;
-        let endI;
-
-        if (totalPages_number <= 5) {
-          startI = 0;
-          endI = totalPages_number;
-
-        } else if (currentPage_number <= 3) {
-          startI = 0;
-          endI = 5;
-
-        } else if ((totalPages_number - currentPage_number) <= 2) {
-          startI = totalPages_number - 5;
-          endI = totalPages_number;
-
-        } else {
-          startI = currentPage_number - 3;
-          endI = currentPage_number + 2;
-        }
-
-        for (let i=startI; i<endI; i++) {
-          const pageString = (i+1).toString();
-
-          linksArray.push(
-              <span
-                key={i}
-                onClick={ () => onClickPaginationButton(pageString) }
-                className={
-                  (i+1) === currentPage_number
-                  ?
-                  `${styles["current-page"]} ${styles["page-button"]}`
-                  :
-                  `${styles["page-button"]}`}
-                  >
-
-                { i + 1 }
-
-              </span>
-          )
-        }
-        return linksArray;
-        break;
+        return makeLinksArray(startI, endI, currentPage, searchResultsOnClick);
     }
   }
 
   function makeLeftArrows() {
     switch (props.useCase) {
-
       case UseCases.SEARCH_RESULTS:
-        const previousPageNumberInt = (parseInt(props.currentPage) - 1);
-        let previousPageNumber: string = "";
+        const previousPage = parseInt(props.currentPage) - 1;
+        let page: number;
 
-        if (previousPageNumberInt <= 0) {
-          previousPageNumber = (1).toString();
+        if (previousPage <= 0) {
+          page = 1;
         } else {
-          previousPageNumber = previousPageNumberInt.toString();
+          page = previousPage;
         }
 
         return (
           <span className={styles["left-buttons"]}>
-              <span className={styles["icon-span"]} onClick={ () => onClickPaginationButton("1") }>
+              <span className={styles["icon-span"]} onClick={ () => searchResultsOnClick(1) }>
                 <i className="fa-solid fa-backward-step fa-lg"></i>
               </span>
-              <span className={styles["icon-span"]} onClick={ () => onClickPaginationButton(previousPageNumber) }>
+              <span className={styles["icon-span"]} onClick={ () => searchResultsOnClick(page) }>
                 <i className="fa-solid fa-play fa-rotate-180"></i>
               </span>
           </span>
@@ -111,23 +133,23 @@ export default function Pagination(props: Props) {
 
   function makeRightArrows() {
     switch (props.useCase) {
-
       case UseCases.SEARCH_RESULTS:
-        const nextPageNumberInt = parseInt(props.currentPage) + 1;
-        let nextPageNumber: string = "";
+        const nextPage = parseInt(props.currentPage) +1;
+        const totalPages = parseInt(props.totalPages);
+        let page: number;
 
-        if (nextPageNumberInt >= parseInt(props.totalPages)) {
-          nextPageNumber = props.totalPages;
+        if (nextPage >= totalPages) {
+          page = totalPages;
         } else {
-          nextPageNumber = nextPageNumberInt.toString();
+          page = nextPage;
         }
 
         return (
           <span className={styles["right-buttons"]}>
-              <span className={styles["icon-span"]} onClick={ () => onClickPaginationButton(nextPageNumber) }>
+              <span className={styles["icon-span"]} onClick={ () => searchResultsOnClick(page) }>
                 <i className="fa-solid fa-play"></i>
               </span>
-              <span className={styles["icon-span"]} onClick={ () => onClickPaginationButton(props.totalPages) }>
+              <span className={styles["icon-span"]} onClick={ () => searchResultsOnClick(totalPages) }>
                 <i className="fa-solid fa-forward-step fa-lg"></i>
               </span>
           </span>

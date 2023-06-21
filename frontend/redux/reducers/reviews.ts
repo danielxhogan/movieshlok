@@ -116,7 +116,15 @@ export const reviewsReducer = reviewsSlice.reducer;
 export const ratingLikeSlice = createSlice({
   name: "ratingLike",
   initialState: intialRatingLikeState,
-  reducers: {},
+  reducers: {
+    unsetRatingLike(state) {
+      state.status = "idle";
+      state.success = null;
+      state.code = null;
+      state.message = "";
+      state.data = null
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getRatingLike.pending, (state) => {
@@ -137,6 +145,7 @@ export const ratingLikeSlice = createSlice({
 
 });
 
+export const { unsetRatingLike } = ratingLikeSlice.actions;
 export const selectRatingLike = (state: AppState) => state.ratingLike;
 export const ratingLikeReducer = ratingLikeSlice.reducer;
 

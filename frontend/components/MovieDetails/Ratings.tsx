@@ -1,9 +1,9 @@
 import styles from "@/styles/MovieDetails/Ratings.module.css";
 import Stars, { Rating } from "@/components/Stars";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
-import { selectCredentials } from "@/redux/reducers/auth";
+import { selectCredentials, unsetCredentials } from "@/redux/reducers/auth";
 import { selectMovieDetails } from "@/redux/reducers/tmdb";
-import { selectRatingLike } from "@/redux/reducers/reviews";
+import { selectRatingLike, unsetRatingLike } from "@/redux/reducers/reviews";
 import { postReview, NewReview } from "@/redux/actions/reviews";
 
 import { useRouter } from "next/router";
@@ -59,6 +59,7 @@ export default function Ratings() {
     if (ratingLike.status === "fulfilled") {
       if (ratingLike.code === 401) {
         dispatch(unsetCredentials());
+        dispatch(unsetRatingLike());
         document.cookie = "username=";
         document.cookie = "jwt_token=";
         router.push("/auth/login");
