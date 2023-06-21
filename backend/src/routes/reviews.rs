@@ -2,9 +2,10 @@ use crate::db::config::db_connect::PgPool;
 use crate::db::config::models::{
   ReviewsMovieId,
   SelectingReview,
+  UserMovie,
   InsertingNewReview,
-  NewRating,
-  NewLike
+  InsertingNewRating,
+  InsertingNewLike
 };
 use crate::db::reviews::ReviewsDbManager;
 use crate::routes::{with_form_body, auth_check, respond, with_clients};
@@ -37,6 +38,29 @@ struct IncomingNewReview {
     pub movie_id: String,
     pub review: String,
     pub rating: i32,
+    pub liked: bool
+}
+
+// sent from client to get a user's rating for a movie
+#[derive(Deserialize, Debug)]
+struct IncomingUserMovie {
+  pub jwt_token: String,
+  pub movie_id: String
+}
+
+// sent from client when posting a new rating
+#[derive(Deserialize, Debug)]
+struct IncomingNewRating {
+    pub jwt_token: String,
+    pub movie_id: String,
+    pub rating: i32,
+}
+
+// sent from client when posting a new like
+#[derive(Deserialize, Debug)]
+struct IncomingNewLike {
+    pub jwt_token: String,
+    pub movie_id: String,
     pub liked: bool
 }
 
@@ -101,14 +125,17 @@ pub fn reviews_filters(pool: PgPool, ws_client_list: ClientList)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
   get_reviews_filters(pool.clone())
-  .or(post_review_filters(pool))
+  .or(get_rating_like_filters(pool.clone()))
+  .or(post_review_filters(pool.clone()))
+  .or(post_rating_filters(pool.clone()))
+  .or(post_like_filters(pool.clone()))
   .or(register_ws_client_filters(ws_client_list.clone()))
   .or(unregister_ws_client_filters(ws_client_list.clone()))
   .or(make_ws_connection_filters(ws_client_list.clone()))
   .or(emit_review_filters(ws_client_list.clone()))
 }
 
-// ENDPOINTS FOR QUERYING DATABASE
+// ENDPOINTS FOR SELECTING FROM DATABASE
 // ********************************************************
 fn get_reviews_filters(pool: PgPool)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
@@ -130,6 +157,42 @@ async fn get_reviews(mut reviews_db_manager: ReviewsDbManager, get_reviews_param
   respond(response, warp::http::StatusCode::OK)
 }
 
+fn get_rating_like_filters(pool: PgPool)
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
+  warp::path!("get-rating")
+    .and(warp::post())
+    .and(with_reviews_db_manager(pool))
+    .and(with_form_body::<IncomingUserMovie>())
+    .and_then(get_rating_like)
+}
+
+async fn get_rating_like(mut reviews_db_manager: ReviewsDbManager, user_movie: IncomingUserMovie)
+-> Result<impl warp::Reply, warp::Rejection>
+{
+  let payload = auth_check(user_movie.jwt_token);
+
+  match payload {
+    Err(err) => { return respond(Err(err), warp::http::StatusCode::UNAUTHORIZED) },
+    Ok(_) => ()
+  }
+
+  let payload = payload.unwrap();
+  let user_id = payload.claims.user_id;
+
+  let user_movie = UserMovie {
+    user_id,
+    movie_id: user_movie.movie_id
+  };
+
+  let response = reviews_db_manager.get_rating_like(user_movie);
+  respond(response, warp::http::StatusCode::OK)
+
+}
+
+// ENDPOINTS FOR INSERTING INTO/UPDATING DATABASE
+// ********************************************************
+
 fn post_review_filters(pool: PgPool)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
@@ -139,6 +202,7 @@ fn post_review_filters(pool: PgPool)
     .and(with_form_body::<IncomingNewReview>())
     .and_then(post_review)
 }
+
 
 async fn post_review(mut reviews_db_manager: ReviewsDbManager, new_review: IncomingNewReview)
 -> Result<impl warp::Reply, warp::Rejection>
@@ -162,13 +226,13 @@ async fn post_review(mut reviews_db_manager: ReviewsDbManager, new_review: Incom
     created_at
   };
 
-  let new_rating = NewRating {
+  let new_rating = InsertingNewRating {
     user_id,
     movie_id: new_review.movie_id.clone(),
     rating: new_review.rating
   };
 
-  let new_like = NewLike {
+  let new_like = InsertingNewLike {
     user_id,
     movie_id: new_review.movie_id,
     liked: new_review.liked
@@ -191,6 +255,72 @@ async fn post_review(mut reviews_db_manager: ReviewsDbManager, new_review: Incom
     Err(err) => respond(Err(err), warp::http::StatusCode::BAD_REQUEST),
     Ok(response) => respond(Ok(response), warp::http::StatusCode::CREATED)
   }
+}
+
+fn post_rating_filters(pool: PgPool)
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
+  warp::path!("rating")
+    .and(warp::post())
+    .and(with_reviews_db_manager(pool))
+    .and(with_form_body::<IncomingNewRating>())
+    .and_then(post_rating)
+}
+
+async fn post_rating(mut reviews_db_manager: ReviewsDbManager, new_rating: IncomingNewRating)
+-> Result<impl warp::Reply, warp::Rejection>
+{
+  let payload = auth_check(new_rating.jwt_token);
+
+  match payload {
+    Err(err) => { return respond(Err(err), warp::http::StatusCode::UNAUTHORIZED) },
+    Ok(_) => ()
+  }
+
+  let payload = payload.unwrap();
+  let user_id = payload.claims.user_id;
+
+  let inserting_new_rating = InsertingNewRating {
+    user_id,
+    movie_id: new_rating.movie_id,
+    rating: new_rating.rating
+  };
+
+  let response = reviews_db_manager.post_rating(inserting_new_rating);
+  respond(response, warp::http::StatusCode::CREATED)
+}
+
+fn post_like_filters(pool: PgPool)
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
+  warp::path!("like")
+    .and(warp::post())
+    .and(with_reviews_db_manager(pool))
+    .and(with_form_body::<IncomingNewLike>())
+    .and_then(post_like)
+}
+
+async fn post_like(mut reviews_db_manager: ReviewsDbManager, new_like: IncomingNewLike)
+-> Result<impl warp::Reply, warp::Rejection>
+{
+  let payload = auth_check(new_like.jwt_token);
+
+  match payload {
+    Err(err) => { return respond(Err(err), warp::http::StatusCode::UNAUTHORIZED) },
+    Ok(_) => ()
+  }
+
+  let payload = payload.unwrap();
+  let user_id = payload.claims.user_id;
+
+  let inserting_new_like = InsertingNewLike {
+    user_id,
+    movie_id: new_like.movie_id,
+    liked: new_like.liked
+  };
+
+  let response = reviews_db_manager.post_like(inserting_new_like);
+  respond(response, warp::http::StatusCode::CREATED)
 }
 
 // ENPOINTS FOR MANAGING WEBSOCKETS
@@ -332,7 +462,7 @@ async fn client_connection(ws: WebSocket, uuid: String, client_list: ClientList,
   client.sender = Some(client_sender);
   client_list.write().await.insert(uuid.clone(), client);
 
-   println!("{} connected", uuid);
+  //  println!("{} connected", uuid);
 
   while let Some(result) = client_ws_rcv.next().await {
       // let msg = match result {
@@ -347,7 +477,7 @@ async fn client_connection(ws: WebSocket, uuid: String, client_list: ClientList,
   }
 
   client_list.write().await.remove(&uuid);
-   println!("{} disconnected", uuid);
+  //  println!("{} disconnected", uuid);
 }
 
 fn emit_review_filters(client_list: ClientList)

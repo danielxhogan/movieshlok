@@ -1,7 +1,7 @@
 import styles from "../../styles/auth/login.module.css";
 import logo from "../../public/logo.png";
 import Navbar from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
+import Footer from "@/components/Footer";
 
 import { FormEvent, useState } from "react";
 import { Input, Button } from '@chakra-ui/react';

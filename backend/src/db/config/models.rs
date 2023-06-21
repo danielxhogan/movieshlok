@@ -73,6 +73,21 @@ pub struct InsertingNewReview {
     pub created_at: i64
 }
 
+// RATINGS AND LIKES
+// ***********************************************
+// sent from client when getting a user's rating and like status for a movie
+#[derive(Debug, Deserialize, Clone)]
+pub struct UserMovie {
+    pub user_id: Uuid,
+    pub movie_id: String
+}
+
+#[derive(Debug, Serialize, Clone)]
+pub struct RatingLike {
+    pub rating: i32,
+    pub liked: bool
+}
+
 // RATINGS
 // ***********************************************
 #[derive(Queryable, Serialize, Deserialize)]
@@ -86,7 +101,7 @@ pub struct Rating {
 
 #[derive(Deserialize, Insertable, Debug)]
 #[diesel(table_name = ratings)]
-pub struct NewRating {
+pub struct InsertingNewRating {
     pub user_id: Uuid,
     pub movie_id: String,
     #[diesel(sql_type = Int4)]
@@ -105,7 +120,7 @@ pub struct Like {
 
 #[derive(Deserialize, Insertable, Debug)]
 #[diesel(table_name = likes)]
-pub struct NewLike {
+pub struct InsertingNewLike {
     pub user_id: Uuid,
     pub movie_id: String,
     pub liked: bool

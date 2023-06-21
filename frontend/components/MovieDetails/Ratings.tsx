@@ -22,6 +22,10 @@ import {
   ModalFooter
 } from "@chakra-ui/react";
 
+import getConfig from "next/config";
+const { publicRuntimeConfig } = getConfig();
+const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
+
 const SHOWN = "shown";
 const HIDDEN = "hidden";
 
@@ -74,11 +78,63 @@ export default function Ratings() {
 
   function updateRating(newRating: Rating) {
     setRating(newRating);
+    let token: string;
+    let movieId: string;
 
+    if (credentials.jwt_token) {
+      token = credentials.jwt_token;
+    } else {
+      return;
+    }
+
+    if (movieDetails.data.id) {
+      movieId = movieDetails.data.id.toString();
+    } else {
+      return;
+    }
+
+    const updateRatingUrl = `${BACKEND_URL}/rating`;
+
+    const headers = new Headers();
+    headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+    const params = new URLSearchParams();
+    params.append("jwt_token", token);
+    params.append("movie_id", movieId);
+    params.append("rating", newRating.toString());
+
+    const request = new Request(updateRatingUrl, { headers, body: params, method: "POST" });
+    fetch(request);
   }
 
   function updateLike(likeStatus: boolean) {
+    let token: string;
+    let movieId: string;
 
+    if (credentials.jwt_token) {
+      token = credentials.jwt_token;
+    } else {
+      return;
+    }
+
+    if (movieDetails.data.id) {
+      movieId = movieDetails.data.id.toString();
+    } else {
+      return;
+    }
+
+    const updateRatingUrl = `${BACKEND_URL}/like`;
+
+    const headers = new Headers();
+    headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+    const params = new URLSearchParams();
+    params.append("jwt_token", token);
+    params.append("movie_id", movieId);
+    params.append("liked", likeStatus.toString());
+
+    const request = new Request(updateRatingUrl, { headers, body: params, method: "POST" });
+    fetch(request);
   }
 
   function toggleLike() {

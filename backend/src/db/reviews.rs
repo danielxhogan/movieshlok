@@ -4,9 +4,11 @@ use crate::db::config::models::{
   SelectingReview,
   InsertingNewReview,
   Review,
-  NewRating,
+  UserMovie,
+  RatingLike,
+  InsertingNewRating,
   Rating,
-  NewLike,
+  InsertingNewLike,
   Like
 };
 use crate::utils::error_handling::AppError;
@@ -50,6 +52,47 @@ impl ReviewsDbManager {
     }
   }
 
+  pub fn get_rating_like(&mut self, user_movie: UserMovie)
+  -> Result<RatingLike, AppError>
+  {
+    let ratings = ratings::table
+      .filter(ratings::user_id.eq(&user_movie.user_id))
+      .filter(ratings::movie_id.eq(&user_movie.movie_id))
+      .load::<Rating>(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while getting a user's rating")
+      });
+    
+    let ratings = ratings.unwrap();
+    let mut rating = 0;
+
+    if ratings.len() > 0 {
+      rating = ratings[0].rating;
+    }
+
+    let likes = likes::table
+      .filter(likes::user_id.eq(&user_movie.user_id))
+      .filter(likes::movie_id.eq(&user_movie.movie_id))
+      .load::<Like>(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while getting a user's like")
+      });
+    
+    let likes = likes.unwrap();
+    let mut liked = false;
+
+    if likes.len() > 0 {
+      liked = likes[0].liked;
+    }
+
+    let rating_like = RatingLike {
+      rating,
+      liked
+    };
+
+    Ok(rating_like)
+  }
+
   pub fn post_review(&mut self, new_review: InsertingNewReview)
   -> Result<Review, AppError>
   {
@@ -61,7 +104,7 @@ impl ReviewsDbManager {
       })
   }
 
-  pub fn post_rating(&mut self, rating: NewRating)
+  pub fn post_rating(&mut self, rating: InsertingNewRating)
   -> Result<Rating, AppError>
   {
     // check if user has previously rated
@@ -95,7 +138,7 @@ impl ReviewsDbManager {
     }
   }
 
-  pub fn post_like(&mut self, like: NewLike)
+  pub fn post_like(&mut self, like: InsertingNewLike)
   -> Result<Like, AppError>
   {
     // check if user previously like

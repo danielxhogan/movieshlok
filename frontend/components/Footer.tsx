@@ -4,7 +4,7 @@ interface Props {
   singlePage: boolean;
 }
 
-export function Footer({singlePage}: Props) {
+export default function Footer({singlePage}: Props) {
   let singlePageClass: string;
 
   switch(singlePage) {

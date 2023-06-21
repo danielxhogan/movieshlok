@@ -3,7 +3,7 @@ import styles from "@/styles/SearchPage.module.css";
 import Navbar from "@/components/Navbar";
 import Searchbar from "@/components/Searchbar";
 import Pagination, { UseCases } from "@/components/Pagination";
-import { Footer } from "@/components/Footer";
+import Footer from "@/components/Footer";
 
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { getSearchResults, SearchParams } from "@/redux/actions/tmdb";
