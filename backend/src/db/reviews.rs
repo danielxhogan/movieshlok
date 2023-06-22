@@ -1,6 +1,7 @@
 use crate::db::config::schema::{reviews, users, ratings, likes};
 use crate::db::config::models::{
-  ReviewsMovieId,
+  GetReviewsRequest,
+  GetReviewsResponse,
   SelectingReview,
   InsertingNewReview,
   Review,
@@ -28,9 +29,24 @@ impl ReviewsDbManager {
     ReviewsDbManager {connection}
   }
 
-  pub fn get_reviews(&mut self, reviews_movie_id: ReviewsMovieId)
-  -> Result<Box<Vec<SelectingReview>>, AppError>
+  pub fn get_reviews(&mut self, get_reviews_request: GetReviewsRequest)
+  -> Result<GetReviewsResponse, AppError>
   {
+    let count = reviews::table
+      .filter(reviews::movie_id.eq(&get_reviews_request.movie_id))
+      .count()
+      .get_result::<i64>(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while getting count of reviews")
+      });
+
+    match count {
+      Err(err) => return Err(err),
+      Ok(_) => ()
+    };
+
+    let count = count.unwrap();
+
     let results = reviews::table
       .inner_join(users::table)
       .select((reviews::id,
@@ -40,15 +56,26 @@ impl ReviewsDbManager {
         reviews::rating,
         reviews::review,
         reviews::created_at))
-      .filter(reviews::movie_id.eq(&reviews_movie_id.movie_id))
+      .order(reviews::created_at.desc())
+      .filter(reviews::movie_id.eq(&get_reviews_request.movie_id))
+      .offset(get_reviews_request.offset)
+      .limit(get_reviews_request.limit)
       .load::<SelectingReview>(&mut self.connection)
       .map_err(|err| {
         AppError::from_diesel_err(err, "while getting reviews")
       });
 
     match results {
-      Ok(results) => return Ok(Box::new(results)),
-      Err(err) => return Err(err)
+      Err(err) => return Err(err),
+
+      Ok(results) => {
+        let response = GetReviewsResponse {
+          total_results: count,
+          reviews: Box::new(results)
+        };
+
+        Ok(response)
+      }
     }
   }
 

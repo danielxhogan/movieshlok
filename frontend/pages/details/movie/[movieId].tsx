@@ -9,7 +9,7 @@ import Footer from "@/components/Footer";
 
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { getMovieDetails } from "@/redux/actions/tmdb";
-import { getReviews, getRatingLike, UserMovie } from "@/redux/actions/reviews";
+import { getReviews, getRatingLike, UserMovie, GetReviewsRequest } from "@/redux/actions/reviews";
 import { selectCredentials } from "@/redux/reducers/auth";
 import { selectMovieDetails } from "@/redux/reducers/tmdb";
 
@@ -34,8 +34,13 @@ export default function MovieDetailsPage() {
 
   useEffect(() => {
     if (router.query.movieId && typeof router.query.movieId === "string") {
+      const getReviewsRequest: GetReviewsRequest = {
+        movie_id: router.query.movieId,
+        page: 1
+      };
+
       dispatch(getMovieDetails(router.query.movieId));
-      dispatch(getReviews(router.query.movieId));
+      dispatch(getReviews(getReviewsRequest));
     }
   }, [dispatch, router.query])
 

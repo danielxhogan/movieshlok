@@ -22,10 +22,17 @@ export interface Review {
   created_at: number;
 }
 
+export interface GetReviewsRequest {
+  movie_id: string;
+  page: number;
+}
+
 // payload sent by getReviews action to reviewsSlice reducer
 interface ReviewsResultsPayload {
   success: boolean;
   message: string;
+  page: number;
+  total_pages: number | null;
   data: {
     reviews?: [Review]
   };
@@ -87,30 +94,41 @@ interface NewReviewPayload {
 
 export const getReviews = createAsyncThunk(
   "reviews/fetchReviews",
-  async (movieId: string): Promise<ReviewsResultsPayload> => {
+  async (getReviewsRequest: GetReviewsRequest): Promise<ReviewsResultsPayload> => {
+    const limit = 10;
+    const offset = (getReviewsRequest.page - 1) * limit;
+
     const getReviewsUrl = `${BACKEND_URL}/reviews`;
 
     const headers = new Headers();
     headers.append("Content-Type", "application/x-www-form-urlencoded");
 
     const params = new URLSearchParams();
-    params.append("movie_id", movieId);
+    params.append("movie_id", getReviewsRequest.movie_id);
+    params.append("offset", offset.toString());
+    params.append("limit", limit.toString());
 
     const request = new Request(getReviewsUrl, { headers, body: params, method: "POST" });
     const response = await fetch(request);
 
     if (response.ok) {
       const data = await response.json();
+      const total_results = data.total_results;
+      const total_pages = Math.ceil(total_results / limit);
       return {
         success: true,
         message: "ok",
-        data
+        page: getReviewsRequest.page,
+        total_pages,
+        data: { reviews: data.reviews }
       };
 
     } else if (response.status >= 500) {
       return {
         success: false,
         message: "server error",
+        page: getReviewsRequest.page,
+        total_pages: null,
         data: {}
       };
 
@@ -119,6 +137,8 @@ export const getReviews = createAsyncThunk(
       return {
         success: false,
         message: data.message,
+        page: getReviewsRequest.page,
+        total_pages: null,
         data: {}
       };
     }

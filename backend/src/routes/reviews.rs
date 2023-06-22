@@ -1,7 +1,6 @@
 use crate::db::config::db_connect::PgPool;
 use crate::db::config::models::{
-  ReviewsMovieId,
-  SelectingReview,
+  GetReviewsRequest,
   UserMovie,
   InsertingNewReview,
   InsertingNewRating,
@@ -23,13 +22,6 @@ use std::env;
 
 // STRUCTS FOR QUERYING DATABASE
 // **************************************************
-
-// results from db query for all reviews for a movie
-// sent to client in response to get_reviews endpoint
-#[derive(Serialize)]
-struct GetReviewsResponse {
-  reviews: Box<Vec<SelectingReview>>
-}
 
 // sent from client when posting a new review
 #[derive(Deserialize, Debug)]
@@ -144,16 +136,15 @@ fn get_reviews_filters(pool: PgPool)
   warp::path!("reviews")
     .and(warp::post())
     .and(with_reviews_db_manager(pool))
-    .and(with_form_body::<ReviewsMovieId>())
+    .and(with_form_body::<GetReviewsRequest>())
     .and_then(get_reviews)
 }
 
-async fn get_reviews(mut reviews_db_manager: ReviewsDbManager, get_reviews_params: ReviewsMovieId)
+async fn get_reviews(mut reviews_db_manager: ReviewsDbManager, get_reviews_request: GetReviewsRequest)
 -> Result<impl warp::Reply, warp::Rejection>
 {
   let response = reviews_db_manager
-    .get_reviews(get_reviews_params)
-    .map(|reviews| { GetReviewsResponse { reviews } });
+    .get_reviews(get_reviews_request);
 
   respond(response, warp::http::StatusCode::OK)
 }

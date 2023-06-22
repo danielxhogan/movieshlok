@@ -1,8 +1,12 @@
 import styles from "@/styles/components/Pagination.module.css";
-import { FilterResults } from "@/pages/search";
-import { useAppDispatch } from "@/redux/hooks";
 
+// imports for SEARCH_RESULTS use case
+import { FilterResults } from "@/pages/search";
 import { useRouter } from "next/router";
+
+// imports for REVIEWS use case
+import { useAppDispatch } from "@/redux/hooks";
+import { getReviews, GetReviewsRequest } from "@/redux/actions/reviews";
 
 export enum UseCases {
   SEARCH_RESULTS,
@@ -33,6 +37,17 @@ export default function Pagination(props: Props) {
   function searchResultsOnClick(page: number) {
     if (props.useCase === UseCases.SEARCH_RESULTS) {
       router.push(`/search?query=${props.searchQuery}&filter=${props.filter}&page=${page}`);
+    }
+  }
+
+  function reviewsOnClick(page: number) {
+    if (props.useCase === UseCases.REVIEWS) {
+    const getReviewsRequest: GetReviewsRequest = {
+      page,
+      movie_id: props.movieId
+    };
+
+    dispatch(getReviews(getReviewsRequest));
     }
   }
 
@@ -102,60 +117,152 @@ export default function Pagination(props: Props) {
     switch (props.useCase) {
       case UseCases.SEARCH_RESULTS:
         return makeLinksArray(startI, endI, currentPage, searchResultsOnClick);
+      case UseCases.REVIEWS:
+        return makeLinksArray(startI, endI, currentPage, reviewsOnClick);
     }
+  }
+
+  function makeLeftArrowIcons(page: number, onClickFunction: Function) {
+    return (
+      <span className={styles["left-buttons"]}>
+          <span className={styles["icon-span"]} onClick={ () => onClickFunction(1) }>
+            <i className="fa-solid fa-backward-step fa-lg"></i>
+          </span>
+          <span className={styles["icon-span"]} onClick={ () => onClickFunction(page) }>
+            <i className="fa-solid fa-play fa-rotate-180"></i>
+          </span>
+      </span>
+    );
   }
 
   function makeLeftArrows() {
-    switch (props.useCase) {
-      case UseCases.SEARCH_RESULTS:
-        const previousPage = parseInt(props.currentPage) - 1;
-        let page: number;
+    let previousPage: number;
+    let page: number;
 
-        if (previousPage <= 0) {
-          page = 1;
-        } else {
-          page = previousPage;
-        }
-
-        return (
-          <span className={styles["left-buttons"]}>
-              <span className={styles["icon-span"]} onClick={ () => searchResultsOnClick(1) }>
-                <i className="fa-solid fa-backward-step fa-lg"></i>
-              </span>
-              <span className={styles["icon-span"]} onClick={ () => searchResultsOnClick(page) }>
-                <i className="fa-solid fa-play fa-rotate-180"></i>
-              </span>
-          </span>
-        );
-        break;
+    if (typeof props.currentPage === "string") {
+      previousPage = parseInt(props.currentPage) - 1;
+    } else {
+      previousPage = props.currentPage - 1;
     }
+
+    if (previousPage <= 0) {
+      page = 1;
+    } else {
+      page = previousPage;
+    }
+
+    switch(props.useCase) {
+      case UseCases.SEARCH_RESULTS:
+        return makeLeftArrowIcons(page, searchResultsOnClick);
+      case UseCases.REVIEWS:
+        return makeLeftArrowIcons(page, reviewsOnClick);
+    }
+
+
+    // switch (props.useCase) {
+    //   case UseCases.SEARCH_RESULTS:
+    //     const previousPage = parseInt(props.currentPage) - 1;
+    //     let page: number;
+
+    //     if (previousPage <= 0) {
+    //       page = 1;
+    //     } else {
+    //       page = previousPage;
+    //     }
+
+    //     return (
+    //       <span className={styles["left-buttons"]}>
+    //           <span className={styles["icon-span"]} onClick={ () => searchResultsOnClick(1) }>
+    //             <i className="fa-solid fa-backward-step fa-lg"></i>
+    //           </span>
+    //           <span className={styles["icon-span"]} onClick={ () => searchResultsOnClick(page) }>
+    //             <i className="fa-solid fa-play fa-rotate-180"></i>
+    //           </span>
+    //       </span>
+    //     );
+    //     break;
+    // }
+  }
+
+  function makeRightArrowIcons(page: number, onClickFuncion: Function) {
+    let totalPages: number;
+
+    if (typeof props.totalPages === "string") {
+      totalPages = parseInt(props.totalPages);
+    } else {
+      totalPages = props.totalPages;
+    }
+
+    return (
+      <span className={styles["right-buttons"]}>
+          <span className={styles["icon-span"]} onClick={ () => onClickFuncion(page) }>
+            <i className="fa-solid fa-play"></i>
+          </span>
+          <span className={styles["icon-span"]} onClick={ () => onClickFuncion(totalPages) }>
+            <i className="fa-solid fa-forward-step fa-lg"></i>
+          </span>
+      </span>
+    );
+
   }
 
   function makeRightArrows() {
-    switch (props.useCase) {
-      case UseCases.SEARCH_RESULTS:
-        const nextPage = parseInt(props.currentPage) +1;
-        const totalPages = parseInt(props.totalPages);
-        let page: number;
+    let nextPage: number;
+    let totalPages: number;
+    let page: number;
 
-        if (nextPage >= totalPages) {
-          page = totalPages;
-        } else {
-          page = nextPage;
-        }
 
-        return (
-          <span className={styles["right-buttons"]}>
-              <span className={styles["icon-span"]} onClick={ () => searchResultsOnClick(page) }>
-                <i className="fa-solid fa-play"></i>
-              </span>
-              <span className={styles["icon-span"]} onClick={ () => searchResultsOnClick(totalPages) }>
-                <i className="fa-solid fa-forward-step fa-lg"></i>
-              </span>
-          </span>
-        );
-        break;
+    if (typeof props.currentPage === "string") {
+      nextPage = parseInt(props.currentPage) + 1;
+    } else {
+      nextPage = props.currentPage + 1;
     }
+
+
+    if (typeof props.totalPages === "string") {
+      totalPages = parseInt(props.totalPages);
+    } else {
+      totalPages = props.totalPages;
+    }
+
+    if (nextPage >= totalPages) {
+      page = totalPages;
+    } else {
+      page = nextPage;
+    }
+
+    switch(props.useCase) {
+      case UseCases.SEARCH_RESULTS:
+        return makeRightArrowIcons(page, searchResultsOnClick);
+      case UseCases.REVIEWS:
+        return makeRightArrowIcons(page, reviewsOnClick);
+    }
+
+
+    // switch (props.useCase) {
+    //   case UseCases.SEARCH_RESULTS:
+    //     const nextPage = parseInt(props.currentPage) +1;
+    //     const totalPages = parseInt(props.totalPages);
+    //     let page: number;
+
+    //     if (nextPage >= totalPages) {
+    //       page = totalPages;
+    //     } else {
+    //       page = nextPage;
+    //     }
+
+    //     return (
+    //       <span className={styles["right-buttons"]}>
+    //           <span className={styles["icon-span"]} onClick={ () => searchResultsOnClick(page) }>
+    //             <i className="fa-solid fa-play"></i>
+    //           </span>
+    //           <span className={styles["icon-span"]} onClick={ () => searchResultsOnClick(totalPages) }>
+    //             <i className="fa-solid fa-forward-step fa-lg"></i>
+    //           </span>
+    //       </span>
+    //     );
+    //     break;
+    // }
   }
 
   return <div className={styles["pagination"]}>

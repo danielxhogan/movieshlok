@@ -1,5 +1,6 @@
 import styles from "@/styles/MovieDetails/Reviews.module.css";
 import Stars from "@/components/Stars";
+import Pagination, { UseCases } from "../Pagination";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { selectCredentials, unsetCredentials } from "@/redux/reducers/auth";
 import { Review } from "@/redux/actions/reviews";
@@ -12,6 +13,7 @@ import {
 
 import { useRouter } from "next/router";
 import { useEffect, useCallback } from "react";
+import { Spinner } from "@chakra-ui/react";
 
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
@@ -278,6 +280,28 @@ export default function Reviews() {
 
   return <div className={styles["wrapper"]}>
     <h2 className={styles["section-title"]}>Reviews</h2>
-    { reviews.data.reviews && sortAndMakeReviews([...reviews.data.reviews])}
+    { reviews.status === "loading"
+    ?
+      <div className={styles["spinner"]}>
+        <Spinner size='xl' />
+      </div>
+    
+    :
+    <>
+      { reviews.data.reviews && sortAndMakeReviews([...reviews.data.reviews])}
+
+      { reviews.total_pages &&
+        reviews.total_pages > 1 &&
+        typeof router.query.movieId === "string" &&
+
+        <Pagination
+          useCase={UseCases.REVIEWS}
+          currentPage={reviews.page}
+          totalPages={reviews.total_pages}
+          movieId={router.query.movieId}
+        />
+      }
+    </>
+    }
   </div>
 }

@@ -22,6 +22,8 @@ interface Reviews {
   status: Status;
   success: boolean | null;
   message: string;
+  page: number;
+  total_pages: number | null;
   data: {
     reviews?: [Review]
   }
@@ -32,6 +34,8 @@ const initialReviewsState: Reviews = {
   status: "idle",
   success: null,
   message: "",
+  page: 0,
+  total_pages: null,
   data: {}
 }
 
@@ -96,12 +100,16 @@ export const reviewsSlice = createSlice({
         state.status = "loading",
         state.success = null,
         state.message = "",
+        state.page = 1,
+        state.total_pages = null,
         state.data = {}
       })
       .addCase(getReviews.fulfilled, (state, action) => {
         state.status = "fulfilled",
         state.success = true,
         state.message = action.payload.message,
+        state.page = action.payload.page,
+        state.total_pages = action.payload.total_pages,
         state.data = action.payload.data
       })
   }
