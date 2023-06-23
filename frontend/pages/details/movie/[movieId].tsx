@@ -42,7 +42,7 @@ export default function MovieDetailsPage() {
       dispatch(getMovieDetails(router.query.movieId));
       dispatch(getReviews(getReviewsRequest));
     }
-  }, [dispatch, router.query])
+  }, [dispatch, router.query]);
 
   useEffect(() => {
     if (credentials.jwt_token && router.query.movieId && typeof router.query.movieId === "string") {

@@ -1,8 +1,8 @@
-import styles from "@/styles/u/MoviesPage.module.css";
+import styles from "@/styles/u/ReviewsPage.module.css";
 import Navbar from "@/components/Navbar"
 import Searchbar from "@/components/Searchbar";
 
-export default function MoviesPage() {
+export default function ReviewsPage() {
   return <div className={styles["wrapper"]}>
     <Navbar />
 

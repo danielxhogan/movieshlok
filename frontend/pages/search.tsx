@@ -330,7 +330,7 @@ export default function SearchPage() {
 
       </div>
     </div>
-    { searchResults.status === "fulfilled" && <Footer singlePage={false}/> }
+    { searchResults.status === "fulfilled" && <Footer singlePage={true}/> }
 
   </div>
 }

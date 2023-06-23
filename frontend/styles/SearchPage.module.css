@@ -1,6 +1,7 @@
 .wrapper {
   background-color: var(--background-primary);
   min-height: 100vh;
+  padding-bottom: 85px;
   /* position: relative; */
 }
 

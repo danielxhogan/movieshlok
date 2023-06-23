@@ -266,7 +266,7 @@ export default function Reviews() {
       case 12: monthText = "December"; break;
     }
 
-    return <Link href={`/u/${review.username}/movie/${review.id}`} key={review.id}>
+    return <Link href={`/u/${review.username}/review?id=${review.id}&movieId=${review.movie_id}`} key={review.id}>
       <div className="block block-btn">
       
         <div className={styles["review-title"]}>

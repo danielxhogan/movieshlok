@@ -18,6 +18,14 @@ CREATE TABLE reviews (
   created_at BIGINT NOT NULL
 );
 
+CREATE TABLE comments (
+  id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id uuid NOT NULL references users(id),
+  review_id uuid NOT NULL references reviews(id),
+  comment TEXT NOT NULL,
+  created_at BIGINT NOT NULL
+)
+
 CREATE TABLE ratings (
   id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id uuid NOT NULL references users(id),
