@@ -21,6 +21,11 @@
 
 .review-title {
   display: flex;
+  justify-content: space-between;
+}
+
+.username-rating {
+  display: flex;
   gap: 15px;
 }
 

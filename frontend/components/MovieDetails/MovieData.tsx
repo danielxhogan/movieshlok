@@ -62,7 +62,10 @@ export default function MovieContent() {
     </span>
   }
 
+
   return <div className={`${styles["wrapper"]} block`}>
+
+
     { movieDetails.data.tagline &&
       <p className={styles["tagline"]}>&quot;{ movieDetails.data.tagline }&quot;</p>
     }

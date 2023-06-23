@@ -16,6 +16,7 @@ import { useEffect, useCallback } from "react";
 import { Spinner } from "@chakra-ui/react";
 
 import getConfig from "next/config";
+import Link from "next/link";
 const { publicRuntimeConfig } = getConfig();
 const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
 
@@ -246,21 +247,46 @@ export default function Reviews() {
   }, [credentials.jwt_token, credentials.username, dispatch, newReview, router])
 
   function makeReview(review: Review) {
-    return <div key={review.id} className="block block-btn">
+    const date = new Date(review.created_at * 1000);
+    const month = date.getMonth();
+    let monthText: string = "";
 
-      <div className={styles["review-title"]}>
-        <h3 className={styles["username"]}>{review.username}</h3>
-        <Stars
-          id="reviews"
-          initialRating={review.rating}
-          setParentRating={() => {}}
-          interactive={false}
-          size="lg"
-        />
+    switch (month) {
+      case 1: monthText = "January"; break;
+      case 2: monthText = "February"; break;
+      case 3: monthText = "March"; break;
+      case 4: monthText = "April"; break;
+      case 5: monthText = "May"; break;
+      case 6: monthText = "June"; break;
+      case 7: monthText = "July"; break;
+      case 8: monthText = "August"; break;
+      case 9: monthText = "September"; break;
+      case 10: monthText = "October"; break;
+      case 11: monthText = "November"; break;
+      case 12: monthText = "December"; break;
+    }
+
+    return <Link href={`/u/${review.username}/movie/${review.id}`} key={review.id}>
+      <div className="block block-btn">
+      
+        <div className={styles["review-title"]}>
+          <div className={styles["username-rating"]}>
+            <h3 className={styles["username"]}>{review.username}</h3>
+            <Stars
+              id="reviews"
+              initialRating={review.rating}
+              setParentRating={() => {}}
+              interactive={false}
+              size="lg"
+            />
+
+          </div>
+        <div>{ `${monthText} ${date.getDate()}, ${date.getFullYear()}` }</div>
+        </div>
+
+        <p>{review.review}</p>
       </div>
-
-      <p>{review.review}</p>
-    </div>
+    </Link>
   }
 
   function sortAndMakeReviews(reviews: Review[]) {
@@ -280,17 +306,17 @@ export default function Reviews() {
 
   return <div className={styles["wrapper"]}>
     <h2 className={styles["section-title"]}>Reviews</h2>
+
     { reviews.status === "loading"
     ?
       <div className={styles["spinner"]}>
         <Spinner size='xl' />
       </div>
-    
     :
     <>
       { reviews.data.reviews && sortAndMakeReviews([...reviews.data.reviews])}
 
-      { reviews.total_pages &&
+      { reviews.total_pages !== null &&
         reviews.total_pages > 1 &&
         typeof router.query.movieId === "string" &&
 

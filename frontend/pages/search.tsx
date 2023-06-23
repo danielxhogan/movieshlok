@@ -267,7 +267,8 @@ export default function SearchPage() {
 
           </div>
 
-          { searchResults.status === "loading" ?
+          { searchResults.status === "loading"
+            ?
             <div className={styles["spinner"]}>
               <Spinner size='xl' />
             </div>
@@ -290,7 +291,6 @@ export default function SearchPage() {
             </>
           }
             
-
         </div>
 
         <div className={styles["filter"]}>

@@ -157,31 +157,6 @@ export default function Pagination(props: Props) {
       case UseCases.REVIEWS:
         return makeLeftArrowIcons(page, reviewsOnClick);
     }
-
-
-    // switch (props.useCase) {
-    //   case UseCases.SEARCH_RESULTS:
-    //     const previousPage = parseInt(props.currentPage) - 1;
-    //     let page: number;
-
-    //     if (previousPage <= 0) {
-    //       page = 1;
-    //     } else {
-    //       page = previousPage;
-    //     }
-
-    //     return (
-    //       <span className={styles["left-buttons"]}>
-    //           <span className={styles["icon-span"]} onClick={ () => searchResultsOnClick(1) }>
-    //             <i className="fa-solid fa-backward-step fa-lg"></i>
-    //           </span>
-    //           <span className={styles["icon-span"]} onClick={ () => searchResultsOnClick(page) }>
-    //             <i className="fa-solid fa-play fa-rotate-180"></i>
-    //           </span>
-    //       </span>
-    //     );
-    //     break;
-    // }
   }
 
   function makeRightArrowIcons(page: number, onClickFuncion: Function) {
@@ -211,13 +186,11 @@ export default function Pagination(props: Props) {
     let totalPages: number;
     let page: number;
 
-
     if (typeof props.currentPage === "string") {
       nextPage = parseInt(props.currentPage) + 1;
     } else {
       nextPage = props.currentPage + 1;
     }
-
 
     if (typeof props.totalPages === "string") {
       totalPages = parseInt(props.totalPages);
@@ -237,32 +210,6 @@ export default function Pagination(props: Props) {
       case UseCases.REVIEWS:
         return makeRightArrowIcons(page, reviewsOnClick);
     }
-
-
-    // switch (props.useCase) {
-    //   case UseCases.SEARCH_RESULTS:
-    //     const nextPage = parseInt(props.currentPage) +1;
-    //     const totalPages = parseInt(props.totalPages);
-    //     let page: number;
-
-    //     if (nextPage >= totalPages) {
-    //       page = totalPages;
-    //     } else {
-    //       page = nextPage;
-    //     }
-
-    //     return (
-    //       <span className={styles["right-buttons"]}>
-    //           <span className={styles["icon-span"]} onClick={ () => searchResultsOnClick(page) }>
-    //             <i className="fa-solid fa-play"></i>
-    //           </span>
-    //           <span className={styles["icon-span"]} onClick={ () => searchResultsOnClick(totalPages) }>
-    //             <i className="fa-solid fa-forward-step fa-lg"></i>
-    //           </span>
-    //       </span>
-    //     );
-    //     break;
-    // }
   }
 
   return <div className={styles["pagination"]}>
