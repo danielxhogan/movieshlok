@@ -4,13 +4,11 @@ pub mod reviews;
 
 use crate::routes::auth::Claims;
 use crate::utils::error_handling::{AppError, ErrorType};
-use crate::utils::websockets::ClientList;
 
 use warp::Filter;
 use jsonwebtoken::{decode, Validation, DecodingKey, TokenData};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
-use std::convert::Infallible;
 use std::env;
 
 
@@ -21,14 +19,7 @@ fn with_form_body<T: DeserializeOwned + Send>()
     warp::body::content_length_limit(1024 * 16).and(warp::body::form())
 }
 
-// filter for adding a reference to the client hashmap to a handler function for a ws enpoint
-fn with_clients(client_list: ClientList)
--> impl Filter<Extract = (ClientList,), Error = Infallible> + Clone
-{
-  warp::any().map(move || client_list.clone())
-}
-
-fn auth_check(jwt_token: String)
+pub fn auth_check(jwt_token: String)
 -> Result<TokenData<Claims>, AppError>
 {
   let jwt_secret = env::var("JWT_SECRET").unwrap();

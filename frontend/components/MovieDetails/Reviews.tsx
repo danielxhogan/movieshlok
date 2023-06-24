@@ -93,7 +93,7 @@ export default function Reviews() {
     // establishes websocket connection and attaches the onmessage handler
     // function when a message is recieved on the ws channel.
     async function wsSetup() {
-      const registerWsUrl = `${BACKEND_URL}/ws-register`;
+      const registerWsUrl = `${BACKEND_URL}/register-reviews-ws`;
 
       const headers = new Headers();
       headers.append("Content-Type", "application/x-www-form-urlencoded");
@@ -160,7 +160,7 @@ export default function Reviews() {
     return (() => {
       const ws_uuid = localStorage.getItem("ws-uuid");
       if (ws_uuid) {
-        const unregisterWsUrl = `${BACKEND_URL}/ws-unregister`;
+        const unregisterWsUrl = `${BACKEND_URL}/unregister-reviews-ws`;
 
         const headers = new Headers();
         headers.append("Content-Type", "application/x-www-form-urlencoded");

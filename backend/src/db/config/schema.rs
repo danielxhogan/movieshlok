@@ -1,6 +1,16 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
+    comments (id) {
+        id -> Uuid,
+        user_id -> Uuid,
+        review_id -> Uuid,
+        comment -> Text,
+        created_at -> Int8,
+    }
+}
+
+diesel::table! {
     likes (id) {
         id -> Uuid,
         user_id -> Uuid,
@@ -40,11 +50,14 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(comments -> reviews (review_id));
+diesel::joinable!(comments -> users (user_id));
 diesel::joinable!(likes -> users (user_id));
 diesel::joinable!(ratings -> users (user_id));
 diesel::joinable!(reviews -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
+    comments,
     likes,
     ratings,
     reviews,

@@ -24,7 +24,7 @@ CREATE TABLE comments (
   review_id uuid NOT NULL references reviews(id),
   comment TEXT NOT NULL,
   created_at BIGINT NOT NULL
-)
+);
 
 CREATE TABLE ratings (
   id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
