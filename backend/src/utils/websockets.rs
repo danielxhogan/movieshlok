@@ -42,6 +42,12 @@ pub struct WsUnregisterRequest {
   pub uuid: String
 }
 
+// sent from clent after registering to make the ws connection
+#[derive(Deserialize, Debug)]
+pub struct WsConnectionRequest {
+  uuid: String
+}
+
 #[derive(Serialize, Debug)]
 pub struct WsOkResponse {
   message: String
@@ -51,11 +57,6 @@ pub fn saul_good_man() -> Result<WsOkResponse, AppError> {
   Ok(WsOkResponse { message: "ok".to_string() })
 }
 
-// sent from clent after registering to make the ws connection
-#[derive(Deserialize, Debug)]
-pub struct WsConnectionRequest {
-  uuid: String
-}
 
 // type of data structure that will be used for lists of clients
 pub type ClientList = Arc<RwLock<HashMap<String, Client>>>;
@@ -63,7 +64,6 @@ pub type ClientList = Arc<RwLock<HashMap<String, Client>>>;
 // function is called in main to create the initial lists that will
 // be used to track ws clients for each page that uses ws's
 pub fn make_client_list() -> ClientList {
-  // hashmap to hold a group of websocket clients
   return Arc::new(RwLock::new(HashMap::new()));
 }
 

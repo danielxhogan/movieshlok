@@ -1,9 +1,9 @@
+use crate::db::PooledPg;
 use crate::db::config::schema::users;
 use crate::db::config::models::{User, NewUser, LoginCreds};
 use crate::utils::error_handling::{AppError, ErrorType};
 
 use diesel::prelude::*;
-use diesel::r2d2::{ConnectionManager, PooledConnection};
 
 extern crate bcrypt;
 use bcrypt::{DEFAULT_COST, hash, verify};
@@ -16,8 +16,6 @@ use uuid::Uuid;
 struct JwtPayload<'a> {
   username: &'a str,
 }
-
-type PooledPg = PooledConnection<ConnectionManager<PgConnection>>;
 
 
 pub struct AuthDbManager {

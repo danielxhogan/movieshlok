@@ -1,3 +1,4 @@
+use crate::db::PooledPg;
 use crate::db::config::schema::{reviews, users, ratings, likes};
 use crate::db::config::models::{
   GetReviewsRequest,
@@ -15,10 +16,6 @@ use crate::db::config::models::{
 use crate::utils::error_handling::AppError;
 
 use diesel::prelude::*;
-use diesel::r2d2::{ConnectionManager, PooledConnection};
-
-type PooledPg = PooledConnection<ConnectionManager<PgConnection>>;
-
 
 pub struct ReviewsDbManager {
   connection:  PooledPg,

@@ -32,7 +32,7 @@ pub struct LoginCreds {
 
 // REVIEWS
 // ***********************************************
-#[derive(Queryable, Serialize, Deserialize)]
+#[derive(Queryable, Serialize, Deserialize, Clone)]
 pub struct Review {
   pub id: Uuid,
   pub user_id: Uuid,
@@ -83,6 +83,7 @@ pub struct InsertingNewReview {
   #[diesel(sql_type = Int8)]
   pub created_at: i64
 }
+
 
 // RATINGS AND LIKES
 // ***********************************************
@@ -135,4 +136,30 @@ pub struct InsertingNewLike {
   pub user_id: Uuid,
   pub movie_id: String,
   pub liked: bool
+}
+
+// REVIEW AND COMMENTS
+// ***********************************************
+#[derive(Queryable, Serialize)]
+pub struct Comment {
+  pub id: Uuid,
+  pub use_id: Uuid,
+  pub review_id: Uuid,
+  pub comment: String,
+  #[diesel(sql_type = Int8)]
+  pub created_at: i64
+}
+
+
+#[derive(Deserialize)]
+pub struct GetReviewRequest {
+  pub review_id: String,
+  pub limit: String,
+  pub offset: String
+}
+
+#[derive(Serialize)]
+pub struct GetReviewResponse {
+  pub review: Review,
+  pub comments: Box<Vec<Comment>>
 }

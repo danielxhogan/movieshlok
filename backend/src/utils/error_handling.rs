@@ -18,7 +18,8 @@ pub enum ErrorType {
   FailedToGetMovieDetails,
   InvalidJwtToken,
   WSClientNotRegistered,
-  WSClientAlreadyRegisted
+  WSClientAlreadyRegisted,
+  ReviewNotFound
 }
 
 #[derive(Debug)]
@@ -46,6 +47,7 @@ impl AppError {
       ErrorType::InvalidJwtToken => warp::http::StatusCode::UNAUTHORIZED,
       ErrorType::WSClientNotRegistered => warp::http::StatusCode::UNAUTHORIZED,
       ErrorType::WSClientAlreadyRegisted => warp::http::StatusCode::CONFLICT,
+      ErrorType::ReviewNotFound => warp::http::StatusCode::NOT_FOUND,
     }
   }
 
