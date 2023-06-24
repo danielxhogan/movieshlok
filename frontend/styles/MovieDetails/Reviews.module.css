@@ -1,13 +1,3 @@
-.wrapper {
-  /* border: 1px solid black; */
-  /* height: 500px; */
-}
-
-.spinner {
-  display: flex;
-  justify-content: center;
-}
-
 .section-title {
   font-family: 'Audiowide', cursive;
   font-size: 2rem;

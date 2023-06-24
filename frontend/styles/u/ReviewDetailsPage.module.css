@@ -1,0 +1,84 @@
+.review-content {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.movie-poster {
+  border-radius: 10px;
+}
+
+.review-details {
+  width: 80%;
+}
+
+.username-section {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.title-section h2 {
+  font-size: 1.8rem;
+}
+
+.heart {
+  color: var(--hot-pink);
+}
+
+.title-text {
+  margin-top: 20px;
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.title {
+  font-size: 3rem;
+  font-weight: 600;
+  padding: 0 5px;
+}
+
+.year {
+  font-size: 2.3rem;
+  padding: 0 5px;
+}
+
+.title-section h3 {
+  font-size: 1.2rem;
+  font-style: italic;
+  padding-bottom: 10px;
+}
+
+.director {
+  font-weight: 600;
+}
+
+.review-section {
+  margin-top: 30px;
+}
+
+.date {
+  margin-bottom: 20px;
+  font-weight: 300;
+}
+
+.comment-section {
+  font-style: italic;
+}
+
+.comments-section {
+  /* padding-bottom: 85px; */
+}
+
+.comments-title {
+  font-family: 'Audiowide', cursive;
+  font-size: 2rem;
+  padding-bottom: 15px;
+}
+
+.no-comments {
+  text-align: center;
+  font-size: 1.5rem;
+  font-family: 'Audiowide', cursive;
+}

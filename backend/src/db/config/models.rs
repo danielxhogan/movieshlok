@@ -143,7 +143,7 @@ pub struct InsertingNewLike {
 #[derive(Queryable, Serialize)]
 pub struct Comment {
   pub id: Uuid,
-  pub use_id: Uuid,
+  pub user_id: Uuid,
   pub review_id: Uuid,
   pub comment: String,
   #[diesel(sql_type = Int8)]
@@ -162,6 +162,7 @@ pub struct GetReviewRequest {
 pub struct GetReviewResponse {
   pub review: Review,
   pub liked: bool,
+  pub total_results: i64,
   pub comments: Box<Vec<Comment>>
 }
 

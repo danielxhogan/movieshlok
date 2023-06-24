@@ -226,13 +226,13 @@ export default function SearchPage() {
   }
 
 
-  return <div className={styles["wrapper"]}>
+  return <div className="wrapper">
     <Navbar />
 
-    <div className={styles["search-page"]}>
+    <div className="content">
       <Searchbar filter={filter} setParentSeachQuery={setParentSeachQuery}/>
 
-      <div className={styles["content"]}>
+      <div className={styles["search-data"]}>
         <div className={styles["results"]}>
 
           <div className={styles["horizontal-filter"]}>
@@ -269,7 +269,7 @@ export default function SearchPage() {
 
           { searchResults.status === "loading"
             ?
-            <div className={styles["spinner"]}>
+            <div className="spinner">
               <Spinner size='xl' />
             </div>
             :

@@ -11,6 +11,13 @@ const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeC
 // GET ALL REVIEWS FOR A MOVIE
 // *****************************
 
+// passed in when getReviews action is dispatched,
+// sent to the /reviews endpoint
+export interface GetReviewsRequest {
+  movie_id: string;
+  page: number;
+}
+
 // review type received from api by getReviews action when all reviews are fetched for a movie
 export interface Review {
   id: string;
@@ -20,11 +27,6 @@ export interface Review {
   rating: number;
   review: string;
   created_at: number;
-}
-
-export interface GetReviewsRequest {
-  movie_id: string;
-  page: number;
 }
 
 // payload sent by getReviews action to reviewsSlice reducer

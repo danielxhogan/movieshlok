@@ -7,9 +7,9 @@ import {
   ReturnedNewReview
 } from "@/redux/actions/reviews";
 
+import { createSlice } from "@reduxjs/toolkit";
 import { Status } from "@/redux/reducers/index"
 import { AppState } from "@/redux/store";
-import { createSlice } from "@reduxjs/toolkit";
 
 
 // TYPES

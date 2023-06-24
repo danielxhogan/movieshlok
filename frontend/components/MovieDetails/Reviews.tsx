@@ -309,7 +309,7 @@ export default function Reviews() {
 
     { reviews.status === "loading"
     ?
-      <div className={styles["spinner"]}>
+      <div className="spinner">
         <Spinner size='xl' />
       </div>
     :

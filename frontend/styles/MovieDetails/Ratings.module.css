@@ -1,6 +1,5 @@
 .wrapper {
   display: flex;
-  gap: 20px;
   justify-content: space-around;
 }
 
@@ -25,7 +24,7 @@
 }
 
 .heart {
-  color: #ff69b4;
+  color: var(--hot-pink);
   cursor: pointer;
 }
 

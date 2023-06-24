@@ -3,6 +3,37 @@
   --background-secondary: #FFF3E2;
   --light-grey: #c0c0c0;
   --dark-grey: #282A3A;
+  --hot-pink: #ff69b4;
+}
+
+.wrapper {
+  background-color: var(--background-primary);
+  min-height: 100vh;
+  padding-bottom: 85px;   /* to account for the height of the footer */
+}
+
+@media screen and (max-width: 650px) {
+  .wrapper {
+    padding-bottom: 150px;    /* at 650px, the footer goes to a height of 150px */
+  }
+}
+
+.content {
+  width: 80%;
+  margin: 30px auto 0;
+  padding-bottom: 40px;
+}
+
+@media screen and (max-width: 1250px) {
+  .content {
+    width: 90%;
+  }
+}
+
+@media only screen and (max-width: 670px) {
+  .content {
+    width: 95%;
+  }
 }
 
 .block {
@@ -17,4 +48,9 @@
 .block-btn:hover {
   cursor: pointer;
   box-shadow: 0 0 10px var(--light-grey);
+}
+
+.spinner {
+  display: flex;
+  justify-content: center;
 }

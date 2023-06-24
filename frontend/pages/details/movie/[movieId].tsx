@@ -55,10 +55,10 @@ export default function MovieDetailsPage() {
     }
   })
 
-  return <div className={styles["wrapper"]}>
+  return <div className="wrapper">
     <Navbar />
 
-    <div className={styles["movie-details"]}>
+    <div className="content">
       <Searchbar />
 
       { movieDetails.status === "fulfilled" ? <>
@@ -83,14 +83,14 @@ export default function MovieDetailsPage() {
           </div>
         </div>
       </> : <>
-        <div className={styles["spinner"]}>
+        <div className="spinner">
           <Spinner size='xl' />
         </div>
       </>}
 
 
     </div>
-    { movieDetails.status === "fulfilled" && <Footer singlePage={false}/> }
+    { movieDetails.status === "fulfilled" && <Footer singlePage={true}/> }
   </div>
 }
 
