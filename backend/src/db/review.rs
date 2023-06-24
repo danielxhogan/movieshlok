@@ -1,6 +1,12 @@
 use crate::db::PooledPg;
 use crate::db::config::schema::{reviews, comments, likes};
-use crate::db::config::models::{Review, Comment, Like, GetReviewRequest, GetReviewResponse};
+use crate::db::config::models::{Review,
+  Comment,
+  Like,
+  GetReviewRequest,
+  GetReviewResponse,
+  InsertingNewComment
+};
 use crate::utils::error_handling::{AppError, ErrorType};
 
 use diesel::prelude::*;
@@ -69,5 +75,16 @@ impl ReviewDbManager {
     };
 
     Ok(response)
+  }
+
+  pub fn post_comment(&mut self, new_comment: InsertingNewComment)
+  -> Result<Comment, AppError>
+  {
+    diesel::insert_into(comments::table)
+      .values(&new_comment)
+      .get_result(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while inserting new comment")
+      })
   }
 }

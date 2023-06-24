@@ -21,7 +21,7 @@ use crate::utils::websockets::{
 };
 
 use warp::{Filter, reject, ws::Message};
-use serde::{Deserialize};
+use serde::Deserialize;
 use chrono::Utc;
 
 // STRUCTS FOR QUERYING DATABASE
@@ -30,34 +30,34 @@ use chrono::Utc;
 // sent from client when posting a new review
 #[derive(Deserialize)]
 struct IncomingNewReview {
-    pub jwt_token: String,
-    pub movie_id: String,
-    pub review: String,
-    pub rating: i32,
-    pub liked: bool
+  jwt_token: String,
+  movie_id: String,
+  review: String,
+  rating: i32,
+  liked: bool
 }
 
 // sent from client to get a user's rating for a movie
 #[derive(Deserialize)]
 struct IncomingUserMovie {
-  pub jwt_token: String,
-  pub movie_id: String
+  jwt_token: String,
+  movie_id: String
 }
 
 // sent from client when posting a new rating
 #[derive(Deserialize)]
 struct IncomingNewRating {
-    pub jwt_token: String,
-    pub movie_id: String,
-    pub rating: i32,
+  jwt_token: String,
+  movie_id: String,
+  rating: i32,
 }
 
 // sent from client when posting a new like
 #[derive(Deserialize)]
 struct IncomingNewLike {
-    pub jwt_token: String,
-    pub movie_id: String,
-    pub liked: bool
+  jwt_token: String,
+  movie_id: String,
+  liked: bool
 }
 
 // STRUCTS FOR MANAGING WEBSOCKETS
@@ -95,14 +95,14 @@ pub fn reviews_filters(pool: PgPool, ws_client_list: ClientList)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
   get_reviews_filters(pool.clone())
-  .or(get_rating_like_filters(pool.clone()))
-  .or(post_review_filters(pool.clone()))
-  .or(post_rating_filters(pool.clone()))
-  .or(post_like_filters(pool.clone()))
-  .or(register_reviews_ws_client_filters(ws_client_list.clone()))
-  .or(unregister_reviews_ws_client_filters(ws_client_list.clone()))
-  .or(make_reviews_ws_connection_filters(ws_client_list.clone()))
-  .or(emit_review_filters(ws_client_list.clone()))
+    .or(get_rating_like_filters(pool.clone()))
+    .or(post_review_filters(pool.clone()))
+    .or(post_rating_filters(pool.clone()))
+    .or(post_like_filters(pool.clone()))
+    .or(register_reviews_ws_client_filters(ws_client_list.clone()))
+    .or(unregister_reviews_ws_client_filters(ws_client_list.clone()))
+    .or(make_reviews_ws_connection_filters(ws_client_list.clone()))
+    .or(emit_review_filters(ws_client_list.clone()))
 }
 
 // ENDPOINTS FOR SELECTING FROM DATABASE

@@ -1,4 +1,4 @@
-use crate::db::config::schema::{users, reviews, ratings, likes};
+use crate::db::config::schema::{users, reviews, ratings, likes, comments};
 
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -163,4 +163,13 @@ pub struct GetReviewResponse {
   pub review: Review,
   pub liked: bool,
   pub comments: Box<Vec<Comment>>
+}
+
+#[derive(Insertable)]
+#[diesel(table_name = comments)]
+pub struct InsertingNewComment {
+  pub user_id: Uuid,
+  pub review_id: Uuid,
+  pub comment: String,
+  pub created_at: i64
 }
