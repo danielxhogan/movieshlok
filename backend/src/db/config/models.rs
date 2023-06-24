@@ -122,7 +122,7 @@ pub struct InsertingNewRating {
 
 // LIKES
 // ***********************************************
-#[derive(Queryable, Serialize, Deserialize)]
+#[derive(Queryable, Serialize, Deserialize, Clone)]
 pub struct Like {
   pub id: Uuid,
   pub user_id: Uuid,
@@ -153,13 +153,14 @@ pub struct Comment {
 
 #[derive(Deserialize)]
 pub struct GetReviewRequest {
-  pub review_id: String,
-  pub limit: String,
-  pub offset: String
+  pub review_id: Uuid,
+  pub limit: i64,
+  pub offset: i64
 }
 
 #[derive(Serialize)]
 pub struct GetReviewResponse {
   pub review: Review,
+  pub liked: bool,
   pub comments: Box<Vec<Comment>>
 }
