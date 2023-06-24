@@ -10,19 +10,19 @@ use std::env;
 // **************************************************
 
 // REQUEST PARAMS
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize)]
 struct MovieDetailsParams {
   movie_id: String
 }
 
 // RESPONSE DATA
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 struct Genre {
   id: Option<i32>,
   name: Option<String>
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 struct ProductionCompany {
   id: Option<i32>,
   logo_path: Option<String>,
@@ -30,13 +30,13 @@ struct ProductionCompany {
   origin_country: Option<String>
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 struct ProductionCountry {
   iso_3166_1: Option<String>,
   name: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 struct Language {
   english_name: Option<String>,
   iso_639_1: Option<String>,
@@ -44,7 +44,7 @@ struct Language {
 }
 
 // VIDEOS
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 struct Video {
   iso_639_1: Option<String>,
   iso_3166_1: Option<String>,
@@ -58,13 +58,13 @@ struct Video {
   id: Option<String>
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 struct Videos {
   id: Option<i32>,
   results: Option<Box<[Video]>>
 }
 // IMAGES
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 struct Image {
   aspect_ration: Option<f32>,
   height: Option<i32>,
@@ -75,7 +75,7 @@ struct Image {
   width: Option<i32>
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 struct Images {
   id: Option<i32>,
   backdrops: Option<Box<[Image]>>,
@@ -84,7 +84,7 @@ struct Images {
 }
 
 // CREDITS
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 struct CastCrewMember {
 
   // cast & crew
@@ -108,7 +108,7 @@ struct CastCrewMember {
   job: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 struct Credits {
   id: Option<i32>,
   cast: Option<Box<[CastCrewMember]>>,
@@ -116,7 +116,7 @@ struct Credits {
 }
 
 // MAIN RESPONSE
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 struct MovieDetails {
   adult: Option<bool>,
   backdrop_path: Option<String>,
@@ -153,7 +153,7 @@ struct MovieDetails {
 // **************************************************
 
 // REQUEST PARAMS
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize)]
 struct QueryParams {
   query: String,
   page: String,
@@ -161,7 +161,7 @@ struct QueryParams {
 }
 
 // RESPONSE DATA
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 struct KnownFor {
   adult: Option<bool>,
   backdrop_path: Option<String>,
@@ -180,7 +180,7 @@ struct KnownFor {
   vote_count: Option<i32>
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 struct SearchResult {
   adult: Option<bool>,
   backdrop_path: Option<String>,
@@ -208,7 +208,7 @@ struct SearchResult {
 }
 
 // MAIN RESPONSE
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 struct SearchResults {
   page: Option<i32>,
   results: Option<Box<[SearchResult]>>,

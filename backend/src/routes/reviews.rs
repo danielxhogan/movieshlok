@@ -28,7 +28,7 @@ use chrono::Utc;
 // **************************************************
 
 // sent from client when posting a new review
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize)]
 struct IncomingNewReview {
     pub jwt_token: String,
     pub movie_id: String,
@@ -38,14 +38,14 @@ struct IncomingNewReview {
 }
 
 // sent from client to get a user's rating for a movie
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize)]
 struct IncomingUserMovie {
   pub jwt_token: String,
   pub movie_id: String
 }
 
 // sent from client when posting a new rating
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize)]
 struct IncomingNewRating {
     pub jwt_token: String,
     pub movie_id: String,
@@ -53,7 +53,7 @@ struct IncomingNewRating {
 }
 
 // sent from client when posting a new like
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize)]
 struct IncomingNewLike {
     pub jwt_token: String,
     pub movie_id: String,

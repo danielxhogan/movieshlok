@@ -8,14 +8,7 @@ use diesel::prelude::*;
 extern crate bcrypt;
 use bcrypt::{DEFAULT_COST, hash, verify};
 
-use serde::{Serialize, Deserialize};
 use uuid::Uuid;
-
-
-#[derive(Debug, Serialize, Deserialize)]
-struct JwtPayload<'a> {
-  username: &'a str,
-}
 
 
 pub struct AuthDbManager {

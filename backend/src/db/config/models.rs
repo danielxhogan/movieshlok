@@ -6,7 +6,7 @@ use uuid::Uuid;
 
 // AUTH
 // ***********************************************
-#[derive(Queryable, Serialize)]
+#[derive(Queryable)]
 pub struct User {
   pub id: Uuid,
   pub username: String,
@@ -16,7 +16,7 @@ pub struct User {
   pub last_name: Option<String>,
 }
 
-#[derive(Debug, Insertable, Deserialize, Clone)]
+#[derive(Insertable, Deserialize)]
 #[diesel(table_name = users)]
 pub struct NewUser {
   pub username: String,
@@ -24,7 +24,7 @@ pub struct NewUser {
   pub password: String,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Deserialize)]
 pub struct LoginCreds {
   pub username: String,
   pub password: String,
@@ -32,7 +32,7 @@ pub struct LoginCreds {
 
 // REVIEWS
 // ***********************************************
-#[derive(Queryable, Serialize, Deserialize, Clone)]
+#[derive(Queryable, Serialize, Clone)]
 pub struct Review {
   pub id: Uuid,
   pub user_id: Uuid,
@@ -73,7 +73,7 @@ pub struct SelectingReview {
   pub created_at: i64
 }
 
-#[derive(Deserialize, Insertable, Debug)]
+#[derive(Insertable)]
 #[diesel(table_name = reviews)]
 pub struct InsertingNewReview {
   pub user_id: Uuid,
@@ -88,13 +88,13 @@ pub struct InsertingNewReview {
 // RATINGS AND LIKES
 // ***********************************************
 // sent from client when getting a user's rating and like status for a movie
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Deserialize)]
 pub struct UserMovie {
   pub user_id: Uuid,
   pub movie_id: String
 }
 
-#[derive(Debug, Serialize, Clone)]
+#[derive(Serialize)]
 pub struct RatingLike {
   pub rating: i32,
   pub liked: bool
@@ -102,7 +102,7 @@ pub struct RatingLike {
 
 // RATINGS
 // ***********************************************
-#[derive(Queryable, Serialize, Deserialize)]
+#[derive(Queryable, Serialize)]
 pub struct Rating {
   pub id: Uuid,
   pub user_id: Uuid,
@@ -111,7 +111,7 @@ pub struct Rating {
   pub rating: i32
 }
 
-#[derive(Deserialize, Insertable, Debug)]
+#[derive(Insertable)]
 #[diesel(table_name = ratings)]
 pub struct InsertingNewRating {
   pub user_id: Uuid,
@@ -122,7 +122,7 @@ pub struct InsertingNewRating {
 
 // LIKES
 // ***********************************************
-#[derive(Queryable, Serialize, Deserialize, Clone)]
+#[derive(Queryable, Serialize, Clone)]
 pub struct Like {
   pub id: Uuid,
   pub user_id: Uuid,
@@ -130,7 +130,7 @@ pub struct Like {
   pub liked: bool
 }
 
-#[derive(Deserialize, Insertable, Debug)]
+#[derive(Insertable)]
 #[diesel(table_name = likes)]
 pub struct InsertingNewLike {
   pub user_id: Uuid,

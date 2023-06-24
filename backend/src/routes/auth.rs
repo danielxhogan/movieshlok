@@ -11,18 +11,18 @@ use uuid::Uuid;
 use chrono::Utc;
 use std::env;
 
-#[derive(Debug, Serialize, Clone)]
+#[derive(Serialize)]
 pub struct RegisterResponse {
   pub id: Uuid,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct Claims {
     pub user_id: Uuid,
     exp: usize
 }
 
-#[derive(Debug, Serialize, Clone)]
+#[derive(Serialize)]
 pub struct LoginResponse {
   pub jwt_token: String,
   pub username: String
