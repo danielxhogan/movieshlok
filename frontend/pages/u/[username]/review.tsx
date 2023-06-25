@@ -8,14 +8,20 @@ import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { selectCredentials } from "@/redux/reducers/auth";
 import { getMovieDetails } from "@/redux/actions/tmdb";
 import { selectMovieDetails } from "@/redux/reducers/tmdb";
-import { getReviewDetails, GetReviewRequest, Comment } from "@/redux/actions/review";
+import {
+  getReviewDetails,
+  postComment,
+  GetReviewRequest,
+  Comment,
+  NewComment
+} from "@/redux/actions/review";
 import { selectReviewDetails } from "@/redux/reducers/review";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 
-import { Textarea, Spinner } from "@chakra-ui/react";
+import { Textarea, Button, Spinner } from "@chakra-ui/react";
 
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
@@ -120,6 +126,21 @@ export default function ReviewDetailsPage() {
     </div>
   }
 
+  function onClickAddComment() {
+    if (commentText !== "" &&
+        credentials.jwt_token &&
+        reviewDetails.data
+      ) {
+      const newComment: NewComment = {
+        jwt_token: credentials.jwt_token,
+        review_id: reviewDetails.data?.review.id,
+        comment: commentText
+      }
+
+      dispatch(postComment(newComment));
+    }
+  }
+
   return <div className="wrapper">
     <Navbar />
     <div className="content">
@@ -132,6 +153,7 @@ export default function ReviewDetailsPage() {
             <Image
               src={`${TMDB_IMAGE_URL}/w342${movieDetails.data.poster_path}`}
               className={styles["movie-poster"]}
+              onClick={ () => { router.push(`/details/movie/${movieDetails.data.id}`) }}
               width={300}
               height={500}
               alt="backdrop">
@@ -190,8 +212,18 @@ export default function ReviewDetailsPage() {
                 <Textarea
                   value={commentText}
                   onChange={e => setCommentText(e.target.value)}
-                  rows={10}
+                  rows={5}
                 />
+                <div className={styles["submit-comment"]}>
+                  <Button
+                    className={styles["submit-comment-button"]}
+                    colorScheme="teal" variant="outline"
+                    mr={3}
+                    onClick={onClickAddComment}
+                    >
+                    Add Comment
+                  </Button>
+                </div>
               </>
               :
               <div className="block">Login to leave a comment</div>
@@ -222,9 +254,7 @@ export default function ReviewDetailsPage() {
         </div>
       }
 
-
     </div>
     <Footer singlePage={true} />
   </div>
 }
-

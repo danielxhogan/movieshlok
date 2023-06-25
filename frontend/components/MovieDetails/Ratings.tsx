@@ -62,7 +62,7 @@ export default function Ratings() {
         dispatch(unsetRatingLike());
         document.cookie = "username=";
         document.cookie = "jwt_token=";
-        router.push("/auth/login");
+        // router.push("/auth/login");
 
       } else if (ratingLike.data) {
         setRating(ratingLike.data.rating);
@@ -92,7 +92,7 @@ export default function Ratings() {
       return;
     }
 
-    const updateRatingUrl = `${BACKEND_URL}/rating`;
+    const updateRatingUrl = `${BACKEND_URL}/post-rating`;
 
     const headers = new Headers();
     headers.append("Content-Type", "application/x-www-form-urlencoded");
@@ -122,7 +122,7 @@ export default function Ratings() {
       return;
     }
 
-    const updateRatingUrl = `${BACKEND_URL}/like`;
+    const updateRatingUrl = `${BACKEND_URL}/post-like`;
 
     const headers = new Headers();
     headers.append("Content-Type", "application/x-www-form-urlencoded");

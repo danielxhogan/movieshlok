@@ -46,6 +46,32 @@ interface GetReviewPayload {
   data: ReviewDetails | null;
 }
 
+// TYPES
+// *******************************
+// POST NEW COMMENT IN DATABASE
+// *******************************
+
+export interface NewComment {
+  jwt_token: string;
+  review_id: string;
+  comment: string;
+}
+
+interface ReturnedNewComment {
+  id: string;
+  user_id: string;
+  review_id: string;
+  comment: string;
+  created_at: number;
+}
+
+interface NewCommentPayload {
+  success: boolean;
+  code: number;
+  message: string;
+  data: ReturnedNewComment | null;
+}
+
 // ACTIONS
 // *******************************
 // GET REVIEW, LIKE, AND COMMENTS
@@ -103,4 +129,51 @@ export const getReviewDetails = createAsyncThunk(
       }
     }
   }
-)
+);
+
+// POST NEW COMMENT IN DATABASE
+// *******************************
+export const postComment = createAsyncThunk(
+  "review/postComment",
+  async(newComment: NewComment): Promise<NewCommentPayload> => {
+    const postCommentUrl = `${BACKEND_URL}/post-comment`;
+
+    const headers = new Headers();
+    headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+    const params = new URLSearchParams();
+    params.append("jwt_token", newComment.jwt_token);
+    params.append("review_id", newComment.review_id);
+    params.append("comment", newComment.comment);
+
+    const request = new Request(postCommentUrl, { body: params, method: "POST" });
+    const response = await fetch(request);
+
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        success: true,
+        code: response.status,
+        message: "ok",
+        data
+      }
+
+    } else if (response.status >= 500) {
+      return {
+        success: false,
+        code: response.status,
+        message: "server error",
+        data: null
+      }
+
+    } else {
+      const data = await response.json();
+      return {
+        success: false,
+        code: response.status,
+        message: data.message,
+        data: null
+      }
+    }
+  }
+);

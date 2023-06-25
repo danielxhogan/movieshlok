@@ -8,6 +8,10 @@
   border-radius: 10px;
 }
 
+.movie-poster:hover {
+  cursor: pointer;
+}
+
 .review-details {
   width: 80%;
 }
@@ -60,11 +64,22 @@
 
 .date {
   margin-bottom: 20px;
-  font-weight: 300;
+  font-style: italic;
+  /* font-weight: 300; */
 }
 
 .comment-section {
   font-style: italic;
+}
+
+.submit-comment {
+  margin-top: 15px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.submit-comment-button {
+  margin-right: 0 !important;
 }
 
 .comments-section {

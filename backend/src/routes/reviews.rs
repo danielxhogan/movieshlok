@@ -110,7 +110,7 @@ pub fn reviews_filters(pool: PgPool, ws_client_list: ClientList)
 fn get_reviews_filters(pool: PgPool)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
-  warp::path!("reviews")
+  warp::path!("get-reviews")
     .and(warp::post())
     .and(with_reviews_db_manager(pool))
     .and(with_form_body::<GetReviewsRequest>())
@@ -129,7 +129,7 @@ async fn get_reviews(mut reviews_db_manager: ReviewsDbManager, get_reviews_reque
 fn get_rating_like_filters(pool: PgPool)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
-  warp::path!("rating-like")
+  warp::path!("get-rating-like")
     .and(warp::post())
     .and(with_reviews_db_manager(pool))
     .and(with_form_body::<IncomingUserMovie>())
@@ -165,7 +165,7 @@ async fn get_rating_like(mut reviews_db_manager: ReviewsDbManager, user_movie: I
 fn post_review_filters(pool: PgPool)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
-  warp::path!("review")
+  warp::path!("post-review")
     .and(warp::post())
     .and(with_reviews_db_manager(pool))
     .and(with_form_body::<IncomingNewReview>())
@@ -229,7 +229,7 @@ async fn post_review(mut reviews_db_manager: ReviewsDbManager, new_review: Incom
 fn post_rating_filters(pool: PgPool)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
-  warp::path!("rating")
+  warp::path!("post-rating")
     .and(warp::post())
     .and(with_reviews_db_manager(pool))
     .and(with_form_body::<IncomingNewRating>())
@@ -262,7 +262,7 @@ async fn post_rating(mut reviews_db_manager: ReviewsDbManager, new_rating: Incom
 fn post_like_filters(pool: PgPool)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
-  warp::path!("like")
+  warp::path!("post-like")
     .and(warp::post())
     .and(with_reviews_db_manager(pool))
     .and(with_form_body::<IncomingNewLike>())

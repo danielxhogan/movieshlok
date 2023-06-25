@@ -87,10 +87,9 @@ export default function MovieDetailsPage() {
           <Spinner size='xl' />
         </div>
       </>}
-
-
     </div>
-    { movieDetails.status === "fulfilled" && <Footer singlePage={true}/> }
+
+    <Footer singlePage={true} />
   </div>
 }
 

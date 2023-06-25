@@ -100,7 +100,7 @@ export const getReviews = createAsyncThunk(
     const limit = 10;
     const offset = (getReviewsRequest.page - 1) * limit;
 
-    const getReviewsUrl = `${BACKEND_URL}/reviews`;
+    const getReviewsUrl = `${BACKEND_URL}/get-reviews`;
 
     const headers = new Headers();
     headers.append("Content-Type", "application/x-www-form-urlencoded");
@@ -152,7 +152,7 @@ export const getReviews = createAsyncThunk(
 export const getRatingLike = createAsyncThunk(
   "reviews/ratingLike",
   async (userMovie: UserMovie): Promise<RatingLikePayload> => {
-    const ratingLikeUrl = `${BACKEND_URL}/rating-like`;
+    const ratingLikeUrl = `${BACKEND_URL}/get-rating-like`;
 
     const headers = new Headers();
     headers.append("Content-Type", "application/x-www-form-urlencoded");
@@ -199,7 +199,7 @@ export const getRatingLike = createAsyncThunk(
 export const postReview = createAsyncThunk(
   "reviews/postReview",
   async (newReview: NewReview): Promise<NewReviewPayload> => {
-    const postReviewUrl = `${BACKEND_URL}/review`;
+    const postReviewUrl = `${BACKEND_URL}/post-review`;
 
     const headers = new Headers();
     headers.append("Content-Type", "application/x-www-form-urlencoded");
