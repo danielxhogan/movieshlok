@@ -244,7 +244,7 @@ export default function Reviews() {
       document.cookie = "jwt_token=";
       // router.push("/auth/login");
     }
-  }, [credentials.jwt_token, credentials.username, dispatch, newReview, router])
+  }, [newReview, credentials.jwt_token, credentials.username, dispatch, router])
 
   function makeReview(review: Review) {
     const date = new Date(review.created_at * 1000);

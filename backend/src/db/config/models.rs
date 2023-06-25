@@ -158,12 +158,23 @@ pub struct GetReviewRequest {
   pub offset: i64
 }
 
+#[derive(Queryable, Serialize)]
+pub struct SelectingComment {
+  pub id: Uuid,
+  pub username: String,
+  pub review_id: Uuid,
+  pub comment: String,
+  #[diesel(sql_type = Int8)]
+  pub created_at: i64
+}
+
+
 #[derive(Serialize)]
 pub struct GetReviewResponse {
   pub review: Review,
   pub liked: bool,
   pub total_results: i64,
-  pub comments: Box<Vec<Comment>>
+  pub comments: Box<Vec<SelectingComment>>
 }
 
 #[derive(Insertable)]

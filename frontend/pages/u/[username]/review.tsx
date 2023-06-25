@@ -5,7 +5,7 @@ import Stars from "@/components/Stars";
 import Footer from "@/components/Footer";
 
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
-import { selectCredentials } from "@/redux/reducers/auth";
+import { selectCredentials, unsetCredentials } from "@/redux/reducers/auth";
 import { getMovieDetails } from "@/redux/actions/tmdb";
 import { selectMovieDetails } from "@/redux/reducers/tmdb";
 import {
@@ -15,7 +15,12 @@ import {
   Comment,
   NewComment
 } from "@/redux/actions/review";
-import { selectReviewDetails } from "@/redux/reducers/review";
+import {
+  selectReviewDetails,
+  addNewComment,
+  selectNewComment,
+  resetNewComment
+} from "@/redux/reducers/review";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
@@ -34,6 +39,7 @@ export default function ReviewDetailsPage() {
   const credentials = useAppSelector(selectCredentials);
   const movieDetails = useAppSelector(selectMovieDetails);
   const reviewDetails = useAppSelector(selectReviewDetails);
+  const newComment = useAppSelector(selectNewComment);
 
   const [ commentText, setCommentText ] = useState("");
 
@@ -90,7 +96,6 @@ export default function ReviewDetailsPage() {
 
   function makeDate(timestamp: number) {
     if (reviewDetails.data) {
-      // const date = new Date(reviewDetails.data.review.created_at * 1000);
       const date = new Date(timestamp * 1000);
       const month = date.getMonth();
       let monthText: string = "";
@@ -117,8 +122,8 @@ export default function ReviewDetailsPage() {
   function makeComment(comment: Comment) {
     return <div className="block">
       <div className={styles["comment-title"]}>
-        <h3 className={styles["username"]}>{comment.user_id}</h3>
-      <div>{ makeDate(comment.created_at) }</div>
+        <h3 className={styles["username"]}><strong>{comment.username}</strong></h3>
+        <div><i>{ makeDate(comment.created_at) }</i></div>
       </div>
 
       <p>{comment.comment}</p>
@@ -140,6 +145,32 @@ export default function ReviewDetailsPage() {
       dispatch(postComment(newComment));
     }
   }
+
+  useEffect(() => {
+    if (newComment.status === "fulfilled" &&
+        newComment.success === true &&
+        newComment.data &&
+        credentials.username
+    ) {
+      const insertingNewComment: Comment = {
+        id: newComment.data.id,
+        username: credentials.username,
+        review_id: newComment.data.review_id,
+        comment: newComment.data.comment,
+        created_at: newComment.data.created_at
+      }
+
+      dispatch(addNewComment(insertingNewComment));
+      setCommentText("");
+
+    } else if (newComment.code === 401) {
+      dispatch(resetNewComment());
+
+      dispatch(unsetCredentials());
+      document.cookie = "username=";
+      document.cookie = "jwt_token=";
+    }
+  }, [dispatch, newComment]);
 
   return <div className="wrapper">
     <Navbar />

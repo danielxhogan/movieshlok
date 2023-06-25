@@ -92,6 +92,12 @@
   padding-bottom: 15px;
 }
 
+.comment-title {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
 .no-comments {
   text-align: center;
   font-size: 1.5rem;

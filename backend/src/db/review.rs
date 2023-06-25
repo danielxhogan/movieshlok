@@ -1,6 +1,7 @@
 use crate::db::PooledPg;
-use crate::db::config::schema::{reviews, comments, likes};
+use crate::db::config::schema::{reviews, comments, likes, users};
 use crate::db::config::models::{Review,
+  SelectingComment,
   Comment,
   Like,
   GetReviewRequest,
@@ -55,11 +56,17 @@ impl ReviewDbManager {
     let count = count.unwrap();
 
     let comments = comments::table
+      .inner_join(users::table)
+      .select((comments::id,
+        users::username,
+        comments::review_id,
+        comments::comment,
+        comments::created_at))
       .order(comments::created_at.asc())
       .filter(comments::review_id.eq(get_review_request.review_id))
       .offset(get_review_request.offset)
       .limit(get_review_request.limit)
-      .load::<Comment>(&mut self.connection)
+      .load::<SelectingComment>(&mut self.connection)
       .map_err(|err| {
         AppError::from_diesel_err(err, "while getting comments")
       });

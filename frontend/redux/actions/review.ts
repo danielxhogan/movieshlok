@@ -18,7 +18,7 @@ export interface GetReviewRequest {
 
 export interface Comment {
   id: string;
-  user_id: string;
+  username: string;
   review_id: string;
   comment: string;
   created_at: number;
@@ -57,7 +57,7 @@ export interface NewComment {
   comment: string;
 }
 
-interface ReturnedNewComment {
+export interface ReturnedNewComment {
   id: string;
   user_id: string;
   review_id: string;
