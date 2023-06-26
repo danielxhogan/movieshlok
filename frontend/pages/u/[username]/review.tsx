@@ -25,7 +25,6 @@ import {
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
-
 import { Textarea, Button, Spinner } from "@chakra-ui/react";
 
 import getConfig from "next/config";
@@ -170,7 +169,7 @@ export default function ReviewDetailsPage() {
       document.cookie = "username=";
       document.cookie = "jwt_token=";
     }
-  }, [dispatch, newComment]);
+  }, [newComment, credentials.username, dispatch]);
 
   return <div className="wrapper">
     <Navbar />
@@ -236,6 +235,21 @@ export default function ReviewDetailsPage() {
               }
             </div>
 
+            <div className={styles["comments-section"]}>
+              <h2 className={styles["comments-title"]}>Comments</h2>
+              { reviewDetails.status === "fulfilled" ?
+                  reviewDetails.data && reviewDetails.data.comments.length > 0 ?
+                  <>{reviewDetails.data.comments.map(comment => makeComment(comment)) }</>
+                  :
+                  <h2 className={styles["no-comments"]}>Be the first to comment</h2>
+                  // <>no Comments</>
+                :
+                  <div className="spinner">
+                    <Spinner size='xl' />
+                  </div>
+              }
+            </div>
+
             <div className={`${styles["comment-section"]} block`}>
               { credentials.jwt_token ?
               <>
@@ -257,22 +271,7 @@ export default function ReviewDetailsPage() {
                 </div>
               </>
               :
-              <div className="block">Login to leave a comment</div>
-              }
-            </div>
-
-            <div className={styles["comments-section"]}>
-              <h2 className={styles["comments-title"]}>Comments</h2>
-              { reviewDetails.status === "fulfilled" ?
-                  reviewDetails.data && reviewDetails.data.comments.length > 0 ?
-                  <>{reviewDetails.data.comments.map(comment => makeComment(comment)) }</>
-                  :
-                  <h2 className={styles["no-comments"]}>Be the first to comment</h2>
-                  // <>no Comments</>
-                :
-                  <div className="spinner">
-                    <Spinner size='xl' />
-                  </div>
+              <p>Login to leave a comment</p>
               }
             </div>
 

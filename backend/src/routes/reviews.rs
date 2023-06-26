@@ -341,8 +341,11 @@ fn make_reviews_ws_connection_filters(client_list: ClientList)
 
 // checks to make sure the client is already registed. If so, creates a new socket
 // passes it into the client connection function.
-async fn make_reviews_ws_connection(ws: warp::ws::Ws, query_params: WsConnectionRequest, client_list: ClientList)
--> Result<impl warp::Reply, warp::Rejection>
+async fn make_reviews_ws_connection(
+  ws: warp::ws::Ws,
+  query_params: WsConnectionRequest,
+  client_list: ClientList
+) -> Result<impl warp::Reply, warp::Rejection>
 {
   make_ws_connection(ws, query_params, client_list).await
 }
@@ -373,14 +376,14 @@ async fn emit_review(req: WsEmitRequest, client_list: ClientList)
     Ok(payload) => {
       let user_id = payload.claims.user_id;
       let message = format!("id={};user_id={};username={};movie_id={};rating={};review={};created_at={}",
-      req.id,
-      user_id,
-      req.username,
-      req.topic,
-      req.rating,
-      req.review,
-      req.created_at
-    );
+        req.id,
+        user_id,
+        req.username,
+        req.topic,
+        req.rating,
+        req.review,
+        req.created_at
+      );
 
       client_list.read().await.iter()
         .filter(|(_, client)| {
