@@ -22,13 +22,14 @@ import {
   resetNewComment
 } from "@/redux/reducers/review";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { Textarea, Button, Spinner } from "@chakra-ui/react";
 
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
+const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
 const TMDB_IMAGE_URL = publicRuntimeConfig.TMDB_IMAGE_URL;
 
 
@@ -56,6 +57,174 @@ export default function ReviewDetailsPage() {
 
     }
   }, [dispatch, router.query]);
+
+  // this is the onmessage functions assigned to the websocket object.
+  // It takes a string from the server with all the relevant data for
+  // creating a new Review type object, parses the data out of the string,
+  // and inserts it into the array of Reviews stored in the redux store by
+  // passing it into the addNewReveiw redux action.
+  const onNewComment = useCallback((newComment: string) => {
+    console.log("new Comment");
+    let id: string | null = null;
+    let username: string | null = null;
+    let review_id: string | null = null;
+    let comment: string | null = null;
+    let created_at: number | null = null;
+    const newCommentArray = newComment.split(";");
+
+    newCommentArray.forEach(commentField => {
+      const commentFieldArray = commentField.split("=");
+      const key = commentFieldArray[0];
+      const value = commentFieldArray[1];
+
+      switch (key) {
+        case "id": id = value; break;
+        case "username": username = value; break;
+        case "review_id": review_id = value; break;
+        case "comment": comment = value; break;
+        case "created_at": created_at = parseInt(value); break;
+      }
+    });
+
+    if (id && username && review_id && comment && created_at) {
+      const insertingNewComment: Comment = {
+        id,
+        username,
+        review_id,
+        comment,
+        created_at
+      };
+
+      dispatch(addNewComment(insertingNewComment));
+    }
+  }, [dispatch]);
+
+  // this useEffect is for handling connection and disconnection process for websockets
+  useEffect(() => {
+    // this function is called on page mount, it registers users on server,
+    // establishes websocket connection and attaches the onmessage handler
+    // function when a message is recieved on the ws channel.
+    async function wsSetup() {
+      const registerWsUrl = `${BACKEND_URL}/register-comments-ws`;
+
+      const headers = new Headers();
+      headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+      // add params
+      const params = new URLSearchParams();
+
+      // add credentials if logged in
+      if (credentials.jwt_token) {
+        params.append("jwt_token", credentials.jwt_token);
+      }
+
+      // add review id as topic
+      const topic = router.query.id;
+      if (typeof topic === "string") {
+        console.log(`topic: ${topic}`);
+        params.append("topic", topic);
+      } else {
+        return;
+      }
+
+      // add ws-uuid to check if already connected
+      const ws_uuid = localStorage.getItem("ws-uuid");
+      if (ws_uuid) {
+        params.append("uuid", ws_uuid);
+      }
+
+      const request = new Request(registerWsUrl, { headers, body: params, method: "POST"});
+      try {
+        const response = await fetch(request);
+        const data = await response.json();
+
+        if ( !response.ok ) {
+          console.log(`ws-uuid: ${ws_uuid}, message: ${data.message}`)
+          return;
+        }
+
+        const ws = new WebSocket(data.ws_url);
+        ws.onopen = () => { console.log(`connected, uuid: ${data.uuid}`); };
+        ws.onmessage = (msg) => { onNewComment(msg.data); }
+
+        localStorage.setItem("ws-uuid", data.uuid);
+
+      } catch (err) {
+        return;
+      }
+    }
+
+    wsSetup();
+
+    // this useEffect return function is called when the component unmounts
+    // as in, user has navigated away from the page. It sends a request to
+    // the unregister-comments-ws endpoint with the uuid for the websocket connection
+    // created in the function above when the page first loaded.
+    return (() => {
+      const ws_uuid = localStorage.getItem("ws-uuid");
+      if (ws_uuid) {
+        const unregisterWsUrl = `${BACKEND_URL}/unregister-comments-ws`;
+
+        const headers = new Headers();
+        headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+        const params = new URLSearchParams();
+        console.log(`disconnecting, uuid: ${ws_uuid}`);
+        params.append("uuid", ws_uuid);
+
+        const request = new Request(unregisterWsUrl, { headers, body: params, method: "POST" }
+        );
+
+        fetch(request);
+        localStorage.setItem("ws-uuid", "");
+      }
+    });
+
+  }, [credentials.jwt_token, onNewComment, router.query.id]);
+
+  useEffect(() => {
+    if (newComment.status === "fulfilled" &&
+        newComment.success === true &&
+        newComment.data &&
+        credentials.username &&
+        credentials.jwt_token
+    ) {
+      const insertingNewComment: Comment = {
+        id: newComment.data.id,
+        username: credentials.username,
+        review_id: newComment.data.review_id,
+        comment: newComment.data.comment,
+        created_at: newComment.data.created_at
+      }
+
+      dispatch(addNewComment(insertingNewComment));
+      setCommentText("");
+
+      const emitCommentUrl = `${BACKEND_URL}/emit-comment`;
+
+      const headers = new Headers();
+      headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+      const params = new URLSearchParams();
+      params.append("id", newComment.data.id);
+      params.append("jwt_token", credentials.jwt_token);
+      params.append("username", credentials.username);
+      params.append("topic", newComment.data.review_id);
+      params.append("comment", newComment.data.comment);
+      params.append("created_at", newComment.data.created_at.toString());
+
+      const request = new Request(emitCommentUrl, { headers, body: params, method: "POST"});
+      fetch(request);
+      dispatch(resetNewComment());
+
+    } else if (newComment.code === 401) {
+      dispatch(resetNewComment());
+
+      dispatch(unsetCredentials());
+      document.cookie = "username=";
+      document.cookie = "jwt_token=";
+    }
+  }, [newComment, credentials.username, dispatch, credentials.jwt_token]);
 
   function makeTitle() {
     let year: string = "";
@@ -144,32 +313,6 @@ export default function ReviewDetailsPage() {
       dispatch(postComment(newComment));
     }
   }
-
-  useEffect(() => {
-    if (newComment.status === "fulfilled" &&
-        newComment.success === true &&
-        newComment.data &&
-        credentials.username
-    ) {
-      const insertingNewComment: Comment = {
-        id: newComment.data.id,
-        username: credentials.username,
-        review_id: newComment.data.review_id,
-        comment: newComment.data.comment,
-        created_at: newComment.data.created_at
-      }
-
-      dispatch(addNewComment(insertingNewComment));
-      setCommentText("");
-
-    } else if (newComment.code === 401) {
-      dispatch(resetNewComment());
-
-      dispatch(unsetCredentials());
-      document.cookie = "username=";
-      document.cookie = "jwt_token=";
-    }
-  }, [newComment, credentials.username, dispatch]);
 
   return <div className="wrapper">
     <Navbar />
@@ -285,6 +428,6 @@ export default function ReviewDetailsPage() {
       }
 
     </div>
-    <Footer singlePage={true} />
+    <Footer />
   </div>
 }

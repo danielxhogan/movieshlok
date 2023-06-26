@@ -89,7 +89,7 @@ export default function MovieDetailsPage() {
       </>}
     </div>
 
-    <Footer singlePage={true} />
+    <Footer />
   </div>
 }
 

@@ -12,11 +12,11 @@ import {
 } from "@/redux/reducers/reviews";
 
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { useEffect, useCallback } from "react";
 import { Spinner } from "@chakra-ui/react";
 
 import getConfig from "next/config";
-import Link from "next/link";
 const { publicRuntimeConfig } = getConfig();
 const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
 
@@ -34,44 +34,32 @@ export default function Reviews() {
   // and inserts it into the array of Reviews stored in the redux store by
   // passing it into the addNewReveiw redux action.
   const onNewReview = useCallback((newReview: string) => {
-    console.log("onNewReview");
     let id: string | null = null
     let user_id: string | null = null;
     let username: string | null = null;
     let movie_id: string | null = null;
     let rating: number | null = null;
     let review: string | null = null;
-    let created_at: number = 0;
+    let created_at: number | null = null;
     const newReviewArray = newReview.split(";");
 
     newReviewArray.forEach(reviewField => {
       const reviewFieldArray = reviewField.split("=");
+      const key = reviewFieldArray[0];
+      const value = reviewFieldArray[1];
 
-      if (reviewFieldArray[0] === "id") {
-        id = reviewFieldArray[1];
-
-      } else if (reviewFieldArray[0] === "user_id") {
-        user_id = reviewFieldArray[1];
-
-      } else if (reviewFieldArray[0] === "username") {
-        username = reviewFieldArray[1];
-
-      } else if (reviewFieldArray[0] === "movie_id") {
-        movie_id = reviewFieldArray[1];
-
-      } else if (reviewFieldArray[0] === "rating") {
-        rating = parseInt(reviewFieldArray[1]);
-
-      } else if (reviewFieldArray[0] === "review") {
-        review = reviewFieldArray[1];
-
-      } else if (reviewFieldArray[0] === "created_at") {
-        created_at = parseInt(reviewFieldArray[1]);
+      switch (key) {
+        case "id": id = value; break;
+        case "user_id": user_id = value; break;
+        case "username": username = value; break;
+        case "movie_id": movie_id = value; break;
+        case "rating": rating = parseInt(value); break;
+        case "review": review = value; break;
+        case "created_at": created_at = parseInt(value); break;
       }
     });
 
-    if (id && user_id && username && movie_id && rating && review) {
-      console.log("creating new Review");
+    if (id && user_id && username && movie_id && rating && review && created_at) {
       const insertingNewReview: Review = {
         id,
         user_id,
@@ -155,7 +143,7 @@ export default function Reviews() {
 
     // this useEffect return function is called when the component unmounts
     // as in, user has navigated away from the page. It sends a request to
-    // the ws-unregister endpoint with the uuid for the websocket connection
+    // the unregister-reviews-ws endpoint with the uuid for the websocket connection
     // created in the function above when the page first loaded.
     return (() => {
       const ws_uuid = localStorage.getItem("ws-uuid");

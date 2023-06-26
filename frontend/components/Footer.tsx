@@ -1,18 +1,10 @@
 import styles from "@/styles/components/Footer.module.css";
 
-interface Props {
-  singlePage: boolean;
-}
-
-export default function Footer({singlePage}: Props) {
+export default function Footer() {
   let singlePageClass: string;
 
-  switch(singlePage) {
-    case true: singlePageClass = "single-page"; break;
-    case false: singlePageClass = ""; break;
-  }
 
-  return <div className={`${styles["wrapper"]} ${styles[singlePageClass]}`}>
+  return <div className={`${styles["wrapper"]}`}>
     <h2>If you don&apos;t like movies then you can get out</h2>
     <p>This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
   </div>

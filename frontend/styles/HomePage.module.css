@@ -1,0 +1,38 @@
+.quote-section {
+  background-color: var(--dark-grey);
+  color: var(--light-grey);
+  height: 200px;
+  margin-top: 75px;
+}
+
+.quote-pic {
+  display: flex;
+  justify-content: space-around;
+  transition: 2s ease;
+  opacity: 100%;
+}
+
+.shown {
+  opacity: 100%;
+}
+
+.hidden {
+  opacity: 0;
+  transition: 5s ease-in;
+}
+
+.quote {
+  padding-top: 60px;
+  font-size: 1.3rem;
+}
+
+.movie {
+  font-size: 1rem;
+  text-align: right;
+  padding-top: 15px;
+  font-style: italic;
+}
+
+.pic {
+  margin-top: -60px;
+}

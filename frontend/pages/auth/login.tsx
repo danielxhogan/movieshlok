@@ -108,6 +108,6 @@ export default function LoginPage() {
       <p>Don&apos;t have an account? <Link href="/auth/register"><span>Register</span></Link></p>
     </form>
 
-    <Footer singlePage={true} />
+    <Footer />
   </div>
 }

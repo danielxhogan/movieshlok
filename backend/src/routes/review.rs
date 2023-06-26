@@ -38,7 +38,6 @@ struct WsEmitRequest {
   jwt_token: String,
   username: String,
   topic: String,
-  review_id: Uuid,
   comment: String,
   created_at: String
 }
@@ -194,6 +193,7 @@ fn emit_comment_filters(client_list: ClientList)
 async fn emit_comment(req: WsEmitRequest, client_list: ClientList)
 -> Result<impl warp::Reply, warp::Rejection>
 {
+  println!("newComment");
   let payload = auth_check(req.jwt_token);
 
   match payload {
@@ -204,7 +204,7 @@ async fn emit_comment(req: WsEmitRequest, client_list: ClientList)
       let message = format!("id={};username={};review_id={};comment={};created_at={}",
         req.id,
         req.username,
-        req.review_id,
+        req.topic,
         req.comment,
         req.created_at
       );

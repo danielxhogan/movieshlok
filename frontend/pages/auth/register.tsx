@@ -112,6 +112,6 @@ export default function RegisterPage() {
 
     </form>
 
-    <Footer singlePage={true} />
+    <Footer />
   </div>
 }

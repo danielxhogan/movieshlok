@@ -1,8 +1,11 @@
 .wrapper {
   background-color: var(--dark-grey);
+  color: var(--light-grey);
   height: 85px;
   padding: 20px;
-  color: var(--light-grey);
+  position: absolute;
+  bottom: 0;
+  width: 100%;
 }
 
 .wrapper h2 {
