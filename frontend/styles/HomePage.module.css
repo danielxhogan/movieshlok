@@ -23,7 +23,9 @@
 
 .quote {
   padding-top: 60px;
+  width: 500px;
   font-size: 1.3rem;
+  text-align: center;
 }
 
 .movie {
@@ -35,4 +37,6 @@
 
 .pic {
   margin-top: -60px;
+  height: 320px;
+  width: auto;
 }

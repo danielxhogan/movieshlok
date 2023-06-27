@@ -13,30 +13,55 @@ export default function HomePage() {
 
   const [ quotePicClass, setQuotePicClass ] = useState(SHOWN);
   const [ quoteIdx, setQuoteIdx ] = useState(0);
+  const [ picIdx, setPicIdx ] = useState(0);
 
   const quotes = [
-    <div key={1}>
+    <span key={1} className={styles["quote-text"]}>
+      <p>&quot;Oh I&apos;m sorry, did I break your concentration?&quot;</p>
+      <div className={styles["movie"]}>Pulp Fiction, 1994</div>
+    </span>,
+    <span key={2} className={styles["quote-text"]}>
+      <p>&quot;Did you just look at me? Look at me! How Dare you!&quot;</p>
+      <div className={styles["movie"]}>The Favourite, 2018</div>
+    </span>,
+    <span key={3} className={styles["quote-text"]}>
       <p>&quot;This is how i win.&quot;</p>
       <div className={styles["movie"]}>Uncut Gems, 2019</div>
-    </div>,
-    <div key={2}>
-      <p>&quot;This is how i lose.&quot;</p>
-      <div className={styles["movie"]}>Cut Gems, 2019</div>
-    </div>,
-    <div key={3}>
-      <p>&quot;This is why I'm hot.&quot;</p>
-      <div className={styles["movie"]}>Cut Gems, 2019</div>
-    </div>
-  ]
+    </span>,
+    <span key={4} className={styles["quote-text"]}>
+      <p>&quot;What&apos;s your favorite scary movie?&quot;</p>
+      <div className={styles["movie"]}>Scream, 1996</div>
+    </span>,
+    <span key={5} className={styles["quote-text"]}>
+      <p>&quot;Why do you wear that stupid bunny suit?&quot;</p>
+      <p>&quot;Why do you wear that stupid man suit?&quot;</p>
+      <div className={styles["movie"]}>Donnie Darko, 2001</div>
+    </span>
+  ];
 
-  const setNextQuote = useCallback(() => {
+  const pics = [
+    "/pulp-fiction.png",
+    "/the-favourite.png",
+    "/uncut-gems.png",
+    "/scream.png",
+    "/donnie-darko.png"
+  ];
+
+  function setNextQuote() {
     let nextQuote = quoteIdx + 1;
     if (nextQuote > quotes.length - 1) {
       nextQuote = 0;
     }
     setQuoteIdx(nextQuote);
+  }
 
-  }, [quoteIdx, quotes.length]);
+  function setNextPic() {
+    let nextPic = picIdx + 1;
+    if (nextPic > pics.length - 1) {
+      nextPic = 0;
+    }
+    setPicIdx(nextPic);
+  }
 
   const toggleQuotePicClass = useCallback(() => {
     switch (quotePicClass) {
@@ -45,22 +70,13 @@ export default function HomePage() {
     }
   }, [quotePicClass]);
 
-  // const intervals = [];
-  // const timers = [];
-
   setTimeout(() => {
     toggleQuotePicClass();
-    setTimeout(() => setNextQuote(), 5000);
-    // setNextQuote();
+    setTimeout(() => {
+      setNextQuote();
+      setNextPic();
+    }, 5000);
   }, 5000);
-
-  // useEffect(() => {
-  //   setInterval(() => {
-  //     toggleQuotePicClass();
-  //     setTimeout(() => setNextQuote(), 5000);
-  //     // setNextQuote();
-  //   }, 5000);
-  // }, [setNextQuote, toggleQuotePicClass]);
 
   return <div className="wrapper">
     <Navbar />
@@ -69,15 +85,13 @@ export default function HomePage() {
       <div className={`${styles["quote-pic"]} ${styles[quotePicClass]} content`}>
         <div className={styles["quote"]}>
           { quotes[quoteIdx] }
-          {/* &quot;This is how I win&quot;
-          <div className={styles["movie"]}>Uncut Gems, 2019</div> */}
         </div>
 
         <Image
-          src="/uncut-gems.png"
+          src={pics[picIdx]}
           className={styles["pic"]}
           width={200}
-          height={300}
+          height={320}
           alt="uncut gems"
         />
       </div>
