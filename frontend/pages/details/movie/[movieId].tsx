@@ -59,8 +59,6 @@ export default function MovieDetailsPage() {
     <Navbar />
 
     <div className="content">
-      <Searchbar />
-
       { movieDetails.status === "fulfilled" ? <>
         <Hero />
 

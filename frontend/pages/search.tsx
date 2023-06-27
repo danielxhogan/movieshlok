@@ -227,11 +227,9 @@ export default function SearchPage() {
 
 
   return <div className="wrapper">
-    <Navbar />
+    <Navbar filter={filter} setParentSeachQuery={setParentSeachQuery} />
 
     <div className="content">
-      <Searchbar filter={filter} setParentSeachQuery={setParentSeachQuery}/>
-
       <div className={styles["search-data"]}>
         <div className={styles["results"]}>
 

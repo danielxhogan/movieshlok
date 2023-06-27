@@ -244,7 +244,6 @@ export default function ReviewDetailsPage() {
     if (directors.length > 0) {
       director = directors[0];
     }
-
     
     return <div className={styles["title-text"]}>
       <h1>
@@ -316,11 +315,11 @@ export default function ReviewDetailsPage() {
 
   return <div className="wrapper">
     <Navbar />
-    <div className="content">
-      <Searchbar />
 
+    <div className="content">
       { movieDetails.status === "fulfilled" ?
         <div className={styles["review-content"]}>
+
           <div className={styles["movie-poster-div"]}>
           { movieDetails.data.poster_path &&
             <Image
@@ -335,7 +334,6 @@ export default function ReviewDetailsPage() {
           </div>
 
           <div className={styles["review-details"]}>
-
             <div className={styles["title-section"]}>
               <div className={styles["username-section"]}>
                 <h2>{ typeof router.query.username === "string" && router.query.username }</h2>
@@ -417,7 +415,6 @@ export default function ReviewDetailsPage() {
               <p>Login to leave a comment</p>
               }
             </div>
-
           </div>
 
         </div>

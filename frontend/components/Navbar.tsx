@@ -1,5 +1,6 @@
 import styles from "@/styles/components/Navbar.module.css";
 import logo from "@/public/logo.png";
+import Searchbar, { SearchbarProps } from "@/components/Searchbar";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { setCredentials, unsetCredentials, selectCredentials, Credentials } from "@/redux/reducers/auth";
 
@@ -18,7 +19,7 @@ import {
   MenuDivider,
 } from '@chakra-ui/react'
 
-export default function Navbar() {
+export default function Navbar(props: SearchbarProps) {
   const router = useRouter();
   const [ authenticated, setAuthenticated ] = useState(false);
 
@@ -83,6 +84,8 @@ export default function Navbar() {
 
   return <>
     <div className={styles["navbar"]}>
+      <div className={styles["nav-flex"]}>
+
 
       <div className={styles["main-nav"]}>
         <Link href="/">
@@ -106,6 +109,12 @@ export default function Navbar() {
 
         </div>
       </div>
+
+      <Searchbar
+        size={"lg"}
+        filter={props.filter}
+        setParentSeachQuery={props.setParentSeachQuery}
+      />
 
       <div className={styles["dropdown"]}>
 
@@ -182,6 +191,13 @@ export default function Navbar() {
         </> }
       </div> {/* end dropdown */}
 
+      </div>
+
+      <Searchbar
+        size={"sm"}
+        filter={props.filter}
+        setParentSeachQuery={props.setParentSeachQuery}
+      />
     </div>
   </>
 }

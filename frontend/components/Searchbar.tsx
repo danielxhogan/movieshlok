@@ -1,3 +1,4 @@
+import styles from "@/styles/components/Searchbar.module.css";
 import { useAppSelector } from "@/redux/hooks";
 import { selectSearchResults } from "@/redux/reducers/tmdb";
 import { FilterResults } from "@/pages/search";
@@ -7,12 +8,13 @@ import { useRouter } from 'next/router';
 import { InputGroup, InputLeftElement, Input } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
 
-interface Props {
+export interface SearchbarProps {
   filter?: FilterResults;
   setParentSeachQuery?: Function;
+  size?: string;
 }
 
-export default function Searchbar(props: Props) {
+export default function Searchbar(props: SearchbarProps) {
   const searchResults = useAppSelector(selectSearchResults);
   const router = useRouter();
 
@@ -54,7 +56,10 @@ export default function Searchbar(props: Props) {
   }
 
   return <>
-    <form onSubmit={onSubmitSearchForm}>
+    <form
+      onSubmit={onSubmitSearchForm}
+      className={`${styles["wrapper"]} ${styles[props.size]}`}
+      >
       <InputGroup>
         <InputLeftElement
           pointerEvents='none'

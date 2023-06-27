@@ -2,16 +2,20 @@
   position:relative;
   z-index: 1;
   background-color: white;
-  display: flex;
-  justify-content: space-between;
   padding: 10px 20px;
   font-family: 'Audiowide', cursive;
   box-shadow: 0px 0px 9px var(--light-grey);
 }
 
+.nav-flex {
+  display: flex;
+  justify-content: space-between;
+}
+
 @media only screen and (max-width: 700px) {
-  .navbar {
+  .nav-flex {
     flex-direction: column;
+    margin-bottom: 10px;
   }
 
   .dropdown {
@@ -95,19 +99,10 @@
   text-decoration: none;
 }
 
-@media only screen and (max-width: 1100px) {
+@media only screen and (max-width: 1500px) {
   .main-nav-links {
     display: none;
   }
-
-  /* .mag-glass {
-    display: inline;
-    margin-right: 10px;
-  }
-
-  .mag-glass > a:hover {
-    text-decoration: none;
-  } */
 
   .small-auth-menu {
     display: block;

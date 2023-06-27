@@ -16,7 +16,7 @@ export default function HomePage() {
   const [ picIdx, setPicIdx ] = useState(0);
 
   const quotes = [
-    <span key={1} className={styles["quote-text"]}>
+    <span key={0} className={styles["quote-text"]}>
       <p>&quot;Oh I&apos;m sorry, did I break your concentration?&quot;</p>
       <div className={styles["movie"]}>Pulp Fiction, 1994</div>
     </span>,
@@ -24,27 +24,49 @@ export default function HomePage() {
       <p>&quot;Did you just look at me? Look at me! How Dare you!&quot;</p>
       <div className={styles["movie"]}>The Favourite, 2018</div>
     </span>,
+    <span key={7} className={styles["quote-text"]}>
+      <p>&quot;Dear Siobhan, obviously I don&apos;t know what &quot;ensconced&quot; is.&quot;</p>
+      <div className={styles["movie"]}>The Banshees of Inisherin, 2022</div>
+    </span>,
+    <span key={1} className={styles["quote-text"]}>
+      <p>&quot;What&apos;s your favorite scary movie?&quot;</p>
+      <div className={styles["movie"]}>Scream, 1996</div>
+    </span>,
     <span key={3} className={styles["quote-text"]}>
-      <p>&quot;This is how i win.&quot;</p>
+      <p>&quot;This is how I win.&quot;</p>
       <div className={styles["movie"]}>Uncut Gems, 2019</div>
     </span>,
     <span key={4} className={styles["quote-text"]}>
-      <p>&quot;What&apos;s your favorite scary movie?&quot;</p>
-      <div className={styles["movie"]}>Scream, 1996</div>
+      <p>&quot;Isn&apos;t it strange, to create something that hates you?&quot;</p>
+      <div className={styles["movie"]}>Ex Machina, 2015</div>
     </span>,
     <span key={5} className={styles["quote-text"]}>
       <p>&quot;Why do you wear that stupid bunny suit?&quot;</p>
       <p>&quot;Why do you wear that stupid man suit?&quot;</p>
       <div className={styles["movie"]}>Donnie Darko, 2001</div>
+    </span>,
+    <span key={8} className={styles["quote-text"]}>
+      <p>&quot;Dodge this.&quot;</p>
+      <div className={styles["movie"]}>The Matrix, 1999</div>
+    </span>,
+    <span key={6} className={styles["quote-text"]}>
+      <p>&quot;He said he forgot the entire indident.&quot;</p>
+      <p>&quot;That means he didn&apos;t deny it.&quot;</p>
+      <p>&quot;It&apos;s a non-denial denial.&quot;</p>
+      <div className={styles["movie"]}>All the Presidents Men, 1976</div>
     </span>
   ];
 
   const pics = [
     "/pulp-fiction.png",
     "/the-favourite.png",
-    "/uncut-gems.png",
+    "/banshees-of-inisherin.png",
     "/scream.png",
-    "/donnie-darko.png"
+    "/uncut-gems.png",
+    "/ex-machina.png",
+    "/donnie-darko.png",
+    "/the-matrix.png",
+    "/all-the-presidents-men.png"
   ];
 
   function setNextQuote() {
