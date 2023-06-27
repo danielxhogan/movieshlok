@@ -1,9 +1,17 @@
 import styles from "@/styles/HomePage.module.css";
 import Navbar from "@/components/Navbar";
-import Searchbar from "@/components/Searchbar";
 import Footer from "@/components/Footer";
 
 import Image from "next/image";
+import pulpFiction from "@/public/pulp-fiction.png";
+import theFavourite from "@/public/the-favourite.png";
+import bansheesOfInisherin from "@/public/banshees-of-inisherin.png";
+import scream from "@/public/scream.png";
+import uncutGems from "@/public/uncut-gems.png";
+import exMachina from "@/public/ex-machina.png";
+import donnieDarko from "@/public/donnie-darko.png";
+import theMatrix from "@/public/the-matrix.png";
+import allThePresidentsMen from "@/public/all-the-presidents-men.png";
 import { useCallback, useEffect, useState } from "react";
 
 const SHOWN = "shown";
@@ -58,16 +66,28 @@ export default function HomePage() {
   ];
 
   const pics = [
-    "/pulp-fiction.png",
-    "/the-favourite.png",
-    "/banshees-of-inisherin.png",
-    "/scream.png",
-    "/uncut-gems.png",
-    "/ex-machina.png",
-    "/donnie-darko.png",
-    "/the-matrix.png",
-    "/all-the-presidents-men.png"
+    pulpFiction,
+    theFavourite,
+    bansheesOfInisherin,
+    scream,
+    uncutGems,
+    exMachina,
+    donnieDarko,
+    theMatrix,
+    allThePresidentsMen
   ];
+
+  // const pics = [
+  //   "/pulp-fiction.png",
+  //   "/the-favourite.png",
+  //   "/banshees-of-inisherin.png",
+  //   "/scream.png",
+  //   "/uncut-gems.png",
+  //   "/ex-machina.png",
+  //   "/donnie-darko.png",
+  //   "/the-matrix.png",
+  //   "/all-the-presidents-men.png"
+  // ];
 
   function setNextQuote() {
     let nextQuote = quoteIdx + 1;
@@ -115,6 +135,7 @@ export default function HomePage() {
           width={200}
           height={320}
           alt="uncut gems"
+          priority
         />
       </div>
     </div>

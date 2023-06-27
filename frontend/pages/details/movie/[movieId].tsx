@@ -1,6 +1,5 @@
 import styles from "@/styles/MovieDetails/MovieDetailsPage.module.css";
 import Navbar from "@/components/Navbar"
-import Searchbar from "@/components/Searchbar";
 import Hero from "@/components/MovieDetails/Hero";
 import MovieData from "@/components/MovieDetails/MovieData";
 import Ratings from "@/components/MovieDetails/Ratings";
