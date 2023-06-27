@@ -135,7 +135,7 @@ export default function HomePage() {
           width={200}
           height={320}
           alt="uncut gems"
-          priority
+          loading="eager"
         />
       </div>
     </div>
