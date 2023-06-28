@@ -12,7 +12,8 @@ import exMachina from "@/public/ex-machina.png";
 import donnieDarko from "@/public/donnie-darko.png";
 import theMatrix from "@/public/the-matrix.png";
 import allThePresidentsMen from "@/public/all-the-presidents-men.png";
-import { useCallback, useEffect, useState } from "react";
+import thoroughbreds from "@/public/thoroughbreds.png";
+import { useCallback, useState } from "react";
 
 const SHOWN = "shown";
 const HIDDEN = "hidden";
@@ -62,7 +63,11 @@ export default function HomePage() {
       <p>&quot;That means he didn&apos;t deny it.&quot;</p>
       <p>&quot;It&apos;s a non-denial denial.&quot;</p>
       <div className={styles["movie"]}>All the Presidents Men, 1976</div>
-    </span>
+    </span>,
+    <span key={9} className={styles["quote-text"]}>
+      <p>&quot;I have a perfectly healthy brain, it just doesn&apos;t contain feelings.&quot;</p>
+      <div className={styles["movie"]}>Thoroughbreds, 2018</div>
+    </span>,
   ];
 
   const pics = [
@@ -74,20 +79,9 @@ export default function HomePage() {
     exMachina,
     donnieDarko,
     theMatrix,
-    allThePresidentsMen
+    allThePresidentsMen,
+    thoroughbreds
   ];
-
-  // const pics = [
-  //   "/pulp-fiction.png",
-  //   "/the-favourite.png",
-  //   "/banshees-of-inisherin.png",
-  //   "/scream.png",
-  //   "/uncut-gems.png",
-  //   "/ex-machina.png",
-  //   "/donnie-darko.png",
-  //   "/the-matrix.png",
-  //   "/all-the-presidents-men.png"
-  // ];
 
   function setNextQuote() {
     let nextQuote = quoteIdx + 1;
