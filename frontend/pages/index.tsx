@@ -13,6 +13,11 @@ import donnieDarko from "@/public/donnie-darko.png";
 import theMatrix from "@/public/the-matrix.png";
 import allThePresidentsMen from "@/public/all-the-presidents-men.png";
 import thoroughbreds from "@/public/thoroughbreds.png";
+
+import searchImg from "@/public/search.png";
+import movieDetailsImg from "@/public/movie-details.png";
+import reviewsImg from "@/public/reviews.png";
+
 import { useCallback, useEffect, useState } from "react";
 
 const SHOWN = "shown";
@@ -116,39 +121,58 @@ export default function HomePage() {
 
   function scrollHandler() {
     const distanceScrolled = window.pageYOffset;
-    const img1 = document.getElementById("img1");
-    const img2 = document.getElementById("img2");
+    console.log(distanceScrolled);
+    const searchImg = document.getElementById("searchImg");
+    const movieDetailsImg = document.getElementById("movieDetailsImg");
+    const reviewsImg = document.getElementById("reviewsImg");
 
     const fadeScrollLength = 400;
-    const gap = 50;
+    const outInGap = 50;
+    const inOutGap = 200;
 
-    const fadeOut1Start = 700;
+    const fadeOut1Start = 350;
     const fadeOut1End = fadeOut1Start + fadeScrollLength;
 
-    const fadeIn1Start = fadeOut1End + gap;
+    const fadeIn1Start = fadeOut1End + outInGap;
     const fadeIn1End = fadeIn1Start + fadeScrollLength;
 
-    // let opacity = 1;
-    if (img1 && img2) {
+    const fadeOut2Start = fadeIn1End + inOutGap;
+    const fadeOut2End = fadeOut2Start + fadeScrollLength;
+
+    const fadeIn2Start = fadeOut2End + outInGap;
+    const fadeIn2End = fadeIn2Start + fadeScrollLength;
+
+    if (searchImg && movieDetailsImg && reviewsImg) {
       if (distanceScrolled <= fadeOut1Start) {
-        img1.style.opacity = "1";
-        img2.style.opacity = "0";
+        searchImg.style.opacity = "1";
+        movieDetailsImg.style.opacity = "0";
+        reviewsImg.style.opacity = "0";
 
       } else if (distanceScrolled > fadeOut1Start && distanceScrolled <= fadeOut1End) { // 2899
-        img1.style.opacity = (1 - ((distanceScrolled - fadeOut1Start) / fadeScrollLength)).toString();
-        img2.style.opacity = "0";
+        searchImg.style.opacity = (1 - ((distanceScrolled - fadeOut1Start) / fadeScrollLength)).toString();
+        movieDetailsImg.style.opacity = "0";
+        reviewsImg.style.opacity = "0";
 
       } else if (distanceScrolled > fadeIn1Start && distanceScrolled <= fadeIn1End) {
-        img1.style.opacity = "0";
-        img2.style.opacity = ((distanceScrolled - fadeIn1Start) / fadeScrollLength).toString();
+        searchImg.style.opacity = "0";
+        movieDetailsImg.style.opacity = ((distanceScrolled - fadeIn1Start) / fadeScrollLength).toString();
+        reviewsImg.style.opacity = "0";
+
+      } else if (distanceScrolled > fadeOut2Start && distanceScrolled <= fadeOut2End) {
+        searchImg.style.opacity = "0";
+        movieDetailsImg.style.opacity = (1 - ((distanceScrolled - fadeOut2Start) / fadeScrollLength)).toString();
+        reviewsImg.style.opacity = "0";
+
+      } else if (distanceScrolled > fadeIn2Start && distanceScrolled <= fadeIn2End) {
+        searchImg.style.opacity = "0";
+        movieDetailsImg.style.opacity = "0";
+        reviewsImg.style.opacity = ((distanceScrolled - fadeIn2Start) / fadeScrollLength).toString();
       }
     }
-
   }
   
   useEffect(() => {
     window.addEventListener('scroll', scrollHandler);
-
   }, []);
 
   return <div className="wrapper">
@@ -175,38 +199,64 @@ export default function HomePage() {
 
       <div className={`${styles["features"]}`}>
         <div className={styles["feature"]}>
-          Search movies
+          <h3>Search Movie Info</h3>
+          <div>
+            <p>
+              Use the searchbar to search for movies,
+              cast & crew, or both
+            </p>
+          </div>
+          <span>powered by the TMDB api</span>
         </div>
 
         <div className={styles["feature"]}>
-          View Details
+          <h3>View Movie Details</h3>
+          <div>
+            <p>
+              Click on a movie search result to watch the trailer,
+              read the synopsis, or view details about cast & crew
+            </p>
+          </div>
         </div>
 
-        <div className={styles["feature"]}>
-          Leave Reviews
-        </div>
-
-        <div className={styles["feature"]}>
-          Leave Comment
+        <div className={`${styles["feature"]} ${styles["last-feature"]}`}>
+          <h3>Leave A Review</h3>
+          <div>
+            <p>
+              On the movie details page you can read reviews left by other users
+            </p>
+            <p>
+              Once you&apos;ve made an account, you can like, rate, and review
+              any movie you want
+            </p>
+          </div>
         </div>
       </div>
 
       <div className={styles["feature-img-section"]}>
         <Image
-          id="img1"
-          src="/mandy-creeps.png"
+          id="searchImg"
+          src={searchImg}
           className={styles["feature-img"]}
-          width={500}
-          height={100}
-          alt="no-results"
+          width={1034}
+          height={528}
+          alt="search image"
         />
         <Image
-          id="img2"
-          src="/mandy-creeps.png"
+          id="movieDetailsImg"
+          src={movieDetailsImg}
           className={styles["feature-img"]}
-          width={500}
-          height={100}
-          alt="no-results"
+          width={1298}
+          height={663}
+          alt="movie details"
+        />
+        <Image
+          id="reviewsImg"
+          src={reviewsImg}
+          className={styles["feature-img"]}
+          width={1231}
+          height={635}
+          alt="reviews"
         />
       </div>
     </div>
