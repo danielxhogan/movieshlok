@@ -5,6 +5,8 @@
 
 .movie-poster {
   border-radius: 10px;
+  position: sticky;
+  top: 130px;
 }
 
 .movie-content {

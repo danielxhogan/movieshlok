@@ -40,3 +40,33 @@
   height: 320px;
   width: auto;
 }
+
+.features-section {
+  margin-top: 75px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.features {
+  width: 50%;
+}
+
+.feature {
+  border: solid 1px black;
+  height: 130vh;
+  padding-top: 200px;
+  display: flex;
+  justify-content: center;
+  /* align-items: center; */
+}
+
+.feature-img-section {
+  border: solid 1px black;
+  width: 50%;
+}
+
+.feature-img {
+  position: sticky;
+  top: 40vh;
+  margin: 200px auto 0;
+}

@@ -13,7 +13,7 @@ import donnieDarko from "@/public/donnie-darko.png";
 import theMatrix from "@/public/the-matrix.png";
 import allThePresidentsMen from "@/public/all-the-presidents-men.png";
 import thoroughbreds from "@/public/thoroughbreds.png";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const SHOWN = "shown";
 const HIDDEN = "hidden";
@@ -59,7 +59,7 @@ export default function HomePage() {
       <div className={styles["movie"]}>The Matrix, 1999</div>
     </span>,
     <span key={6} className={styles["quote-text"]}>
-      <p>&quot;He said he forgot the entire indident.&quot;</p>
+      <p>&quot;He said he forgot the entire incident.&quot;</p>
       <p>&quot;That means he didn&apos;t deny it.&quot;</p>
       <p>&quot;It&apos;s a non-denial denial.&quot;</p>
       <div className={styles["movie"]}>All the Presidents Men, 1976</div>
@@ -114,6 +114,43 @@ export default function HomePage() {
     }, 5000);
   }, 5000);
 
+  function scrollHandler() {
+    const distanceScrolled = window.pageYOffset;
+    const img1 = document.getElementById("img1");
+    const img2 = document.getElementById("img2");
+
+    const fadeScrollLength = 400;
+    const gap = 50;
+
+    const fadeOut1Start = 700;
+    const fadeOut1End = fadeOut1Start + fadeScrollLength;
+
+    const fadeIn1Start = fadeOut1End + gap;
+    const fadeIn1End = fadeIn1Start + fadeScrollLength;
+
+    // let opacity = 1;
+    if (img1 && img2) {
+      if (distanceScrolled <= fadeOut1Start) {
+        img1.style.opacity = "1";
+        img2.style.opacity = "0";
+
+      } else if (distanceScrolled > fadeOut1Start && distanceScrolled <= fadeOut1End) { // 2899
+        img1.style.opacity = (1 - ((distanceScrolled - fadeOut1Start) / fadeScrollLength)).toString();
+        img2.style.opacity = "0";
+
+      } else if (distanceScrolled > fadeIn1Start && distanceScrolled <= fadeIn1End) {
+        img1.style.opacity = "0";
+        img2.style.opacity = ((distanceScrolled - fadeIn1Start) / fadeScrollLength).toString();
+      }
+    }
+
+  }
+  
+  useEffect(() => {
+    window.addEventListener('scroll', scrollHandler);
+
+  }, []);
+
   return <div className="wrapper">
     <Navbar />
 
@@ -134,8 +171,47 @@ export default function HomePage() {
       </div>
     </div>
 
+    <div className={`${styles["features-section"]} content`}>
+
+      <div className={`${styles["features"]}`}>
+        <div className={styles["feature"]}>
+          Search movies
+        </div>
+
+        <div className={styles["feature"]}>
+          View Details
+        </div>
+
+        <div className={styles["feature"]}>
+          Leave Reviews
+        </div>
+
+        <div className={styles["feature"]}>
+          Leave Comment
+        </div>
+      </div>
+
+      <div className={styles["feature-img-section"]}>
+        <Image
+          id="img1"
+          src="/mandy-creeps.png"
+          className={styles["feature-img"]}
+          width={500}
+          height={100}
+          alt="no-results"
+        />
+        <Image
+          id="img2"
+          src="/mandy-creeps.png"
+          className={styles["feature-img"]}
+          width={500}
+          height={100}
+          alt="no-results"
+        />
+      </div>
+    </div>
+
     <div className="content">
-      {/* <Searchbar /> */}
     </div>
     <Footer />
   </div>

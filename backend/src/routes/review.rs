@@ -193,7 +193,6 @@ fn emit_comment_filters(client_list: ClientList)
 async fn emit_comment(req: WsEmitRequest, client_list: ClientList)
 -> Result<impl warp::Reply, warp::Rejection>
 {
-  println!("newComment");
   let payload = auth_check(req.jwt_token);
 
   match payload {

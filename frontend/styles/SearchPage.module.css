@@ -12,9 +12,6 @@
   display: none;
 }
 
-.filter-button {
-}
-
 .no-results {
   text-align: center;
   font-size: 1.5rem;
@@ -43,10 +40,6 @@
 .movie-poster-image {
   width: 200px;
   height: 300px;
-}
-
-.movie-details {
-  /* width: 80%; */
 }
 
 .person-result-content {

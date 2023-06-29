@@ -200,7 +200,7 @@ export default function SearchPage() {
     }
   }
 
-  function sortAndMakeSearchResults(results: [SearchResult]) {
+  function sortAndMakeSearchResults(results: SearchResult[]) {
     if (results.length === 0) {
       return <>
         <h2 className={styles["no-results"]}>Sorry, No Results</h2>
@@ -322,13 +322,11 @@ export default function SearchPage() {
                 justifyContent="left">
                 CAST & CREW
               </Button>
-          </div>
+            </div> {/* end filter-buttons */}
+        </div> {/* end filter */}
+      </div> {/* end search-data */}
+    </div> {/* end content */}
 
-        </div>
-
-      </div>
-    </div>
-    <Footer singlePage={true} />
-
-  </div>
+    <Footer />
+  </div> /* end wrapper */
 }

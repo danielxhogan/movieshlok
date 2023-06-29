@@ -9,7 +9,14 @@
 .wrapper {
   background-color: var(--background-primary);
   min-height: 100vh;
+  padding-top: 100px;
   padding-bottom: 85px;   /* to account for the height of the footer */
+}
+
+@media only screen and (max-width: 900px) {
+  .wrapper {
+    padding-top: 150px;   /* to account for the search bar in nav dropping down to its own row */
+  }
 }
 
 @media screen and (max-width: 650px) {
@@ -20,7 +27,8 @@
 
 .content {
   width: 80%;
-  margin: 30px auto 0;
+  /* margin: 30px auto 0; */
+  margin: 0 auto 0;
   padding-bottom: 40px;
 }
 

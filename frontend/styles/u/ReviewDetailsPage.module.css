@@ -6,6 +6,8 @@
 
 .movie-poster {
   border-radius: 10px;
+  position: sticky;
+  top: 130px;
 }
 
 .movie-poster:hover {
@@ -80,10 +82,6 @@
 
 .submit-comment-button {
   margin-right: 0 !important;
-}
-
-.comments-section {
-  /* padding-bottom: 85px; */
 }
 
 .comments-title {
