@@ -118,61 +118,59 @@ export default function HomePage() {
       setNextPic();
     }, 5000);
   }, 5000);
-
-  function scrollHandler() {
-    const distanceScrolled = window.pageYOffset;
-    console.log(distanceScrolled);
-    const searchImg = document.getElementById("searchImg");
-    const movieDetailsImg = document.getElementById("movieDetailsImg");
-    const reviewsImg = document.getElementById("reviewsImg");
-
-    const fadeScrollLength = 400;
-    const outInGap = 50;
-    const inOutGap = 200;
-
-    const fadeOut1Start = 350;
-    const fadeOut1End = fadeOut1Start + fadeScrollLength;
-
-    const fadeIn1Start = fadeOut1End + outInGap;
-    const fadeIn1End = fadeIn1Start + fadeScrollLength;
-
-    const fadeOut2Start = fadeIn1End + inOutGap;
-    const fadeOut2End = fadeOut2Start + fadeScrollLength;
-
-    const fadeIn2Start = fadeOut2End + outInGap;
-    const fadeIn2End = fadeIn2Start + fadeScrollLength;
-
-    if (searchImg && movieDetailsImg && reviewsImg) {
-      if (distanceScrolled <= fadeOut1Start) {
-        searchImg.style.opacity = "1";
-        movieDetailsImg.style.opacity = "0";
-        reviewsImg.style.opacity = "0";
-
-      } else if (distanceScrolled > fadeOut1Start && distanceScrolled <= fadeOut1End) { // 2899
-        searchImg.style.opacity = (1 - ((distanceScrolled - fadeOut1Start) / fadeScrollLength)).toString();
-        movieDetailsImg.style.opacity = "0";
-        reviewsImg.style.opacity = "0";
-
-      } else if (distanceScrolled > fadeIn1Start && distanceScrolled <= fadeIn1End) {
-        searchImg.style.opacity = "0";
-        movieDetailsImg.style.opacity = ((distanceScrolled - fadeIn1Start) / fadeScrollLength).toString();
-        reviewsImg.style.opacity = "0";
-
-      } else if (distanceScrolled > fadeOut2Start && distanceScrolled <= fadeOut2End) {
-        searchImg.style.opacity = "0";
-        movieDetailsImg.style.opacity = (1 - ((distanceScrolled - fadeOut2Start) / fadeScrollLength)).toString();
-        reviewsImg.style.opacity = "0";
-
-      } else if (distanceScrolled > fadeIn2Start && distanceScrolled <= fadeIn2End) {
-        searchImg.style.opacity = "0";
-        movieDetailsImg.style.opacity = "0";
-        reviewsImg.style.opacity = ((distanceScrolled - fadeIn2Start) / fadeScrollLength).toString();
-      }
-    }
-  }
   
   useEffect(() => {
-    window.addEventListener('scroll', scrollHandler);
+    window.addEventListener('scroll', () => {
+      const distanceScrolled = window.pageYOffset;
+      console.log(distanceScrolled);
+      const searchImg = document.getElementById("searchImg");
+      const movieDetailsImg = document.getElementById("movieDetailsImg");
+      const reviewsImg = document.getElementById("reviewsImg");
+
+      const fadeScrollLength = 400;
+      const outInGap = 50;
+      const inOutGap = 200;
+
+      const fadeOut1Start = 350;
+      const fadeOut1End = fadeOut1Start + fadeScrollLength;
+
+      const fadeIn1Start = fadeOut1End + outInGap;
+      const fadeIn1End = fadeIn1Start + fadeScrollLength;
+
+      const fadeOut2Start = fadeIn1End + inOutGap;
+      const fadeOut2End = fadeOut2Start + fadeScrollLength;
+
+      const fadeIn2Start = fadeOut2End + outInGap;
+      const fadeIn2End = fadeIn2Start + fadeScrollLength;
+
+      if (searchImg && movieDetailsImg && reviewsImg) {
+        if (distanceScrolled <= fadeOut1Start) {
+          searchImg.style.opacity = "1";
+          movieDetailsImg.style.opacity = "0";
+          reviewsImg.style.opacity = "0";
+
+        } else if (distanceScrolled > fadeOut1Start && distanceScrolled <= fadeOut1End) {
+          searchImg.style.opacity = (1 - ((distanceScrolled - fadeOut1Start) / fadeScrollLength)).toString();
+          movieDetailsImg.style.opacity = "0";
+          reviewsImg.style.opacity = "0";
+
+        } else if (distanceScrolled > fadeIn1Start && distanceScrolled <= fadeIn1End) {
+          searchImg.style.opacity = "0";
+          movieDetailsImg.style.opacity = ((distanceScrolled - fadeIn1Start) / fadeScrollLength).toString();
+          reviewsImg.style.opacity = "0";
+
+        } else if (distanceScrolled > fadeOut2Start && distanceScrolled <= fadeOut2End) {
+          searchImg.style.opacity = "0";
+          movieDetailsImg.style.opacity = (1 - ((distanceScrolled - fadeOut2Start) / fadeScrollLength)).toString();
+          reviewsImg.style.opacity = "0";
+
+        } else if (distanceScrolled > fadeIn2Start && distanceScrolled <= fadeIn2End) {
+          searchImg.style.opacity = "0";
+          movieDetailsImg.style.opacity = "0";
+          reviewsImg.style.opacity = ((distanceScrolled - fadeIn2Start) / fadeScrollLength).toString();
+        }
+      }
+    });
   }, []);
 
   return <div className="wrapper">

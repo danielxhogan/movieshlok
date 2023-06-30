@@ -63,7 +63,7 @@ export default function RegisterPage() {
   }
 
 
-  return <div className={styles["wrapper"]}>
+  return <div className={"wrapper"}>
     <Navbar />
 
     <form className={styles["register-form"]} onSubmit={onSubmitRegisterForm}>

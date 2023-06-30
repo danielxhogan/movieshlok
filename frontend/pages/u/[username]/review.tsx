@@ -1,6 +1,5 @@
 import styles from "@/styles/u/ReviewDetailsPage.module.css";
 import Navbar from "@/components/Navbar"
-import Searchbar from "@/components/Searchbar";
 import Stars from "@/components/Stars";
 import Footer from "@/components/Footer";
 

@@ -76,7 +76,7 @@ export default function LoginPage() {
   }
 
 
-  return <div className={styles["wrapper"]}>
+  return <div className={"wrapper"}>
     <Navbar />
 
     <form className={styles["login-form"]} onSubmit={onSubmitLoginForm}>
