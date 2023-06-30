@@ -156,7 +156,6 @@ async fn get_rating_like(mut reviews_db_manager: ReviewsDbManager, user_movie: I
 
   let response = reviews_db_manager.get_rating_like(user_movie);
   respond(response, warp::http::StatusCode::OK)
-
 }
 
 // ENDPOINTS FOR INSERTING INTO/UPDATING DATABASE

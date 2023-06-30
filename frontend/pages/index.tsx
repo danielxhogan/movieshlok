@@ -23,8 +23,8 @@ import { useCallback, useEffect, useState } from "react";
 const SHOWN = "shown";
 const HIDDEN = "hidden";
 
-export default function HomePage() {
 
+export default function HomePage() {
   const [ quotePicClass, setQuotePicClass ] = useState(SHOWN);
   const [ quoteIdx, setQuoteIdx ] = useState(0);
   const [ picIdx, setPicIdx ] = useState(0);
@@ -122,7 +122,7 @@ export default function HomePage() {
   useEffect(() => {
     window.addEventListener('scroll', () => {
       const distanceScrolled = window.pageYOffset;
-      console.log(distanceScrolled);
+      // console.log(distanceScrolled);
       const searchImg = document.getElementById("searchImg");
       const movieDetailsImg = document.getElementById("movieDetailsImg");
       const reviewsImg = document.getElementById("reviewsImg");
@@ -182,14 +182,15 @@ export default function HomePage() {
           { quotes[quoteIdx] }
         </div>
 
-        <Image
-          src={pics[picIdx]}
-          className={styles["pic"]}
-          width={200}
-          height={320}
-          alt="uncut gems"
-          loading="eager"
-        />
+        <div className={styles["pic-div"]}>
+          <Image src={pics[picIdx]}
+            className={styles["pic"]}
+            width={200}
+            height={320}
+            alt="uncut gems"
+            loading="eager"
+          />
+        </div>
       </div>
     </div>
 
@@ -205,6 +206,13 @@ export default function HomePage() {
             </p>
           </div>
           <span>powered by the TMDB api</span>
+          <Image
+            src={searchImg}
+            className={styles["column-feature-img"]}
+            width={1034}
+            height={528}
+            alt="search image"
+          />
         </div>
 
         <div className={styles["feature"]}>
@@ -215,6 +223,13 @@ export default function HomePage() {
               read the synopsis, or view details about cast & crew
             </p>
           </div>
+          <Image
+            src={movieDetailsImg}
+            className={styles["column-feature-img"]}
+            width={1298}
+            height={663}
+            alt="movie details"
+          />
         </div>
 
         <div className={`${styles["feature"]} ${styles["last-feature"]}`}>
@@ -228,6 +243,13 @@ export default function HomePage() {
               any movie you want
             </p>
           </div>
+          <Image
+            src={reviewsImg}
+            className={styles["column-feature-img"]}
+            width={1231}
+            height={635}
+            alt="reviews"
+          />
         </div>
       </div>
 
