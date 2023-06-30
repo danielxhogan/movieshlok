@@ -334,29 +334,62 @@ export default function ReviewDetailsPage() {
 
           <div className={styles["review-details"]}>
             <div className={styles["title-section"]}>
-              <div className={styles["username-section"]}>
-                <h2>{ typeof router.query.username === "string" && router.query.username }</h2>
-                {reviewDetails.data &&
-                  <Stars
-                    id="title-section"
-                    initialRating={reviewDetails.data.review.rating}
-                    setParentRating={()=>{}}
-                    interactive={false}
-                    size={"xl"}
-                  />
+
+              <div className={styles["title-movie-poster"]}>
+                { movieDetails.data.poster_path &&
+                  <Image
+                    src={`${TMDB_IMAGE_URL}/w342${movieDetails.data.poster_path}`}
+                    className={styles["movie-poster"]}
+                    onClick={ () => { router.push(`/details/movie/${movieDetails.data.id}`) }}
+                    width={300}
+                    height={500}
+                    alt="backdrop">
+                  </Image>
                 }
-                <span className={styles["heart"]}>
-                  { reviewDetails.data && reviewDetails.data.liked
-                  ?
-                    <i className={`fa-solid fa-heart fa-2xl`}></i>
-                  :
-                    <i className={`fa-regular fa-heart fa-2xl`}></i>
-                  }
-                </span>
               </div>
 
-              { makeTitle() }
-            </div>
+              <div className={styles["user-title-data"]}>
+                <div className={styles["username-section"]}>
+                  <h2>{ typeof router.query.username === "string" && router.query.username }</h2>
+
+                  <div className={styles["rating-heart"]}>
+                    {reviewDetails.data &&
+                      <Stars
+                        id="title-section"
+                        initialRating={reviewDetails.data.review.rating}
+                        setParentRating={()=>{}}
+                        interactive={false}
+                        size={"xl"}
+                      />
+                    }
+                    <span className={styles["heart"]}>
+                      { reviewDetails.data && reviewDetails.data.liked
+                      ?
+                        <i className={`fa-solid fa-heart fa-2xl`}></i>
+                      :
+                        <i className={`fa-regular fa-heart fa-2xl`}></i>
+                      }
+                    </span>
+                  </div>
+                </div>
+
+                <div className={styles["user-title-movie-poster"]}>
+                  { movieDetails.data.poster_path &&
+                    <Image
+                      src={`${TMDB_IMAGE_URL}/w342${movieDetails.data.poster_path}`}
+                      className={styles["movie-poster"]}
+                      onClick={ () => { router.push(`/details/movie/${movieDetails.data.id}`) }}
+                      width={300}
+                      height={500}
+                      alt="backdrop">
+                    </Image>
+                  }
+                </div>
+
+                { makeTitle() }
+              </div>
+
+            </div>  {/* end title-section */}
 
             <div className={`${styles["review-section"]} block`}>
               { reviewDetails.status === "fulfilled" ?

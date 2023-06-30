@@ -18,10 +18,23 @@
   width: 80%;
 }
 
+.title-movie-poster {
+  display: none;
+}
+
 .username-section {
   display: flex;
   gap: 20px;
   align-items: center;
+}
+
+.rating-heart {
+  display: flex;
+  gap: 15px;
+}
+
+.user-title-movie-poster {
+  display: none;
 }
 
 .title-section h2 {
@@ -67,7 +80,6 @@
 .date {
   margin-bottom: 20px;
   font-style: italic;
-  /* font-weight: 300; */
 }
 
 .comment-section {
@@ -100,4 +112,98 @@
   text-align: center;
   font-size: 1.5rem;
   font-family: 'Audiowide', cursive;
+}
+
+@media screen and (max-width: 1500px) {
+  .title-text {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 5px;
+  }
+  
+  .title {
+    padding: 0;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .movie-poster-div {
+    display: none;
+  }
+
+  .title-movie-poster {
+    display: block;
+  }
+
+  .review-content {
+    justify-content: center;
+  }
+
+  .title-section {
+    display: flex;
+    gap: 20px;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .title {
+    font-size: 2rem;
+  }
+
+  .user-title-data {
+    width: 50%;
+  }
+
+  .username-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 25px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .title-section {
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+  }
+  
+  .title-movie-poster {
+    display: none;
+  }
+
+  .user-title-data {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .user-title-movie-poster {
+    display: block;
+  }
+
+  .user-title-movie-poster .movie-poster {
+    height: 300px;
+    width: auto;
+  }
+
+  .username-section {
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .title-text {
+    text-align: center;
+  }
+
+  .title-text h3 {
+    margin: auto;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .comment-title {
+    flex-direction: column;
+  }
 }
