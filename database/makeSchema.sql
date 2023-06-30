@@ -30,7 +30,9 @@ CREATE TABLE ratings (
   id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id uuid NOT NULL references users(id),
   movie_id VARCHAR(255) NOT NULL,
-  rating INTEGER NOT NULL
+  rating INTEGER NOT NULL,
+  last_updated BIGINT NOT NULL,
+  reviewed BOOLEAN NOT NULL
 );
 
 CREATE TABLE likes (

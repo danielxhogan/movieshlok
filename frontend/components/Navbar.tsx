@@ -102,9 +102,9 @@ export default function Navbar(props: SearchbarProps) {
           {/* authenticated & large screen */}
           { authenticated && credentials.username ? <>
               <Link href={`/u/${credentials.username}/profile`}> Profile </Link>
-              <Link href={`/u/${credentials.username}/movies`}> Movies </Link>
+              <Link href={`/u/${credentials.username}/ratings`}> Ratings </Link>
+              <Link href={`/u/${credentials.username}/watchlist`}> Watchlist </Link>
               <Link href={`/u/${credentials.username}/lists`}> Lists </Link>
-              <Link href={`/u/${credentials.username}/calendar`}> Calendar </Link>
           </>: <></> }
 
         </div>
@@ -143,16 +143,16 @@ export default function Navbar(props: SearchbarProps) {
                   <MenuItem command="Profile"></MenuItem>
                 </Link>
 
-                <Link href={`/u/${credentials.username}/movies`}>
-                  <MenuItem command="Movies"></MenuItem>
+                <Link href={`/u/${credentials.username}/ratings`}>
+                  <MenuItem command="Ratings"></MenuItem>
+                </Link>
+
+                <Link href={`/u/${credentials.username}/watchlist`}>
+                  <MenuItem command="Watchlist"></MenuItem>
                 </Link>
 
                 <Link href={`/u/${credentials.username}/lists`}>
                   <MenuItem command="Lists"></MenuItem>
-                </Link>
-
-                <Link href={`/u/${credentials.username}/calendar`}>
-                  <MenuItem command="Calendar"></MenuItem>
                 </Link>
 
                 <MenuDivider />

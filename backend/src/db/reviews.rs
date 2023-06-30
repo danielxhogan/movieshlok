@@ -1,17 +1,26 @@
 use crate::db::PooledPg;
 use crate::db::config::schema::{reviews, users, ratings, likes};
 use crate::db::config::models::{
+
+  // get all reviews for a movie
   GetReviewsRequest,
-  GetReviewsResponse,
   SelectingReview,
+  GetReviewsResponse,
+
+  // get all ratings for a user
+  GetRatingsRequest,
+
+  // get rating and like for a user for movie
+  UserMovie,
+  Rating,
+  Like,
+  RatingLike,
+
+  // insert new review, rating, or like
   InsertingNewReview,
   Review,
-  UserMovie,
-  RatingLike,
   InsertingNewRating,
-  Rating,
   InsertingNewLike,
-  Like
 };
 use crate::utils::error_handling::AppError;
 
@@ -117,6 +126,12 @@ impl ReviewsDbManager {
     Ok(rating_like)
   }
 
+  // pub fn get_ratings(&mut self, get_ratings_request: GetRatingsRequest)
+  // -> Result<RatingLike, AppError>
+  // {
+
+  // }
+
   pub fn post_review(&mut self, new_review: InsertingNewReview)
   -> Result<Review, AppError>
   {
@@ -128,7 +143,7 @@ impl ReviewsDbManager {
       })
   }
 
-  pub fn post_rating(&mut self, rating: InsertingNewRating)
+  pub fn post_rating(&mut self, rating: InsertingNewRating, review: bool)
   -> Result<Rating, AppError>
   {
     // check if user has previously rated
@@ -149,16 +164,32 @@ impl ReviewsDbManager {
           AppError::from_diesel_err(err, "while inserting new rating")
         })
 
-    // if user has previously submitted a rating for this movie
-    } else {
+    // if user has previously submitted a rating for this movie and
+    // rating is being updated while creating a new review, set reviewed to true
+    } else if review {
       diesel::update(ratings::table
         .filter(ratings::user_id.eq(&rating.user_id))
         .filter(ratings::movie_id.eq(&rating.movie_id)))
-        .set(ratings::rating.eq(&rating.rating))
+        .set((ratings::rating.eq(&rating.rating),
+          ratings::last_updated.eq(&rating.last_updated),
+          ratings::reviewed.eq(true)))
         .get_result(&mut self.connection)
         .map_err(|err| {
           AppError::from_diesel_err(err, "while updating rating")
         })
+    
+    // if user has previously submitted a rating for this movie and
+    // rating is not being updated while creating a new review, leave reviewed alone
+    } else {
+      diesel::update(ratings::table
+        .filter(ratings::user_id.eq(&rating.user_id))
+        .filter(ratings::movie_id.eq(&rating.movie_id)))
+        .set((ratings::rating.eq(&rating.rating), ratings::last_updated.eq(&rating.last_updated)))
+        .get_result(&mut self.connection)
+        .map_err(|err| {
+          AppError::from_diesel_err(err, "while updating rating")
+        })
+
     }
   }
 

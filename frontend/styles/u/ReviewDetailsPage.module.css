@@ -150,6 +150,10 @@
     font-size: 2rem;
   }
 
+  .year {
+    font-size: 1.8rem;
+  }
+
   .user-title-data {
     width: 50%;
   }

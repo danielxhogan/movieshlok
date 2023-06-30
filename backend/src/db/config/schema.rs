@@ -25,6 +25,8 @@ diesel::table! {
         user_id -> Uuid,
         movie_id -> Varchar,
         rating -> Int4,
+        last_updated -> Int8,
+        reviewed -> Bool,
     }
 }
 

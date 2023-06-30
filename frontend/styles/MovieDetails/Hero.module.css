@@ -62,3 +62,13 @@
     border-radius: 10px;
   }
 }
+
+@media screen and (max-width: 600px) {
+  .title {
+    font-size: 2rem;
+  }
+
+  .year {
+    font-size: 1.8rem;
+  }
+}

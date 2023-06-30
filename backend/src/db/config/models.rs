@@ -108,8 +108,23 @@ pub struct Rating {
   pub user_id: Uuid,
   pub movie_id: String,
   #[diesel(sql_type = Int4)]
-  pub rating: i32
+  pub rating: i32,
+  #[diesel(sql_type = Int8)]
+  pub last_updated: i64,
+  pub reviewed: bool
 }
+
+#[derive(Deserialize)]
+pub struct GetRatingsRequest {
+  username: String,
+  limit: i64,
+  offset: i64
+}
+
+// #[derive(Serialize)]
+// pub struct GetRatingsResponse {
+//   pub 
+// }
 
 #[derive(Insertable)]
 #[diesel(table_name = ratings)]
@@ -117,7 +132,10 @@ pub struct InsertingNewRating {
   pub user_id: Uuid,
   pub movie_id: String,
   #[diesel(sql_type = Int4)]
-  pub rating: i32
+  pub rating: i32,
+  #[diesel(sql_type = Int8)]
+  pub last_updated: i64,
+  pub reviewed: bool
 }
 
 // LIKES

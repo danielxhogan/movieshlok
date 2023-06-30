@@ -83,7 +83,6 @@ export default function MovieContent() {
       <TabList className={styles["tab-list"]}>
         <Tab>Cast</Tab>
         <Tab>Crew</Tab>
-        <Tab>Showtimes</Tab>
       </TabList>
       <TabPanels>
         <TabPanel>

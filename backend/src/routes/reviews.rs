@@ -2,6 +2,7 @@ use crate::db::config::db_connect::PgPool;
 use crate::db::config::models::{
   GetReviewsRequest,
   UserMovie,
+  GetRatingsRequest,
   InsertingNewReview,
   InsertingNewRating,
   InsertingNewLike
@@ -158,6 +159,22 @@ async fn get_rating_like(mut reviews_db_manager: ReviewsDbManager, user_movie: I
   respond(response, warp::http::StatusCode::OK)
 }
 
+// fn get_ratings_filters(pool: PgPool)
+// -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+// {
+//   warp::path!("get-ratings")
+//     .and(warp::post())
+//     .and(with_reviews_db_manager(pool))
+//     .and(with_form_body::<GetRatingsRequest>())
+//     .and_then(get_ratings)
+// }
+
+// async fn get_ratings(mut reviews_db_manager: ReviewsDbManager, get_ratings_request: GetRatingsRequest)
+// -> Result<impl warp::Reply, warp::Rejection>
+// {
+
+// }
+
 // ENDPOINTS FOR INSERTING INTO/UPDATING DATABASE
 // ********************************************************
 
@@ -197,7 +214,9 @@ async fn post_review(mut reviews_db_manager: ReviewsDbManager, new_review: Incom
   let new_rating = InsertingNewRating {
     user_id,
     movie_id: new_review.movie_id.clone(),
-    rating: new_review.rating
+    rating: new_review.rating,
+    last_updated: created_at,
+    reviewed: true
   };
 
   let new_like = InsertingNewLike {
@@ -206,7 +225,7 @@ async fn post_review(mut reviews_db_manager: ReviewsDbManager, new_review: Incom
     liked: new_review.liked
   };
 
-  let rating_response = reviews_db_manager.post_rating(new_rating);
+  let rating_response = reviews_db_manager.post_rating(new_rating, true);
   match rating_response {
     Err(err) => { return respond(Err(err), warp::http::StatusCode::BAD_REQUEST) },
     Ok(_) => ()
@@ -251,10 +270,12 @@ async fn post_rating(mut reviews_db_manager: ReviewsDbManager, new_rating: Incom
   let inserting_new_rating = InsertingNewRating {
     user_id,
     movie_id: new_rating.movie_id,
-    rating: new_rating.rating
+    rating: new_rating.rating,
+    last_updated: Utc::now().timestamp(),
+    reviewed: false
   };
 
-  let response = reviews_db_manager.post_rating(inserting_new_rating);
+  let response = reviews_db_manager.post_rating(inserting_new_rating, false);
   respond(response, warp::http::StatusCode::CREATED)
 }
 
