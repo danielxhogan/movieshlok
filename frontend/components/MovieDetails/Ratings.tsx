@@ -195,26 +195,31 @@ export default function Ratings() {
       <div className={styles["rating-review"]}>
         { ratingLike.data
         ?
-          <Stars
-            id="rating"
-            initialRating={ratingLike.data.rating}
-            setParentRating={updateRating}
-            interactive={true}
-            size="2xl"
-          />
+          <span className={styles["stars"]}>
+            <Stars
+              id="rating"
+              initialRating={ratingLike.data.rating}
+              setParentRating={updateRating}
+              interactive={true}
+              size="2xl"
+            />
+
+          </span>
         :
-          <Stars
-            id="rating"
-            initialRating={Rating.ZERO}
-            setParentRating={updateRating}
-            interactive={true}
-            size="2xl"
-          />
+          <span>
+            <Stars
+              id="rating"
+              initialRating={Rating.ZERO}
+              setParentRating={updateRating}
+              interactive={true}
+              size="2xl"
+            />
+          </span>
         }
 
         <Button
           colorScheme="teal" variant="outline"
-          className={styles["trailer-button"]}
+          className={styles["review-button"]}
           onClick={onOpenModal}>
           Leave Review
         </Button>
@@ -231,14 +236,14 @@ export default function Ratings() {
       <div className={styles["add-to-list"]}>
         <Button
           colorScheme="teal" variant="outline"
-          className={styles["trailer-button"]}
+          className={styles["list-button"]}
           >
           Add to Watchlist
         </Button>
 
         <Button
           colorScheme="teal" variant="outline"
-          className={styles["trailer-button"]}
+          className={styles["list-button"]}
           >
           Add to other list
         </Button>

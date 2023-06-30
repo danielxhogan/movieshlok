@@ -9,6 +9,10 @@
   justify-content: space-between;
 }
 
+.stars {
+  padding-top: 15px;
+}
+
 .like {
   align-self: center;
   padding: 10px 0 0;
@@ -57,4 +61,30 @@
 
 .submit-review {
   margin: 0 0 0 20px;
+}
+
+@media only screen and (max-width: 550px) {
+  .wrapper {
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  .rating-review {
+    gap: 40px;
+    justify-content: center;
+  }
+
+  .review-button {
+    width: 200px;
+    margin: auto;
+  }
+
+  .add-to-list {
+    gap: 20px;
+  }
+
+  .list-button {
+    width: 200px;
+    margin: auto;
+  }
 }
