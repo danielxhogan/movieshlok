@@ -66,6 +66,8 @@ interface RatingLikePayload {
 export interface NewReview {
   jwt_token: string;
   movieId: string;
+  movie_title: string;
+  poster_path: string;
   review: string;
   rating: Rating;
   liked: boolean;
@@ -208,6 +210,8 @@ export const postReview = createAsyncThunk(
     const params = new URLSearchParams();
     params.append("jwt_token", newReview.jwt_token);
     params.append("movie_id", newReview.movieId);
+    params.append("movie_title", newReview.movie_title);
+    params.append("poster_path", newReview.poster_path);
     params.append("review", newReview.review);
     params.append("rating", newReview.rating.toString());
     params.append("liked", newReview.liked.toString());

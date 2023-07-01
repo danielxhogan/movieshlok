@@ -33,6 +33,8 @@ use chrono::Utc;
 struct IncomingNewReview {
   jwt_token: String,
   movie_id: String,
+  movie_title: String,
+  poster_path: String,
   review: String,
   rating: i32,
   liked: bool
@@ -50,6 +52,8 @@ struct IncomingUserMovie {
 struct IncomingNewRating {
   jwt_token: String,
   movie_id: String,
+  movie_title: String,
+  poster_path: String,
   rating: i32,
 }
 
@@ -206,6 +210,8 @@ async fn post_review(mut reviews_db_manager: ReviewsDbManager, new_review: Incom
   let inserting_new_review = InsertingNewReview {
     user_id,
     movie_id: new_review.movie_id.clone(),
+    movie_title: new_review.movie_title.clone(),
+    poster_path: new_review.poster_path.clone(),
     review: new_review.review,
     rating: new_review.rating,
     created_at
@@ -214,6 +220,8 @@ async fn post_review(mut reviews_db_manager: ReviewsDbManager, new_review: Incom
   let new_rating = InsertingNewRating {
     user_id,
     movie_id: new_review.movie_id.clone(),
+    movie_title: new_review.movie_title.clone(),
+    poster_path: new_review.poster_path.clone(),
     rating: new_review.rating,
     last_updated: created_at,
     reviewed: true
@@ -270,6 +278,8 @@ async fn post_rating(mut reviews_db_manager: ReviewsDbManager, new_rating: Incom
   let inserting_new_rating = InsertingNewRating {
     user_id,
     movie_id: new_rating.movie_id,
+    movie_title: new_rating.movie_title.clone(),
+    poster_path: new_rating.poster_path.clone(),
     rating: new_rating.rating,
     last_updated: Utc::now().timestamp(),
     reviewed: false

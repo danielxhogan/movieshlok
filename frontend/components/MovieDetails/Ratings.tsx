@@ -77,33 +77,28 @@ export default function Ratings() {
 
   function updateRating(newRating: Rating) {
     setRating(newRating);
-    let token: string;
-    let movieId: string;
 
-    if (credentials.jwt_token) {
-      token = credentials.jwt_token;
-    } else {
-      return;
+    if (credentials.jwt_token &&
+        movieDetails.data.id &&
+        movieDetails.data &&
+        movieDetails.data.title &&
+        movieDetails.data.poster_path
+    ) {
+      const updateRatingUrl = `${BACKEND_URL}/post-rating`;
+
+      const headers = new Headers();
+      headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+      const params = new URLSearchParams();
+      params.append("jwt_token",credentials.jwt_token);
+      params.append("movie_id", movieDetails.data.id.toString());
+      params.append("movie_title", movieDetails.data.title);
+      params.append("poster_path", movieDetails.data.poster_path);
+      params.append("rating", newRating.toString());
+
+      const request = new Request(updateRatingUrl, { headers, body: params, method: "POST" });
+      fetch(request);
     }
-
-    if (movieDetails.data.id) {
-      movieId = movieDetails.data.id.toString();
-    } else {
-      return;
-    }
-
-    const updateRatingUrl = `${BACKEND_URL}/post-rating`;
-
-    const headers = new Headers();
-    headers.append("Content-Type", "application/x-www-form-urlencoded");
-
-    const params = new URLSearchParams();
-    params.append("jwt_token", token);
-    params.append("movie_id", movieId);
-    params.append("rating", newRating.toString());
-
-    const request = new Request(updateRatingUrl, { headers, body: params, method: "POST" });
-    fetch(request);
   }
 
   function updateLike(likeStatus: boolean) {
@@ -174,6 +169,8 @@ export default function Ratings() {
     if (newReviewText !== "" &&
         movieDetails.data &&
         movieDetails.data.id &&
+        movieDetails.data.title &&
+        movieDetails.data.poster_path &&
         credentials.jwt_token &&
         credentials.username
       ) {
@@ -181,6 +178,8 @@ export default function Ratings() {
       const newReview: NewReview = {
         jwt_token: credentials.jwt_token,
         movieId,
+        movie_title: movieDetails.data.title,
+        poster_path: movieDetails.data.poster_path,
         review: newReviewText,
         rating: reviewRating,
         liked

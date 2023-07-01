@@ -37,6 +37,8 @@ pub struct Review {
   pub id: Uuid,
   pub user_id: Uuid,
   pub movie_id: String,
+  pub movie_title: String,
+  pub poster_path: String,
   pub review: String,
   #[diesel(sql_type = Int4)]
   pub rating: i32,
@@ -78,6 +80,8 @@ pub struct SelectingReview {
 pub struct InsertingNewReview {
   pub user_id: Uuid,
   pub movie_id: String,
+  pub movie_title: String,
+  pub poster_path: String,
   pub review: String,
   pub rating: i32,
   #[diesel(sql_type = Int8)]
@@ -107,6 +111,8 @@ pub struct Rating {
   pub id: Uuid,
   pub user_id: Uuid,
   pub movie_id: String,
+  pub movie_title: String,
+  pub poster_path: String,
   #[diesel(sql_type = Int4)]
   pub rating: i32,
   #[diesel(sql_type = Int8)]
@@ -131,6 +137,8 @@ pub struct GetRatingsRequest {
 pub struct InsertingNewRating {
   pub user_id: Uuid,
   pub movie_id: String,
+  pub movie_title: String,
+  pub poster_path: String,
   #[diesel(sql_type = Int4)]
   pub rating: i32,
   #[diesel(sql_type = Int8)]

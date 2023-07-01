@@ -13,6 +13,8 @@ CREATE TABLE reviews (
   id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id uuid NOT NULL references users(id),
   movie_id VARCHAR(255) NOT NULL,
+  movie_title VARCHAR(255) NOT NULL,
+  poster_path VARCHAR(255) NOT NULL,
   review TEXT NOT NULL,
   rating INTEGER NOT NULL,
   created_at BIGINT NOT NULL
@@ -30,6 +32,8 @@ CREATE TABLE ratings (
   id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id uuid NOT NULL references users(id),
   movie_id VARCHAR(255) NOT NULL,
+  movie_title VARCHAR(255) NOT NULL,
+  poster_path VARCHAR(255) NOT NULL,
   rating INTEGER NOT NULL,
   last_updated BIGINT NOT NULL,
   reviewed BOOLEAN NOT NULL
