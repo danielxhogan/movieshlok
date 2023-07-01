@@ -122,15 +122,42 @@ pub struct Rating {
 
 #[derive(Deserialize)]
 pub struct GetRatingsRequest {
-  username: String,
-  limit: i64,
-  offset: i64
+  pub username: String,
+  pub limit: i64,
+  pub offset: i64
 }
 
-// #[derive(Serialize)]
-// pub struct GetRatingsResponse {
-//   pub 
-// }
+#[derive(Queryable)]
+pub struct RatingsReview {
+  pub movie_id: String,
+  pub movie_title: String,
+  pub poster_path: String,
+  pub rating: i32,
+  pub liked: bool,
+  pub review_id: Uuid,
+  pub timestamp: i64
+}
+
+#[derive(Queryable)]
+pub struct RatingsRating {
+  pub movie_id: String,
+  pub movie_title: String,
+  pub poster_path: String,
+  pub rating: i32,
+  pub liked: bool,
+  pub timestamp: i64
+}
+
+#[derive(Serialize, Clone)]
+pub struct RatingReview {
+  pub movie_id: String,
+  pub movie_title: String,
+  pub poster_path: String,
+  pub rating: i32,
+  pub liked: bool,
+  pub review_id: Option<Uuid>,
+  pub timestamp: i64
+}
 
 #[derive(Insertable)]
 #[diesel(table_name = ratings)]

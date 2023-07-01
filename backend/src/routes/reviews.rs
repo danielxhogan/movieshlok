@@ -101,6 +101,7 @@ pub fn reviews_filters(pool: PgPool, ws_client_list: ClientList)
 {
   get_reviews_filters(pool.clone())
     .or(get_rating_like_filters(pool.clone()))
+    .or(get_ratings_filters(pool.clone()))
     .or(post_review_filters(pool.clone()))
     .or(post_rating_filters(pool.clone()))
     .or(post_like_filters(pool.clone()))
@@ -163,21 +164,22 @@ async fn get_rating_like(mut reviews_db_manager: ReviewsDbManager, user_movie: I
   respond(response, warp::http::StatusCode::OK)
 }
 
-// fn get_ratings_filters(pool: PgPool)
-// -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
-// {
-//   warp::path!("get-ratings")
-//     .and(warp::post())
-//     .and(with_reviews_db_manager(pool))
-//     .and(with_form_body::<GetRatingsRequest>())
-//     .and_then(get_ratings)
-// }
+fn get_ratings_filters(pool: PgPool)
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
+  warp::path!("get-ratings")
+    .and(warp::post())
+    .and(with_reviews_db_manager(pool))
+    .and(with_form_body::<GetRatingsRequest>())
+    .and_then(get_ratings)
+}
 
-// async fn get_ratings(mut reviews_db_manager: ReviewsDbManager, get_ratings_request: GetRatingsRequest)
-// -> Result<impl warp::Reply, warp::Rejection>
-// {
-
-// }
+async fn get_ratings(mut reviews_db_manager: ReviewsDbManager, get_ratings_request: GetRatingsRequest)
+-> Result<impl warp::Reply, warp::Rejection>
+{
+  let response = reviews_db_manager.get_ratings(get_ratings_request);
+  respond(response, warp::http::StatusCode::OK)
+}
 
 // ENDPOINTS FOR INSERTING INTO/UPDATING DATABASE
 // ********************************************************
