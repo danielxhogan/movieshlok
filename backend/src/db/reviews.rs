@@ -1,5 +1,3 @@
-use std::collections::VecDeque;
-
 use crate::db::PooledPg;
 use crate::db::config::schema::{reviews, users, ratings, likes};
 use crate::db::config::models::{
@@ -9,17 +7,18 @@ use crate::db::config::models::{
   SelectingReview,
   GetReviewsResponse,
 
-  // get all ratings for a user
-  GetRatingsRequest,
-  RatingsReview,
-  RatingsRating,
-  RatingReview,
-
   // get rating and like for a user for movie
   UserMovie,
   Rating,
   Like,
   RatingLike,
+
+  // get all ratings for a user
+  GetRatingsRequest,
+  GetRatingsResponse,
+  RatingsReview,
+  RatingsRating,
+  RatingReview,
 
   // insert new review, rating, or like
   InsertingNewReview,
@@ -30,6 +29,7 @@ use crate::db::config::models::{
 use crate::utils::error_handling::AppError;
 
 use diesel::prelude::*;
+use std::collections::VecDeque;
 
 pub struct ReviewsDbManager {
   connection:  PooledPg,
@@ -40,6 +40,8 @@ impl ReviewsDbManager {
     ReviewsDbManager {connection}
   }
 
+  // GET ALL REVIEWS FOR A MOVIE
+  // ****************************
   pub fn get_reviews(&mut self, get_reviews_request: GetReviewsRequest)
   -> Result<GetReviewsResponse, AppError>
   {
@@ -90,6 +92,8 @@ impl ReviewsDbManager {
     }
   }
 
+  // GET RATING AND LIKE FOR A MOVIE
+  // ********************************
   pub fn get_rating_like(&mut self, user_movie: UserMovie)
   -> Result<RatingLike, AppError>
   {
@@ -131,11 +135,14 @@ impl ReviewsDbManager {
     Ok(rating_like)
   }
 
+  // GET ALL RATINGS FOR A USER
+  // ************************************
   pub fn get_ratings(&mut self, get_ratings_request: GetRatingsRequest)
-  -> Result<Box<VecDeque<Option<RatingReview>>>, AppError>
+  -> Result<GetRatingsResponse, AppError>
   {
     let mut results = Vec::new();
 
+    // get all reviews for a user, review_id field is String
     let reviews = reviews::table
       .inner_join(users::table.on(
         reviews::user_id.eq(users::id)
@@ -157,6 +164,8 @@ impl ReviewsDbManager {
         AppError::from_diesel_err(err, "while getting reviews for user")
       });
 
+    // convert RatingsReview vec to RatingReview vec
+    // review_id field: String -> Option<String>
     for review in reviews.unwrap().iter() {
       let rating_review = Some(RatingReview {
         movie_id: review.movie_id.clone(),
@@ -171,6 +180,8 @@ impl ReviewsDbManager {
       results.push(rating_review);
     }
 
+    // get all ratings for a user for any movie not reviewed,
+    // review_id field nonexistent
     let ratings = ratings::table
       .inner_join(users::table.on(
         ratings::user_id.eq(users::id)
@@ -192,6 +203,8 @@ impl ReviewsDbManager {
         AppError::from_diesel_err(err, "while getting ratings for user")
       });
 
+    // convert RatingsRating vec to RatingReview vec
+    // review_id field: nonexistent -> None
     for rating in ratings.unwrap().iter() {
       let rating_review = Some(RatingReview {
         movie_id: rating.movie_id.clone(),
@@ -206,8 +219,15 @@ impl ReviewsDbManager {
       results.push(rating_review);
     }
 
+    // sort newest to oldest
     results.sort_by(|a, b| b.clone().unwrap().timestamp.cmp(&a.clone().unwrap().timestamp));
 
+    // get total_pages
+    let limit = get_ratings_request.limit as f64;
+    let total_results = results.len() as f64;
+    let total_pages = (total_results / limit).ceil() as u64;
+
+    // apply offset and limit
     let mut results_deque = VecDeque::from(results);
     let mut i = 0;
 
@@ -215,14 +235,18 @@ impl ReviewsDbManager {
       results_deque.pop_front();
       i += 1;
     }
+    results_deque.resize(get_ratings_request.limit as usize, None);
 
-    let size = get_ratings_request.limit as usize;
+    let response = GetRatingsResponse {
+      total_pages,
+      ratings: Box::new(results_deque)
+    };
 
-    results_deque.resize(size, None);
-
-    Ok(Box::new(results_deque))
+    Ok(response)
   }
 
+  // CREATE A NEW REVIEW IN THE DATABASE
+  // ************************************
   pub fn post_review(&mut self, new_review: InsertingNewReview)
   -> Result<Review, AppError>
   {
@@ -234,6 +258,8 @@ impl ReviewsDbManager {
       })
   }
 
+  // CREATE/UPDATE RATING FOR A USER
+  // ********************************
   pub fn post_rating(&mut self, rating: InsertingNewRating, review: bool)
   -> Result<Rating, AppError>
   {
@@ -255,6 +281,8 @@ impl ReviewsDbManager {
         AppError::from_diesel_err(err, "while checking for existing like in rating post")
       });
 
+    // if user has not liked/disliked the movie, creating a rating for the movie
+    // will create a like defaulted to false
     if previously_liked.unwrap().len() == 0 {
       let like = InsertingNewLike {
         movie_id: rating.movie_id.clone(),
@@ -299,7 +327,8 @@ impl ReviewsDbManager {
       diesel::update(ratings::table
         .filter(ratings::user_id.eq(&rating.user_id))
         .filter(ratings::movie_id.eq(&rating.movie_id)))
-        .set((ratings::rating.eq(&rating.rating), ratings::last_updated.eq(&rating.last_updated)))
+        .set((ratings::rating.eq(&rating.rating),
+          ratings::last_updated.eq(&rating.last_updated)))
         .get_result(&mut self.connection)
         .map_err(|err| {
           AppError::from_diesel_err(err, "while updating rating")
@@ -308,6 +337,8 @@ impl ReviewsDbManager {
     }
   }
 
+  // CREATE/UPDATE LIKE FOR A USER
+  // ********************************
   pub fn post_like(&mut self, like: InsertingNewLike)
   -> Result<Like, AppError>
   {

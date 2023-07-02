@@ -112,7 +112,10 @@ pub fn reviews_filters(pool: PgPool, ws_client_list: ClientList)
 }
 
 // ENDPOINTS FOR SELECTING FROM DATABASE
-// ********************************************************
+// *************************************************************************************************
+
+// GET ALL REVIEWS FOR A MOVIE
+// ****************************
 fn get_reviews_filters(pool: PgPool)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
@@ -132,6 +135,8 @@ async fn get_reviews(mut reviews_db_manager: ReviewsDbManager, get_reviews_reque
   respond(response, warp::http::StatusCode::OK)
 }
 
+// GET RATING AND LIKE FOR A MOVIE
+// ********************************
 fn get_rating_like_filters(pool: PgPool)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
@@ -164,6 +169,8 @@ async fn get_rating_like(mut reviews_db_manager: ReviewsDbManager, user_movie: I
   respond(response, warp::http::StatusCode::OK)
 }
 
+// GET ALL RATINGS FOR A USER
+// ***************************
 fn get_ratings_filters(pool: PgPool)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
@@ -182,8 +189,10 @@ async fn get_ratings(mut reviews_db_manager: ReviewsDbManager, get_ratings_reque
 }
 
 // ENDPOINTS FOR INSERTING INTO/UPDATING DATABASE
-// ********************************************************
+// *************************************************************************************************
 
+// CREATE A NEW REVIEW IN THE DATABASE
+// ************************************
 fn post_review_filters(pool: PgPool)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
@@ -219,6 +228,8 @@ async fn post_review(mut reviews_db_manager: ReviewsDbManager, new_review: Incom
     created_at
   };
 
+  // if db function creates a new rating record,
+  // reviewed is initialized to true
   let new_rating = InsertingNewRating {
     user_id,
     movie_id: new_review.movie_id.clone(),
@@ -235,6 +246,8 @@ async fn post_review(mut reviews_db_manager: ReviewsDbManager, new_review: Incom
     liked: new_review.liked
   };
 
+  // if a rating already exists for this movie for this user
+  // db function will update the rating record to make sure reviewed = true
   let rating_response = reviews_db_manager.post_rating(new_rating, true);
   match rating_response {
     Err(err) => { return respond(Err(err), warp::http::StatusCode::BAD_REQUEST) },
@@ -254,6 +267,8 @@ async fn post_review(mut reviews_db_manager: ReviewsDbManager, new_review: Incom
   }
 }
 
+// CREATE/UPDATE RATING FOR A USER
+// ********************************
 fn post_rating_filters(pool: PgPool)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
@@ -291,6 +306,8 @@ async fn post_rating(mut reviews_db_manager: ReviewsDbManager, new_rating: Incom
   respond(response, warp::http::StatusCode::CREATED)
 }
 
+// CREATE/UPDATE LIKE FOR A USER
+// ********************************
 fn post_like_filters(pool: PgPool)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
@@ -325,7 +342,7 @@ async fn post_like(mut reviews_db_manager: ReviewsDbManager, new_like: IncomingN
 }
 
 // ENPOINTS FOR MANAGING WEBSOCKETS
-// ********************************************************
+// *************************************************************************************************
 
 fn register_reviews_ws_client_filters(client_list: ClientList)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone

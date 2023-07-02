@@ -1,9 +1,11 @@
 import {
   getReviews,
   getRatingLike,
+  getRatings,
   postReview,
   Review,
   RatingLikeResponse,
+  RatingReview,
   ReturnedNewReview
 } from "@/redux/actions/reviews";
 
@@ -11,12 +13,11 @@ import { createSlice } from "@reduxjs/toolkit";
 import { Status } from "@/redux/reducers/index"
 import { AppState } from "@/redux/store";
 
-
 // TYPES
 // *****************************
+
 // GET ALL REVIEWS FOR A MOVIE
 // *****************************
-
 // type for value of reviews variable in redux store
 interface Reviews {
   status: Status;
@@ -41,7 +42,6 @@ const initialReviewsState: Reviews = {
 
 // GET RATING AND LIKE FOR A MOVIE
 // ********************************
-
 // type for value of rating/like in redux store
 interface RatingLike {
   status: Status;
@@ -57,6 +57,26 @@ const intialRatingLikeState: RatingLike = {
   message: "",
   code: null,
   data: null
+}
+
+// GET ALL RATINGS FOR A USER
+// ***************************
+interface Ratings {
+  status: Status;
+  success: boolean | null;
+  message: string;
+  page: number;
+  total_pages: number | null;
+  ratings: RatingReview[] | null
+}
+
+const initialGetRatingsState: Ratings = {
+  status: "idle",
+  success: null,
+  message: "",
+  page: 0,
+  total_pages: null,
+  ratings: null
 }
 
 // CREATE A NEW REVIEW IN THE DATABASE TYPES
@@ -157,9 +177,45 @@ export const { unsetRatingLike } = ratingLikeSlice.actions;
 export const selectRatingLike = (state: AppState) => state.ratingLike;
 export const ratingLikeReducer = ratingLikeSlice.reducer;
 
+// GET ALL RATINGS FOR A USER
+// ***************************
+export const ratingsSlice = createSlice({
+  name: "ratings",
+  initialState: initialGetRatingsState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(getRatings.pending, (state) => {
+        state.status = "loading",
+        state.success = null,
+        state.message = "",
+        state.page = 0,
+        state.total_pages = null,
+        state.ratings = null
+      })
+      .addCase(getRatings.fulfilled, (state, action) => {
+        state.status = "fulfilled",
+        state.success = action.payload.success,
+        state.message = action.payload.message,
+        state.page = action.payload.page,
+        state.total_pages = action.payload.total_pages,
+        state. ratings = action.payload.ratings
+      })
+  }
+});
+
+export const selectRatings = (state: AppState) => state.ratings;
+export const ratingsReducer = ratingsSlice.reducer;
+
+  // status: "idle",
+  // success: null,
+  // message: "",
+  // page: 0,
+  // total_pages: 0,
+  // ratings: null
+
 // CREATE A NEW REVIEW IN THE DATABASE
 // ************************************
-
 // this reducer sets the value for newReview in redux store
 export const newReviewSlice = createSlice({
   name: "newReview",

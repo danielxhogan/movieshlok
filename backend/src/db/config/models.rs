@@ -3,6 +3,7 @@ use crate::db::config::schema::{users, reviews, ratings, likes, comments};
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use std::collections::VecDeque;
 
 // AUTH
 // ***********************************************
@@ -125,6 +126,12 @@ pub struct GetRatingsRequest {
   pub username: String,
   pub limit: i64,
   pub offset: i64
+}
+
+#[derive(Serialize)]
+pub struct GetRatingsResponse {
+  pub total_pages: u64,
+  pub ratings: Box<VecDeque<Option<RatingReview>>>
 }
 
 #[derive(Queryable)]

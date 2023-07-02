@@ -1,6 +1,11 @@
 import { authSliceReducer } from "@/redux/reducers/auth";
 import { searchResultsReducer, movieDetailsReducer } from "@/redux/reducers/tmdb";
-import { reviewsReducer, ratingLikeReducer, newReviewReducer } from "@/redux/reducers/reviews";
+import {
+  reviewsReducer,
+  ratingLikeReducer,
+  ratingsReducer,
+  newReviewReducer
+} from "@/redux/reducers/reviews";
 import { reviewDetailsReducer, newCommentReducer } from "@/redux/reducers/review";
 import { combineReducers } from 'redux';
 
@@ -14,7 +19,8 @@ const reducers = combineReducers({
   ratingLike: ratingLikeReducer,
   newReview: newReviewReducer,
   reviewDetails: reviewDetailsReducer,
-  newComment: newCommentReducer
+  newComment: newCommentReducer,
+  ratings: ratingsReducer
 });
 
 export default reducers;
