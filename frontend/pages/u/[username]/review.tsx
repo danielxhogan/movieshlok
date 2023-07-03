@@ -1,5 +1,6 @@
 import styles from "@/styles/u/ReviewDetailsPage.module.css";
 import Navbar from "@/components/Navbar"
+import ProfileNav from "@/components/ProfileNav";
 import Stars from "@/components/Stars";
 import Footer from "@/components/Footer";
 
@@ -316,6 +317,7 @@ export default function ReviewDetailsPage() {
     <Navbar />
 
     <div className="content">
+      <ProfileNav />
       { movieDetails.status === "fulfilled" ?
         <div className={styles["review-content"]}>
 

@@ -26,6 +26,7 @@ use crate::db::config::models::{
   InsertingNewRating,
   InsertingNewLike,
 };
+
 use crate::utils::error_handling::AppError;
 
 use diesel::prelude::*;

@@ -1,14 +1,17 @@
 import styles from "@/styles/u/ProfilePage.module.css";
 import Navbar from "@/components/Navbar";
-import Searchbar from "@/components/Searchbar";
+import ProfileNav from "@/components/ProfileNav";
+import Footer from "@/components/Footer";
 
 export default function ProfilePage() {
-  return <div className={styles["wrapper"]}>
+  return <div className="wrapper">
     <Navbar />
 
-    <div className={styles["profile-page"]}>
-      <Searchbar />
-      <h1>Profile</h1>
+    <div className="content">
+    <ProfileNav />
+
     </div>
+
+    <Footer />
   </div>
 }

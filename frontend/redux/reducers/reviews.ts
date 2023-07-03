@@ -42,7 +42,7 @@ const initialReviewsState: Reviews = {
 
 // GET RATING AND LIKE FOR A MOVIE
 // ********************************
-// type for value of rating/like in redux store
+// type for value of ratingLike in redux store
 interface RatingLike {
   status: Status;
   success: boolean | null;
@@ -51,6 +51,7 @@ interface RatingLike {
   data: RatingLikeResponse | null;
 }
 
+// default value for ratingLike
 const intialRatingLikeState: RatingLike = {
   status: "idle",
   success: null,
@@ -61,6 +62,7 @@ const intialRatingLikeState: RatingLike = {
 
 // GET ALL RATINGS FOR A USER
 // ***************************
+// type for value of ratings variable in redux store
 interface Ratings {
   status: Status;
   success: boolean | null;
@@ -70,7 +72,8 @@ interface Ratings {
   ratings: RatingReview[] | null
 }
 
-const initialGetRatingsState: Ratings = {
+// default value for ratings
+const initialRatingsState: Ratings = {
   status: "idle",
   success: null,
   message: "",
@@ -81,7 +84,6 @@ const initialGetRatingsState: Ratings = {
 
 // CREATE A NEW REVIEW IN THE DATABASE TYPES
 // ******************************************
-
 // type for value of newReview variable in redux store
 interface NewReview {
   status: Status;
@@ -102,9 +104,9 @@ const initialNewReviewState: NewReview = {
 
 // REDUCERS
 // ****************************
+
 // GET ALL REVIEWS FOR A MOVIE
 // ****************************
-
 // this reducer sets the value for reviews in redux store
 export const reviewsSlice = createSlice({
   name: "reviews",
@@ -141,6 +143,7 @@ export const reviewsReducer = reviewsSlice.reducer;
 
 // GET RATING AND LIKE FOR A MOVIE
 // ********************************
+// this reducer sets the value for ratingLike in redux store
 export const ratingLikeSlice = createSlice({
   name: "ratingLike",
   initialState: intialRatingLikeState,
@@ -179,9 +182,10 @@ export const ratingLikeReducer = ratingLikeSlice.reducer;
 
 // GET ALL RATINGS FOR A USER
 // ***************************
+// this reducer sets the value for ratings in redux store
 export const ratingsSlice = createSlice({
   name: "ratings",
-  initialState: initialGetRatingsState,
+  initialState: initialRatingsState,
   reducers: {},
   extraReducers: (builder) => {
     builder
@@ -206,13 +210,6 @@ export const ratingsSlice = createSlice({
 
 export const selectRatings = (state: AppState) => state.ratings;
 export const ratingsReducer = ratingsSlice.reducer;
-
-  // status: "idle",
-  // success: null,
-  // message: "",
-  // page: 0,
-  // total_pages: 0,
-  // ratings: null
 
 // CREATE A NEW REVIEW IN THE DATABASE
 // ************************************
