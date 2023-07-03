@@ -28,6 +28,7 @@ import Image from "next/image";
 import { Textarea, Button, Spinner } from "@chakra-ui/react";
 
 import getConfig from "next/config";
+import Link from "next/link";
 const { publicRuntimeConfig } = getConfig();
 const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
 const TMDB_IMAGE_URL = publicRuntimeConfig.TMDB_IMAGE_URL;
@@ -352,7 +353,9 @@ export default function ReviewDetailsPage() {
 
               <div className={styles["user-title-data"]}>
                 <div className={styles["username-section"]}>
-                  <h2>{ typeof router.query.username === "string" && router.query.username }</h2>
+                  <Link href={`/u/${router.query.username}/profile`}>
+                    <h2>{ typeof router.query.username === "string" && router.query.username }</h2>
+                  </Link>
 
                   <div className={styles["rating-heart"]}>
                     {reviewDetails.data &&

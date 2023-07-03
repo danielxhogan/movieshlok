@@ -149,7 +149,7 @@ impl ReviewsDbManager {
         reviews::user_id.eq(users::id)
       ))
       .inner_join(likes::table.on(
-        reviews::movie_id.eq(likes::movie_id)
+        reviews::movie_id.eq(likes::movie_id),
       ))
       .select((reviews::movie_id,
         reviews::movie_title,
@@ -160,6 +160,7 @@ impl ReviewsDbManager {
         reviews::created_at))
       .order(reviews::created_at.desc())
       .filter(users::username.eq(&get_ratings_request.username))
+      .filter(reviews::user_id.eq(likes::user_id))
       .load::<RatingsReview>(&mut self.connection)
       .map_err(|err| {
         AppError::from_diesel_err(err, "while getting reviews for user")
