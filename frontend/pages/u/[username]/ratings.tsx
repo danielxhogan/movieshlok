@@ -39,6 +39,8 @@ export default function ReviewsPage() {
   let currentMonth = 0;
 
   function makeRating(rating: RatingReview, idx: number) {
+    if ( !rating ) { return; }
+
     const date = new Date(rating.timestamp * 1000);
     const month = date.getMonth();
     let monthText: string = "";
