@@ -45,11 +45,11 @@ fn with_auth_db_manager(pool: PgPool)
 pub fn auth_filters(pool: PgPool,)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
-  register_filter(pool.clone())
-  .or(login_filter(pool))
+  register_filters(pool.clone())
+  .or(login_filters(pool))
 }
 
-pub fn register_filter(pool: PgPool,)
+pub fn register_filters(pool: PgPool,)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
   warp::path!("register")
@@ -69,7 +69,7 @@ async fn register_user(mut auth_db_manager: AuthDbManager, new_user: NewUser)
   respond(response, warp::http::StatusCode::CREATED)
 }
 
-pub fn login_filter(pool: PgPool,)
+pub fn login_filters(pool: PgPool,)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
   warp::path!("login")

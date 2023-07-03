@@ -58,11 +58,11 @@ export default function Ratings() {
   useEffect(() => {
     if (ratingLike.status === "fulfilled") {
       if (ratingLike.code === 401) {
-        dispatch(unsetCredentials());
         dispatch(unsetRatingLike());
-        document.cookie = "username=";
-        document.cookie = "jwt_token=";
-        // router.push("/auth/login");
+
+        dispatch(unsetCredentials());
+        localStorage.removeItem("jwt_token");
+        localStorage.removeItem("username");
 
       } else if (ratingLike.data) {
         setRating(ratingLike.data.rating);

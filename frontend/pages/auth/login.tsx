@@ -51,9 +51,9 @@ export default function LoginPage() {
     const response = await fetch(request);
 
     if (response.ok) {
-      const responseData = await response.json();
-      document.cookie = `username=${responseData.username}`;
-      document.cookie = `jwt_token=${responseData.jwt_token}`;
+      const data = await response.json();
+      localStorage.setItem("jwt_token", data.jwt_token);
+      localStorage.setItem("username", data.username);
 
       const currentLocation = localStorage.getItem("currentLocation");
 

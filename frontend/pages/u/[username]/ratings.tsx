@@ -36,7 +36,7 @@ export default function ReviewsPage() {
     }
   }, [dispatch, router.query.username]);
 
-  let currentMonth = 0;
+  let currentMonth = 13;
 
   function makeRating(rating: RatingReview, idx: number) {
     if ( !rating ) { return; }
@@ -46,7 +46,7 @@ export default function ReviewsPage() {
     let monthText: string = "";
     let monthHeading: JSX.Element | null;
 
-    if (month > currentMonth) {
+    if (month < currentMonth) {
       currentMonth = month;
 
       switch (month) {
@@ -64,7 +64,9 @@ export default function ReviewsPage() {
         case 12: monthText = "December"; break;
       }
       
-      monthHeading = <h2>{monthText} {date.getFullYear()}</h2>;
+      monthHeading = <h2 className={styles["month-heading"]}>
+        <span className={styles["month"]}>{monthText}</span> {date.getFullYear()}
+      </h2>;
 
     } else {
       monthHeading = null;

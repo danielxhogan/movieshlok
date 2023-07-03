@@ -1,4 +1,4 @@
-use crate::db::config::schema::{users, reviews, ratings, likes, comments};
+use crate::db::config::schema::{users, lists, reviews, ratings, likes, comments};
 
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -29,6 +29,28 @@ pub struct NewUser {
 pub struct LoginCreds {
   pub username: String,
   pub password: String,
+}
+
+// LISTS
+// ***********************************************
+#[derive(Queryable, Serialize)]
+pub struct List {
+  pub id: Uuid,
+  pub user_id: Uuid,
+  pub name: String,
+  pub watchlist: bool,
+  #[diesel(sql_type = Int8)]
+  pub created_at: i64
+}
+
+#[derive(Insertable)]
+#[diesel(table_name = lists)]
+pub struct NewList {
+  pub user_id: Uuid,
+  pub name: String,
+  pub watchlist: bool,
+  #[diesel(sql_type = Int8)]
+  pub created_at: i64
 }
 
 // REVIEWS
@@ -88,7 +110,6 @@ pub struct InsertingNewReview {
   #[diesel(sql_type = Int8)]
   pub created_at: i64
 }
-
 
 // RATINGS AND LIKES
 // ***********************************************

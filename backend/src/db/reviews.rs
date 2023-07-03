@@ -199,6 +199,7 @@ impl ReviewsDbManager {
         ratings::last_updated))
       .order(ratings::last_updated.desc())
       .filter(users::username.eq(get_ratings_request.username))
+      .filter(ratings::user_id.eq(likes::user_id))
       .filter(ratings::reviewed.eq(false))
       .load::<RatingsRating>(&mut self.connection)
       .map_err(|err| {

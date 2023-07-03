@@ -7,6 +7,16 @@
   font-weight: bold;
 }
 
+.month-heading {
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+}
+
+.month {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
 .rating {
   display: flex;
   justify-content: space-between;

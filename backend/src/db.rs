@@ -1,5 +1,6 @@
 pub mod config;
 pub mod auth;
+pub mod lists;
 pub mod reviews;
 pub mod review;
 

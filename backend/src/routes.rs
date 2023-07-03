@@ -1,7 +1,8 @@
 pub mod auth;
-pub mod tmdb;
+pub mod lists;
 pub mod reviews;
 pub mod review;
+pub mod tmdb;
 
 use crate::routes::auth::Claims;
 use crate::utils::error_handling::{AppError, ErrorType};

@@ -1,15 +1,14 @@
 use crate::db::PooledPg;
-use crate::db::config::schema::users;
-use crate::db::config::models::{User, NewUser, LoginCreds};
+use crate::db::config::schema::{users, lists};
+use crate::db::config::models::{User, NewUser, LoginCreds, List, NewList};
 use crate::utils::error_handling::{AppError, ErrorType};
 
 use diesel::prelude::*;
+use uuid::Uuid;
+use chrono::Utc;
 
 extern crate bcrypt;
 use bcrypt::{DEFAULT_COST, hash, verify};
-
-use uuid::Uuid;
-
 
 pub struct AuthDbManager {
   connection:  PooledPg,
@@ -57,12 +56,31 @@ impl AuthDbManager {
       password: hashed_password
     };
 
-    diesel::insert_into(users::table)
+    let new_user = diesel::insert_into(users::table)
       .values(&inserting_user)
       .get_result(&mut self.connection)
       .map_err(|err| {
         AppError::from_diesel_err(err, "while inserting new user")
-      })
+      });
+
+    let new_user: User = new_user.unwrap();
+    let created_at = Utc::now().timestamp();
+
+    let new_list = NewList {
+      user_id: new_user.id.clone(),
+      name: new_user.username.clone(),
+      watchlist: true,
+      created_at
+    };
+
+    let _ = diesel::insert_into(lists::table)
+      .values(&new_list)
+      .get_result::<List>(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while inserting new watchlist")
+      });
+
+    Ok(new_user)
   }
 
   pub fn login_user(&mut self, login_creds: & LoginCreds)

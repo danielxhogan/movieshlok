@@ -220,11 +220,11 @@ struct SearchResults {
 pub fn tmdb_filters()
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
-  search_filter()
-  .or(movie_details_filter())
+  search_filters()
+  .or(movie_details_filters())
 }
 
-pub fn movie_details_filter()
+pub fn movie_details_filters()
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
   warp::path!("tmdb" / "movie")
@@ -253,7 +253,7 @@ async fn movie_details(movie_details_params: MovieDetailsParams)
   respond(response, warp::http::StatusCode::OK)
 }
 
-pub fn search_filter()
+pub fn search_filters()
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
   warp::path!("tmdb" / "search")

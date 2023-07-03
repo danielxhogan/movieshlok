@@ -222,8 +222,8 @@ export default function ReviewDetailsPage() {
       dispatch(resetNewComment());
 
       dispatch(unsetCredentials());
-      document.cookie = "username=";
-      document.cookie = "jwt_token=";
+      localStorage.removeItem("jwt_token");
+      localStorage.removeItem("username");
     }
   }, [newComment, credentials.username, dispatch, credentials.jwt_token]);
 

@@ -228,9 +228,8 @@ export default function Reviews() {
       dispatch(resetNewReview());
 
       dispatch(unsetCredentials());
-      document.cookie = "username=";
-      document.cookie = "jwt_token=";
-      // router.push("/auth/login");
+      localStorage.removeItem("jwt_token");
+      localStorage.removeItem("username");
     }
   }, [newReview, credentials.jwt_token, credentials.username, dispatch, router])
 

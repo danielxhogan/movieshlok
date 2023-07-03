@@ -42,28 +42,11 @@ export default function Navbar(props: SearchbarProps) {
   }
 
   useEffect(() => {
-    const cookiesString = document.cookie;
-    const cookies = cookiesString.split(";");
+    const jwt_token = localStorage.getItem("jwt_token");
+    const username = localStorage.getItem("username");
 
-    const newCredentials: Credentials = {
-      jwt_token: null,
-      username: null
-    };
-
-    cookies.forEach(cookieString => {
-      const cookie = cookieString.split("=");
-
-      if (cookie[0].trim() === "jwt_token") {
-        newCredentials.jwt_token = cookie[1];
-      }
-
-      if (cookie[0].trim() === "username") {
-        newCredentials.username = cookie[1];
-      }
-    });
-
-    if (newCredentials.jwt_token !== null && newCredentials.username !== null) {
-      setCreds(newCredentials);
+    if (jwt_token !== "undefined" && username !== "undefined") {
+      setCreds({ jwt_token, username });
     }
   }, [])
 
@@ -76,9 +59,9 @@ export default function Navbar(props: SearchbarProps) {
   }, [credentials]);
 
   function onClickLogOut() {
-    document.cookie = "username=";
-    document.cookie = "jwt_token=";
     dispatch(unsetCredentials());
+    localStorage.removeItem("jwt_token");
+    localStorage.removeItem("username");
   }
 
 
