@@ -1,6 +1,7 @@
 use crate::db::PooledPg;
-use crate::db::config::schema::{lists, list_items};
+use crate::db::config::schema::{lists, list_items, users};
 use crate::db::config::models::{List,
+  GetListsRequest,
   InsertingNewList,
   UserList,
   InsertingNewListItem,
@@ -18,6 +19,35 @@ impl ListsDbManager {
   pub fn new(connection: PooledPg) -> ListsDbManager {
     ListsDbManager {connection}
   }
+
+// QUERIES FOR SELECTING LIST AND LIST_ITEM DATA
+// *************************************************************************************
+
+// GET ALL LISTS FOR A USER
+// *************************
+pub fn get_lists(&mut self, lists_request: GetListsRequest)
+-> Result<Box<Vec<List>>, AppError>
+{
+  let users_lists = lists::table
+    .inner_join(users::table.on(
+      lists::user_id.eq(users::id)
+    ))
+    .select((lists::id,
+      lists::user_id,
+      lists::name,
+      lists::watchlist,
+      lists::created_at))
+    .filter(users::username.eq(lists_request.username))
+    .load::<List>(&mut self.connection)
+    .map_err(|err| {
+      AppError::from_diesel_err(err, "while gettings lists for a users")
+    });
+
+  Ok(Box::new(users_lists.unwrap()))
+}
+
+// QUERIES FOR CREATING LIST AND LIST_ITEM DATA
+// *************************************************************************************
 
   pub fn create_list(&mut self, new_list: InsertingNewList)
   -> Result<List, AppError>
@@ -48,6 +78,8 @@ impl ListsDbManager {
     }
   }
 
+// CREATE NEW LIST FOR A USER
+// ***************************
   pub fn create_list_item(&mut self, list_item: InsertingNewListItem)
   -> Result<ListItem, AppError>
   {

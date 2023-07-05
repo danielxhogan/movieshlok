@@ -43,6 +43,12 @@ pub struct List {
   pub created_at: i64
 }
 
+// sent from client when requesting all lists for a user
+#[derive(Deserialize)]
+pub struct GetListsRequest {
+  pub username: String,
+}
+
 #[derive(Insertable)]
 #[diesel(table_name = lists)]
 pub struct InsertingNewList {

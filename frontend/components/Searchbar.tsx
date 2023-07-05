@@ -43,7 +43,7 @@ export default function Searchbar(props: SearchbarProps) {
     }
   }
 
-  function onSubmitSearchForm(e: React.ChangeEvent<HTMLInputElement>) {
+  function onSubmitSearchForm(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     let defaultFilter: FilterResults;

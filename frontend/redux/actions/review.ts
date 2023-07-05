@@ -46,8 +46,6 @@ interface GetReviewPayload {
   data: ReviewDetails | null;
 }
 
-// TYPES
-// *******************************
 // POST NEW COMMENT IN DATABASE
 // *******************************
 

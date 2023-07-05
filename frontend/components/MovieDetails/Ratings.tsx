@@ -4,6 +4,8 @@ import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { selectCredentials, unsetCredentials } from "@/redux/reducers/auth";
 import { selectMovieDetails } from "@/redux/reducers/tmdb";
 import { selectRatingLike, unsetRatingLike } from "@/redux/reducers/reviews";
+import { selectLists, addNewList, resetNewList, selectNewList } from "@/redux/reducers/lists";
+import { createList, NewList } from "@/redux/actions/lists";
 import { postReview, NewReview } from "@/redux/actions/reviews";
 
 import { useRouter } from "next/router";
@@ -21,6 +23,7 @@ import {
   FormLabel,
   ModalCloseButton,
   Textarea,
+  Input,
   ModalFooter
 } from "@chakra-ui/react";
 
@@ -31,6 +34,10 @@ const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeC
 const SHOWN = "shown";
 const HIDDEN = "hidden";
 
+enum ModalType {
+  Review,
+  Lists
+};
 
 export default function Ratings() {
   const router = useRouter();
@@ -38,14 +45,20 @@ export default function Ratings() {
   const credentials = useAppSelector(selectCredentials);
   const movieDetails = useAppSelector(selectMovieDetails);
   const ratingLike = useAppSelector(selectRatingLike);
+  const lists = useAppSelector(selectLists);
+  const newList = useAppSelector(selectNewList);
 
-  const [ rating, setRating ] = useState(Rating.ZERO);
+  const [ modalType, setModalType ] = useState(ModalType.Review);
+  const [ listsState, setListsState ] = useState(lists.lists);
+  const [ newListTitle, setNewListTitle ] = useState("");
   const [ reviewRating, setReviewRating] = useState(Rating.ZERO);
   const [ newReviewText, setNewReviewText ] = useState("");
 
+  const [ rating, setRating ] = useState(Rating.ZERO);
   const [ liked, setLiked ] = useState(false);
   const [ likedClass, setLikedClass ] = useState(HIDDEN);
   const [ unlikedClass, setUnlikedClass ] = useState(SHOWN);
+
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -69,7 +82,6 @@ export default function Ratings() {
         if (ratingLike.data.liked) {
           setLikeTrue();
         }
-
       }
     }
   }, [dispatch, ratingLike, router, setLikeTrue]);
@@ -148,12 +160,22 @@ export default function Ratings() {
     }
   }
 
-  function onOpenModal() {
+  // MODAL OPEN
+  // *******************************
+  function onOpenReviewModal() {
+    setModalType(ModalType.Review);
     onOpen();
     setReviewRating(rating);
   }
 
-  function makeModalHeader() {
+  function onOpenListsModal() {
+    setModalType(ModalType.Lists);
+    onOpen();
+  }
+
+  // MODAL RENDER
+  // *******************************
+  function makeReviewModalHeader() {
     let year;
     if (movieDetails.data.release_date) {
       year = movieDetails.data.release_date.substring(0,4);
@@ -163,6 +185,99 @@ export default function Ratings() {
     </>
   }
 
+  function makeModal(type: ModalType) {
+    switch (type) {
+      case ModalType.Review:
+        return <>
+          <ModalContent className={styles["modal"]}>
+            <ModalHeader>{ makeReviewModalHeader() }</ModalHeader>
+            <ModalCloseButton />
+
+            <ModalBody>
+              <FormControl>
+                <FormLabel className={styles["rating-label"]}>
+                  <i>What did you think?</i>
+                  <Stars
+                    id="review"
+                    initialRating={rating}
+                    setParentRating={setReviewRating}
+                    interactive={true}
+                    size="2xl"
+                  />
+                </FormLabel>
+                <Textarea
+                  value={newReviewText}
+                  onChange={e => setNewReviewText(e.target.value)}
+                  rows={10}
+                />
+              </FormControl>
+            </ModalBody>
+
+            <ModalFooter>
+            <span className={styles["heart"]} onClick={toggleLike}>
+              <i className={`${styles[unlikedClass]} fa-regular fa-heart fa-2xl`}></i>
+              <i className={`${styles[likedClass]} fa-solid fa-heart fa-2xl`}></i>
+            </span>
+              <Button
+                className={styles["submit-review"]}
+                colorScheme="teal" variant="outline"
+                mr={3}
+                onClick={onClickCloseReviewModal}
+                >
+                Submit Review
+              </Button>
+            </ModalFooter>
+
+          </ModalContent>
+        </>
+
+      case ModalType.Lists:
+        return <>
+          <ModalContent className={styles["modal"]}>
+            <ModalHeader>Lists</ModalHeader>
+            <ModalCloseButton />
+
+            <ModalBody>
+              <form onSubmit={onSubmitNewList}>
+                <FormControl>
+                  <FormLabel>
+                  <i className="fa-solid fa-plus"></i>
+                    <i> Add list</i>
+                  </FormLabel>
+                  <Input
+                    type="text"
+                    placeholder="Choose a name for your new list"
+                    value={newListTitle}
+                    onChange={e => setNewListTitle(e.target.value)}
+                    variant="filled"
+                  />
+                </FormControl>
+              </form>
+
+              { listsState && listsState.map(list => {
+                return <>
+                  { list.name }
+                </>
+              })}
+
+              {/* { lists.lists && lists.lists.map(list => {
+                return <>
+                  { list.name }
+                </>
+              })} */}
+
+            </ModalBody>
+
+            <ModalFooter>
+            </ModalFooter>
+
+          </ModalContent>
+        </>
+    }
+  }
+
+  // MODAL SUBMIT
+  // *******************************
   function onClickCloseReviewModal() {
     onClose();
 
@@ -188,6 +303,34 @@ export default function Ratings() {
       dispatch(postReview(newReview));
     }
   }
+
+  function onSubmitNewList(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    if (credentials.jwt_token) {
+      const newList: NewList = {
+        jwt_token: credentials.jwt_token,
+        name: newListTitle
+      }
+
+      dispatch(createList(newList));
+    }
+  }
+
+  // this useEffect detects when a new list is created
+  // and updates the list of lists in the redux store
+  useEffect(() => {
+    if (newList.status === "fulfilled" &&
+        newList.success === true &&
+        newList.list
+    ) {
+      setNewListTitle("");
+      if (listsState) {
+        setListsState([...listsState, newList.list])
+      }
+      dispatch(resetNewList());
+    }
+  }, [newList, listsState, dispatch]);
 
   return <div className={`${styles["wrapper"]} block`}>
     { credentials.jwt_token ? <>
@@ -219,7 +362,7 @@ export default function Ratings() {
         <Button
           colorScheme="teal" variant="outline"
           className={styles["review-button"]}
-          onClick={onOpenModal}>
+          onClick={onOpenReviewModal}>
           Leave Review
         </Button>
       </div>
@@ -243,6 +386,7 @@ export default function Ratings() {
         <Button
           colorScheme="teal" variant="outline"
           className={styles["list-button"]}
+          onClick={onOpenListsModal}
           >
           Add to other list
         </Button>
@@ -251,46 +395,8 @@ export default function Ratings() {
       <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
         <ModalOverlay />
 
-        <ModalContent className={styles["modal"]}>
-          <ModalHeader>{ makeModalHeader() }</ModalHeader>
-          <ModalCloseButton />
+        { makeModal(modalType) }
 
-          <ModalBody>
-            <FormControl>
-              <FormLabel className={styles["rating-label"]}>
-                <i>What did you think?</i>
-                <Stars
-                  id="review"
-                  initialRating={rating}
-                  setParentRating={setReviewRating}
-                  interactive={true}
-                  size="2xl"
-                />
-              </FormLabel>
-              <Textarea
-                value={newReviewText}
-                onChange={e => setNewReviewText(e.target.value)}
-                rows={10}
-              />
-            </FormControl>
-          </ModalBody>
-
-          <ModalFooter>
-          <span className={styles["heart"]} onClick={toggleLike}>
-            <i className={`${styles[unlikedClass]} fa-regular fa-heart fa-2xl`}></i>
-            <i className={`${styles[likedClass]} fa-solid fa-heart fa-2xl`}></i>
-          </span>
-            <Button
-              className={styles["submit-review"]}
-              colorScheme="teal" variant="outline"
-              mr={3}
-              onClick={onClickCloseReviewModal}
-              >
-              Submit Review
-            </Button>
-          </ModalFooter>
-
-        </ModalContent>
       </Modal>
     </> 
     :

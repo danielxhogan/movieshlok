@@ -81,7 +81,6 @@ struct WsEmitRequest {
   created_at: String
 }
 
-
 // filter for adding a database connection object to the handler function for an endpoint
 fn with_reviews_db_manager(pool: PgPool)
 -> impl Filter<Extract = (ReviewsDbManager,), Error = warp::Rejection> + Clone
@@ -95,7 +94,6 @@ fn with_reviews_db_manager(pool: PgPool)
       ),
     }})
 }
-
 
 // groups all review enpoints together, imported in main
 pub fn reviews_filters(pool: PgPool, ws_client_list: ClientList)

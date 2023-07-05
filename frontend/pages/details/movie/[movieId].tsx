@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { getMovieDetails } from "@/redux/actions/tmdb";
 import { getReviews, getRatingLike, UserMovie, GetReviewsRequest } from "@/redux/actions/reviews";
+import { getLists, GetListsRequest } from "@/redux/actions/lists";
 import { selectCredentials } from "@/redux/reducers/auth";
 import { selectMovieDetails } from "@/redux/reducers/tmdb";
 
@@ -44,13 +45,22 @@ export default function MovieDetailsPage() {
   }, [dispatch, router.query]);
 
   useEffect(() => {
-    if (credentials.jwt_token && router.query.movieId && typeof router.query.movieId === "string") {
+    if (credentials.jwt_token &&
+      credentials.username &&
+      router.query.movieId &&
+      typeof router.query.movieId === "string"
+      ) {
       const userMovie: UserMovie = {
         jwt_token: credentials.jwt_token,
         movie_id: router.query.movieId
       };
 
+      const getListsRequest: GetListsRequest = {
+        username: credentials.username
+      }
+
       dispatch(getRatingLike(userMovie));
+      dispatch(getLists(getListsRequest));
     }
   })
 

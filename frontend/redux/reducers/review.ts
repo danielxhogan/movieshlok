@@ -13,7 +13,7 @@ import { AppState } from "@/redux/store";
 // *******************************
 // GET REVIEW, LIKE, AND COMMENTS
 // *******************************
-interface InitialReviewDetailsState {
+interface ReviewDetail {
   status: Status;
   success: boolean | null;
   message: string;
@@ -21,7 +21,7 @@ interface InitialReviewDetailsState {
   total_pages: number | null;
   data: ReviewDetails | null;
 }
-const initialReviewDetailsState: InitialReviewDetailsState = {
+const initialReviewDetailsState: ReviewDetail = {
   status: "idle",
   success: null,
   message: "",

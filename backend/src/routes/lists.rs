@@ -1,5 +1,5 @@
 use crate::db::config::db_connect::PgPool;
-use crate::db::config::models::{InsertingNewList, UserList, InsertingNewListItem};
+use crate::db::config::models::{GetListsRequest, InsertingNewList, UserList, InsertingNewListItem};
 use crate::db::lists::ListsDbManager;
 use crate::routes::{with_form_body, auth_check, respond};
 use crate::utils::error_handling::{AppError, ErrorType};
@@ -9,8 +9,11 @@ use serde::Deserialize;
 use chrono::Utc;
 use uuid::Uuid;
 
+// TYPES
+// *******************************
+
 #[derive(Deserialize)]
-struct IncomingNewRequest {
+struct IncomingNewList {
   jwt_token: String,
   name: String
 }
@@ -37,24 +40,54 @@ fn with_lists_db_manager(pool: PgPool)
     }})
 }
 
+// ENDPOINTS
+// *******************************
+
 pub fn lists_filters(pool: PgPool,)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
-  create_list_filters(pool.clone())
+  get_lists_filters(pool.clone())
+    .or(create_list_filters(pool.clone()))
     .or(create_list_item_filters(pool.clone()))
 }
 
+// ENDPOINTS FOR SELECTING LIST AND LIST_ITEM DATA
+// *************************************************************************************
+
+// GET ALL LISTS FOR A USER
+// *************************
+fn get_lists_filters(pool: PgPool)
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
+  warp::path!("get-lists")
+    .and(warp::post())
+    .and(with_lists_db_manager(pool))
+    .and(with_form_body::<GetListsRequest>())
+    .and_then(get_lists)
+}
+
+async fn get_lists(mut lists_db_manager: ListsDbManager, lists_request: GetListsRequest)
+-> Result<impl warp::Reply, warp::Rejection>
+{
+  respond(lists_db_manager.get_lists(lists_request), warp::http::StatusCode::OK)
+}
+
+// ENDPOINTS FOR CREATING LIST AND LIST_ITEM DATA
+// *************************************************************************************
+
+// CREATE NEW LIST FOR A USER
+// ***************************
 fn create_list_filters(pool: PgPool)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
   warp::path!("create-list")
     .and(warp::post())
     .and(with_lists_db_manager(pool))
-    .and(with_form_body::<IncomingNewRequest>())
+    .and(with_form_body::<IncomingNewList>())
     .and_then(create_list)
 }
 
-async fn create_list(mut lists_db_manager: ListsDbManager, new_list: IncomingNewRequest)
+async fn create_list(mut lists_db_manager: ListsDbManager, new_list: IncomingNewList)
 -> Result<impl warp::Reply, warp::Rejection>
 {
   let payload = auth_check(new_list.jwt_token);
@@ -126,14 +159,3 @@ async fn create_list_item(mut lists_db_manager: ListsDbManager, new_list_item: I
   let response = lists_db_manager.create_list_item(list_item);
   respond(response, warp::http::StatusCode::CREATED)
 }
-
-  // pub list_id: Uuid,
-  // pub movie_id: String,
-  // pub poster_path: String,
-  // pub created_at: i64
-
-  // jwt_token: String,
-  // list_id: Uuid,
-  // movie_id: String,
-  // poster_path: String,
-  // created_at: i64
