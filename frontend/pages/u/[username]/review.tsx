@@ -24,11 +24,11 @@ import {
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import Image from "next/image";
 import { Textarea, Button, Spinner } from "@chakra-ui/react";
 
 import getConfig from "next/config";
-import Link from "next/link";
 const { publicRuntimeConfig } = getConfig();
 const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
 const TMDB_IMAGE_URL = publicRuntimeConfig.TMDB_IMAGE_URL;

@@ -233,8 +233,7 @@ export default function Stars(props: Props) {
   }
 
   return <>
-    { props.interactive
-    ?
+    { props.interactive ?
       <span id="stars"
         className={styles["stars"]}
         onMouseOut={() => setNewRating(currentRating)}
@@ -242,14 +241,12 @@ export default function Stars(props: Props) {
         >
         { makeStars(newRating) }
       </span>
-    
     :
       <span id="stars"
         className={styles["stars"]}
         >
         { makeStars(newRating) }
       </span>
-    
     }
   </>
 }

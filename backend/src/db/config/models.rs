@@ -1,4 +1,4 @@
-use crate::db::config::schema::{users, lists, reviews, ratings, likes, comments};
+use crate::db::config::schema::{users, lists, list_items, reviews, ratings, likes, comments};
 
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -45,11 +45,38 @@ pub struct List {
 
 #[derive(Insertable)]
 #[diesel(table_name = lists)]
-pub struct NewList {
+pub struct InsertingNewList {
   pub user_id: Uuid,
   pub name: String,
   pub watchlist: bool,
   #[diesel(sql_type = Int8)]
+  pub created_at: i64
+}
+
+#[derive(Queryable, Serialize)]
+pub struct ListItem {
+  pub id: Uuid,
+  pub list_id: Uuid,
+  pub movie_id: String,
+  pub movie_title: String,
+  pub poster_path: String,
+  pub created_at: i64
+}
+
+// when a list is appended checks that the list being appended
+// belongs to the user appending
+pub struct UserList {
+  pub user_id: Uuid,
+  pub list_id: Uuid
+}
+
+#[derive(Insertable)]
+#[diesel(table_name = list_items)]
+pub struct InsertingNewListItem {
+  pub list_id: Uuid,
+  pub movie_title: String,
+  pub movie_id: String,
+  pub poster_path: String,
   pub created_at: i64
 }
 

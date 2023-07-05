@@ -1,6 +1,6 @@
 use crate::db::PooledPg;
 use crate::db::config::schema::{users, lists};
-use crate::db::config::models::{User, NewUser, LoginCreds, List, NewList};
+use crate::db::config::models::{User, NewUser, LoginCreds, List, InsertingNewList};
 use crate::utils::error_handling::{AppError, ErrorType};
 
 use diesel::prelude::*;
@@ -66,7 +66,7 @@ impl AuthDbManager {
     let new_user: User = new_user.unwrap();
     let created_at = Utc::now().timestamp();
 
-    let new_list = NewList {
+    let new_list = InsertingNewList {
       user_id: new_user.id.clone(),
       name: new_user.username.clone(),
       watchlist: true,

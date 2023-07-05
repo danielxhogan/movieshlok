@@ -19,7 +19,9 @@ pub enum ErrorType {
   InvalidJwtToken,
   WSClientNotRegistered,
   WSClientAlreadyRegisted,
-  ReviewNotFound
+  ReviewNotFound,
+  InvalidListOwnership,
+  DuplicateListItem
 }
 
 #[derive(Debug)]
@@ -48,6 +50,8 @@ impl AppError {
       ErrorType::WSClientNotRegistered => warp::http::StatusCode::UNAUTHORIZED,
       ErrorType::WSClientAlreadyRegisted => warp::http::StatusCode::CONFLICT,
       ErrorType::ReviewNotFound => warp::http::StatusCode::NOT_FOUND,
+      ErrorType::InvalidListOwnership => warp::http::StatusCode::UNAUTHORIZED,
+      ErrorType::DuplicateListItem => warp::http::StatusCode::CONFLICT,
     }
   }
 
