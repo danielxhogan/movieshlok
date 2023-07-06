@@ -35,9 +35,27 @@ export interface NewList {
 }
 
 interface CreateListPayload {
-  success: boolean
+  success: boolean;
   message: string;
   list: List | null;
+}
+
+// ADD A MOVIE TO A LIST
+// ***************************
+export interface NewListItem {
+  jwt_token: string;
+  list_id: string;
+  list_name: string;
+  movie_id: string;
+  movie_title: string;
+  poster_path: string;
+}
+
+interface CreateListItemPayload {
+  success: boolean;
+  message: string;
+  code: number;
+  list_name: string | null;
 }
 
 // ACTIONS
@@ -126,4 +144,52 @@ export const createList = createAsyncThunk(
       }
     }
   }
-)
+);
+
+// ADD A MOVIE TO A LIST
+// ***************************
+export const createListItem = createAsyncThunk(
+  "lists/createListItem",
+  async (newListItem: NewListItem): Promise<CreateListItemPayload> => {
+    const createListitemsUrl = `${BACKEND_URL}/create-list-item`;
+
+    const headers = new Headers();
+    headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+    const params = new URLSearchParams();
+    params.append("jwt_token", newListItem.jwt_token);
+    params.append("list_id", newListItem.list_id);
+    params.append("movie_id", newListItem.movie_id);
+    params.append("movie_title", newListItem.movie_title);
+    params.append("poster_path", newListItem.poster_path);
+
+    const request = new Request(createListitemsUrl, { headers, body: params, method: "POST" });
+    const response = await fetch(request);
+
+    if (response.ok) {
+      return {
+        success: true,
+        message: "ok",
+        code: response.status,
+        list_name: newListItem.list_name
+      }
+
+    } else if (response.status >= 500) {
+      return{
+        success: false,
+        message: "server error",
+        code: response.status,
+        list_name: newListItem.list_name
+      }
+
+    } else {
+      const data = await response.json();
+      return {
+        success: false,
+        message: data.message,
+        code: response.status,
+        list_name: newListItem.list_name
+      }
+    }
+  }
+);

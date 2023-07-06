@@ -1,4 +1,4 @@
-import { getLists, createList, List } from "@/redux/actions/lists";
+import { getLists, createList, createListItem, List } from "@/redux/actions/lists";
 
 import { createSlice } from "@reduxjs/toolkit";
 import { Status } from "@/redux/reducers/index"
@@ -37,6 +37,25 @@ const initialNewListState: NewList = {
   success: null,
   message: "",
   list: null
+}
+
+// ADD A MOVIE TO A LIST
+// ***************************
+
+interface NewListItem {
+  status: Status;
+  success: boolean | null;
+  message: string;
+  code: number | null;
+  list_name: string | null;
+}
+
+const initialNewListItemState: NewListItem = {
+  status: "idle",
+  success: null,
+  message: "",
+  code: null,
+  list_name: null
 }
 
 // REDUCERS
@@ -106,3 +125,40 @@ export const newListSlice = createSlice({
 export const { resetNewList } = newListSlice.actions;
 export const selectNewList = (state: AppState) => state.newList;
 export const newListReducer = newListSlice.reducer;
+
+// ADD A MOVIE TO A LIST
+// ***************************
+export const newListItemSlice = createSlice({
+  name: "newListItem",
+  initialState: initialNewListItemState,
+  reducers: {
+    resetNewListItem(state) {
+      state.status = "idle",
+      state.success = null,
+      state.message = "",
+      state.code = null,
+      state.list_name = null
+    }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(createListItem.pending, (state) => {
+        state.status = "loading",
+        state.success = null,
+        state.message = "",
+        state.code = null,
+        state.list_name = null
+      })
+      .addCase(createListItem.fulfilled, (state, action) => {
+        state.status = "fulfilled",
+        state.success = action.payload.success,
+        state.message = action.payload.message,
+        state.code = action.payload.code,
+        state.list_name = action.payload.list_name
+      })
+  }
+});
+
+export const { resetNewListItem } = newListItemSlice.actions;
+export const selectNewListItem = (state: AppState) => state.newListItem;
+export const newListItemReducer = newListItemSlice.reducer;

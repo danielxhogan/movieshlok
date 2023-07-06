@@ -4,8 +4,15 @@ import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { selectCredentials, unsetCredentials } from "@/redux/reducers/auth";
 import { selectMovieDetails } from "@/redux/reducers/tmdb";
 import { selectRatingLike, unsetRatingLike } from "@/redux/reducers/reviews";
-import { selectLists, addNewList, resetNewList, selectNewList } from "@/redux/reducers/lists";
-import { createList, NewList } from "@/redux/actions/lists";
+import {
+  selectLists,
+  addNewList,
+  resetNewList,
+  selectNewList,
+  selectNewListItem,
+  resetNewListItem
+} from "@/redux/reducers/lists";
+import { createList, createListItem, List, NewList, NewListItem } from "@/redux/actions/lists";
 import { postReview, NewReview } from "@/redux/actions/reviews";
 
 import { useRouter } from "next/router";
@@ -24,7 +31,8 @@ import {
   ModalCloseButton,
   Textarea,
   Input,
-  ModalFooter
+  ModalFooter,
+  useToast
 } from "@chakra-ui/react";
 
 import getConfig from "next/config";
@@ -47,6 +55,7 @@ export default function Ratings() {
   const ratingLike = useAppSelector(selectRatingLike);
   const lists = useAppSelector(selectLists);
   const newList = useAppSelector(selectNewList);
+  const newListItem = useAppSelector(selectNewListItem);
 
   const [ modalType, setModalType ] = useState(ModalType.Review);
   const [ listsState, setListsState ] = useState(lists.lists);
@@ -61,6 +70,7 @@ export default function Ratings() {
 
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
 
   const setLikeTrue = useCallback(() => {
         setLikedClass(SHOWN);
@@ -185,6 +195,17 @@ export default function Ratings() {
     </>
   }
 
+  function makeList(list: List) {
+    if (list.watchlist) { return; }
+
+    return <>
+      <div className={styles["list"]} onClick={ () => onClickList(list.id, list.name) }>
+        { list.name }
+        <br />
+      </div>
+    </>
+  }
+
   function makeModal(type: ModalType) {
     switch (type) {
       case ModalType.Review:
@@ -238,6 +259,9 @@ export default function Ratings() {
             <ModalCloseButton />
 
             <ModalBody>
+              { listsState && listsState.map(list => makeList(list))}
+              <br />
+
               <form onSubmit={onSubmitNewList}>
                 <FormControl>
                   <FormLabel>
@@ -253,19 +277,6 @@ export default function Ratings() {
                   />
                 </FormControl>
               </form>
-
-              { listsState && listsState.map(list => {
-                return <>
-                  { list.name }
-                </>
-              })}
-
-              {/* { lists.lists && lists.lists.map(list => {
-                return <>
-                  { list.name }
-                </>
-              })} */}
-
             </ModalBody>
 
             <ModalFooter>
@@ -277,6 +288,9 @@ export default function Ratings() {
   }
 
   // MODAL SUBMIT
+  // *******************************
+
+  // NEW REVIEW
   // *******************************
   function onClickCloseReviewModal() {
     onClose();
@@ -290,6 +304,7 @@ export default function Ratings() {
         credentials.username
       ) {
       const movieId = movieDetails.data.id.toString();
+
       const newReview: NewReview = {
         jwt_token: credentials.jwt_token,
         movieId,
@@ -304,6 +319,62 @@ export default function Ratings() {
     }
   }
 
+  // NEW LIST ITEM
+  // *******************************
+  function onClickList(list_id: string, list_name: string) {
+    if (credentials.jwt_token &&
+        movieDetails.data.id &&
+        movieDetails.data.title &&
+        movieDetails.data.poster_path
+    ) {
+      onClose();
+
+      const newListItem: NewListItem = {
+        jwt_token: credentials.jwt_token,
+        list_id,
+        list_name,
+        movie_id: movieDetails.data.id.toString(),
+        movie_title: movieDetails.data.title,
+        poster_path: movieDetails.data.poster_path
+      };
+
+      dispatch(createListItem(newListItem));
+    }
+  }
+
+  useEffect(() => {
+    if (newListItem.status === "fulfilled" &&
+        newListItem.success === true &&
+        newListItem.list_name
+    ) {
+      toast({
+        title: `${movieDetails.data.title} added to ${newListItem.list_name}`,
+        description: "",
+        status: "success",
+        duration: 5000,
+        isClosable: true
+      });
+
+      dispatch(resetNewListItem());
+
+    } else if (newListItem.status === "fulfilled" &&
+        newListItem.success === false &&
+        newListItem.code === 409
+    ) {
+      toast({
+        title: newListItem.message,
+        description: "",
+        status: "error",
+        duration: 5000,
+        isClosable: true
+      });
+
+      dispatch(resetNewListItem());
+    }
+  }, [newListItem, movieDetails.data.title, toast, dispatch]);
+
+  // NEW LIST
+  // *******************************
   function onSubmitNewList(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 

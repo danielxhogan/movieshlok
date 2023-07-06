@@ -49,6 +49,8 @@ pub fn get_lists(&mut self, lists_request: GetListsRequest)
 // QUERIES FOR CREATING LIST AND LIST_ITEM DATA
 // *************************************************************************************
 
+  // CREATE NEW LIST FOR A USER
+  // ***************************
   pub fn create_list(&mut self, new_list: InsertingNewList)
   -> Result<List, AppError>
   {
@@ -78,8 +80,8 @@ pub fn get_lists(&mut self, lists_request: GetListsRequest)
     }
   }
 
-// CREATE NEW LIST FOR A USER
-// ***************************
+  // ADD A MOVIE TO A LIST
+  // ***************************
   pub fn create_list_item(&mut self, list_item: InsertingNewListItem)
   -> Result<ListItem, AppError>
   {
@@ -92,7 +94,7 @@ pub fn get_lists(&mut self, lists_request: GetListsRequest)
       });
     
     if existing_list_item.unwrap().len() > 0 {
-      return Err(AppError::new("item alreay exists in list", ErrorType::DuplicateListItem));
+      return Err(AppError::new("item already exists in list", ErrorType::DuplicateListItem));
     }
 
     diesel::insert_into(list_items::table)

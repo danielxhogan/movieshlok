@@ -63,6 +63,21 @@
   margin: 0 0 0 20px;
 }
 
+.list {
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: var(--background-primary);
+  border: 1px solid var(--light-grey);
+  border-radius: 5px;
+  transition: 0.3s ease;
+}
+
+.list:hover {
+  cursor: pointer;
+  border: 1px solid var(--dark-grey);
+  transition: 0.3s ease;
+}
+
 @media only screen and (max-width: 550px) {
   .wrapper {
     flex-direction: column;
