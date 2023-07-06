@@ -10,6 +10,7 @@ use crate::db::config::models::{List,
 use crate::utils::error_handling::{AppError, ErrorType};
 
 use diesel::prelude::*;
+use uuid::Uuid;
 
 pub struct ListsDbManager {
   connection:  PooledPg,
@@ -62,24 +63,6 @@ pub fn get_lists(&mut self, lists_request: GetListsRequest)
       })
   }
 
-  pub fn check_list_ownership(&mut self, user_list: UserList)
-  -> Result<String, AppError>
-  {
-    let owner_check = lists::table
-      .filter(lists::user_id.eq(user_list.user_id))
-      .filter(lists::id.eq(user_list.list_id))
-      .load::<List>(&mut self.connection)
-      .map_err(|err| {
-        AppError::from_diesel_err(err, "while checking user list match")
-      });
-    
-    if owner_check.unwrap().len() != 1 {
-      return Err(AppError::new("user doesn't own this list", ErrorType::InvalidListOwnership));
-    } else {
-      return Ok("ok".to_string())
-    }
-  }
-
   // ADD A MOVIE TO A LIST
   // ***************************
   pub fn create_list_item(&mut self, list_item: InsertingNewListItem)
@@ -103,5 +86,47 @@ pub fn get_lists(&mut self, lists_request: GetListsRequest)
       .map_err(|err| {
         AppError::from_diesel_err(err, "while inserting new list item")
       })
+  }
+
+  pub fn check_list_ownership(&mut self, user_list: UserList)
+  -> Result<String, AppError>
+  {
+    let owner_check = lists::table
+      .filter(lists::user_id.eq(user_list.user_id))
+      .filter(lists::id.eq(user_list.list_id))
+      .load::<List>(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while checking user list match")
+      });
+    
+    if owner_check.unwrap().len() != 1 {
+      return Err(AppError::new("user doesn't own this list", ErrorType::InvalidListOwnership));
+    } else {
+      return Ok("ok".to_string())
+    }
+  }
+
+  pub fn get_watchlst(&mut self, user_id: &Uuid)
+  -> Result<Uuid, AppError>
+  {
+    let watchlist = lists::table
+      .inner_join(users::table.on(
+        lists::user_id.eq(users::id)
+      ))
+      .select(lists::id)
+      .filter(lists::watchlist.eq(true))
+      .filter(users::id.eq(user_id))
+      .load::<Uuid>(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while getting user's watchlist")
+      });
+    
+    let watchlist = watchlist.unwrap();
+
+    if watchlist.len() != 1 {
+      return Err(AppError::new("can't find watchlist", ErrorType::WatchlistNotFound));
+    } else {
+      return Ok(watchlist[0]);
+    }
   }
 }

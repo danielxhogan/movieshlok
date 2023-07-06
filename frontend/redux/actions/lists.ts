@@ -44,11 +44,12 @@ interface CreateListPayload {
 // ***************************
 export interface NewListItem {
   jwt_token: string;
-  list_id: string;
+  list_id?: string;
   list_name: string;
   movie_id: string;
   movie_title: string;
   poster_path: string;
+  watchlist: boolean
 }
 
 interface CreateListItemPayload {
@@ -158,10 +159,11 @@ export const createListItem = createAsyncThunk(
 
     const params = new URLSearchParams();
     params.append("jwt_token", newListItem.jwt_token);
-    params.append("list_id", newListItem.list_id);
+    newListItem.list_id && params.append("list_id", newListItem.list_id);
     params.append("movie_id", newListItem.movie_id);
     params.append("movie_title", newListItem.movie_title);
     params.append("poster_path", newListItem.poster_path);
+    params.append("watchlist", newListItem.watchlist.toString());
 
     const request = new Request(createListitemsUrl, { headers, body: params, method: "POST" });
     const response = await fetch(request);

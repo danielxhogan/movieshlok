@@ -21,7 +21,9 @@ pub enum ErrorType {
   WSClientAlreadyRegisted,
   ReviewNotFound,
   InvalidListOwnership,
-  DuplicateListItem
+  DuplicateListItem,
+  WatchlistNotFound,
+  NoListIdProvided
 }
 
 #[derive(Debug)]
@@ -52,6 +54,8 @@ impl AppError {
       ErrorType::ReviewNotFound => warp::http::StatusCode::NOT_FOUND,
       ErrorType::InvalidListOwnership => warp::http::StatusCode::UNAUTHORIZED,
       ErrorType::DuplicateListItem => warp::http::StatusCode::CONFLICT,
+      ErrorType::WatchlistNotFound => warp::http::StatusCode::NOT_FOUND,
+      ErrorType::NoListIdProvided => warp::http::StatusCode::BAD_REQUEST,
     }
   }
 

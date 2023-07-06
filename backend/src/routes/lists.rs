@@ -21,10 +21,11 @@ struct IncomingNewList {
 #[derive(Deserialize)]
 struct IncomingNewListItem {
   jwt_token: String,
-  list_id: Uuid,
+  list_id: Option<Uuid>,
   movie_id: String,
   movie_title: String,
-  poster_path: String
+  poster_path: String,
+  watchlist: bool
 }
 
 fn with_lists_db_manager(pool: PgPool)
@@ -137,26 +138,54 @@ async fn create_list_item(mut lists_db_manager: ListsDbManager, new_list_item: I
   let payload = payload.unwrap();
   let user_id = payload.claims.user_id;
   let created_at = Utc::now().timestamp();
+  let list_item: InsertingNewListItem;
 
-  let user_list = UserList {
-    user_id,
-    list_id: new_list_item.list_id.clone()
-  };
+  if new_list_item.watchlist {
+    let watchlist = lists_db_manager.get_watchlst(&user_id);
 
-  let owner_check = lists_db_manager.check_list_ownership(user_list);
+    match watchlist {
+      Ok(watchlist_id) => {
+        list_item = InsertingNewListItem {
+          list_id: watchlist_id,
+          movie_id: new_list_item.movie_id,
+          movie_title: new_list_item.movie_title,
+          poster_path: new_list_item.poster_path,
+          created_at
+        };
+      },
+      Err(err) => { return respond(Err(err), warp::http::StatusCode::NOT_FOUND) },
+    }
 
-  match owner_check {
-    Err(err) => return respond(Err(err), warp::http::StatusCode::UNAUTHORIZED),
-    Ok(_) => ()
+  } else {
+    match new_list_item.list_id {
+      Some(list_id) => {
+        let user_list = UserList {
+          user_id,
+          list_id
+        };
+
+        let owner_check = lists_db_manager.check_list_ownership(user_list);
+
+        match owner_check {
+          Err(err) => return respond(Err(err), warp::http::StatusCode::UNAUTHORIZED),
+          Ok(_) => ()
+        }
+
+        list_item = InsertingNewListItem {
+          list_id,
+          movie_id: new_list_item.movie_id,
+          movie_title: new_list_item.movie_title,
+          poster_path: new_list_item.poster_path,
+          created_at
+        };
+      },
+
+      None => { return respond(
+        Err(AppError::new("No list id provided", ErrorType::NoListIdProvided)),
+        warp::http::StatusCode::BAD_REQUEST
+      )}
+    }
   }
-
-  let list_item = InsertingNewListItem {
-    list_id: new_list_item.list_id,
-    movie_id: new_list_item.movie_id,
-    movie_title: new_list_item.movie_title,
-    poster_path: new_list_item.poster_path,
-    created_at
-  };
 
   let response = lists_db_manager.create_list_item(list_item);
   respond(response, warp::http::StatusCode::CREATED)

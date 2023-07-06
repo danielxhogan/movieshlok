@@ -58,7 +58,6 @@ export default function Ratings() {
   const newListItem = useAppSelector(selectNewListItem);
 
   const [ modalType, setModalType ] = useState(ModalType.Review);
-  const [ listsState, setListsState ] = useState(lists.lists);
   const [ newListTitle, setNewListTitle ] = useState("");
   const [ reviewRating, setReviewRating] = useState(Rating.ZERO);
   const [ newReviewText, setNewReviewText ] = useState("");
@@ -199,7 +198,7 @@ export default function Ratings() {
     if (list.watchlist) { return; }
 
     return <>
-      <div className={styles["list"]} onClick={ () => onClickList(list.id, list.name) }>
+      <div className={styles["list"]} onClick={ () => onClickList(list.id, list.name, false) }>
         { list.name }
         <br />
       </div>
@@ -259,7 +258,7 @@ export default function Ratings() {
             <ModalCloseButton />
 
             <ModalBody>
-              { listsState && listsState.map(list => makeList(list))}
+              { lists.lists && lists.lists.map(list => makeList(list))}
               <br />
 
               <form onSubmit={onSubmitNewList}>
@@ -321,24 +320,51 @@ export default function Ratings() {
 
   // NEW LIST ITEM
   // *******************************
-  function onClickList(list_id: string, list_name: string) {
+  function onClickList(list_id: string | null, list_name: string, watchlist: boolean) {
     if (credentials.jwt_token &&
         movieDetails.data.id &&
         movieDetails.data.title &&
         movieDetails.data.poster_path
     ) {
-      onClose();
+      let newListItem: NewListItem;
 
-      const newListItem: NewListItem = {
-        jwt_token: credentials.jwt_token,
-        list_id,
-        list_name,
-        movie_id: movieDetails.data.id.toString(),
-        movie_title: movieDetails.data.title,
-        poster_path: movieDetails.data.poster_path
-      };
+      if (!watchlist && list_id) {
+        newListItem = {
+          jwt_token: credentials.jwt_token,
+          list_id,
+          list_name,
+          movie_id: movieDetails.data.id.toString(),
+          movie_title: movieDetails.data.title,
+          poster_path: movieDetails.data.poster_path,
+          watchlist: false
+        };
 
-      dispatch(createListItem(newListItem));
+        dispatch(createListItem(newListItem));
+
+      } else if (watchlist && lists.lists) {
+        let watchlist_id: string | null = null;
+
+        for (let i=0; i<lists.lists.length; i++) {
+          if (lists.lists[i].watchlist === true) {
+            watchlist_id = lists.lists[i].id;
+            break;
+          }
+        }
+
+        if (watchlist_id) {
+          newListItem = {
+            jwt_token: credentials.jwt_token,
+            list_id: watchlist_id,
+            list_name,
+            movie_id: movieDetails.data.id.toString(),
+            movie_title: movieDetails.data.title,
+            poster_path: movieDetails.data.poster_path,
+            watchlist: false
+          };
+
+          dispatch(createListItem(newListItem));
+        }
+      }
     }
   }
 
@@ -396,13 +422,13 @@ export default function Ratings() {
         newList.list
     ) {
       setNewListTitle("");
-      if (listsState) {
-        setListsState([...listsState, newList.list])
-      }
+      dispatch(addNewList({ newList: newList.list }));
       dispatch(resetNewList());
     }
-  }, [newList, listsState, dispatch]);
+  }, [newList, dispatch]);
 
+  // JSX
+  // ***********************************************************************************
   return <div className={`${styles["wrapper"]} block`}>
     { credentials.jwt_token ? <>
       <div className={styles["rating-review"]}>
@@ -450,6 +476,7 @@ export default function Ratings() {
         <Button
           colorScheme="teal" variant="outline"
           className={styles["list-button"]}
+          onClick={ () => onClickList(null, "watchlist", true) }
           >
           Add to Watchlist
         </Button>
