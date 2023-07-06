@@ -2,6 +2,7 @@ use crate::db::PooledPg;
 use crate::db::config::schema::{lists, list_items, users};
 use crate::db::config::models::{List,
   GetListsRequest,
+  GetListItemsRequest,
   InsertingNewList,
   UserList,
   InsertingNewListItem,
@@ -21,34 +22,77 @@ impl ListsDbManager {
     ListsDbManager {connection}
   }
 
-// QUERIES FOR SELECTING LIST AND LIST_ITEM DATA
-// *************************************************************************************
+  // QUERIES FOR SELECTING LIST AND LIST_ITEM DATA
+  // *************************************************************************************
 
-// GET ALL LISTS FOR A USER
-// *************************
-pub fn get_lists(&mut self, lists_request: GetListsRequest)
--> Result<Box<Vec<List>>, AppError>
-{
-  let users_lists = lists::table
-    .inner_join(users::table.on(
-      lists::user_id.eq(users::id)
-    ))
-    .select((lists::id,
-      lists::user_id,
-      lists::name,
-      lists::watchlist,
-      lists::created_at))
-    .filter(users::username.eq(lists_request.username))
-    .load::<List>(&mut self.connection)
-    .map_err(|err| {
-      AppError::from_diesel_err(err, "while gettings lists for a users")
-    });
+  // GET ALL LISTS FOR A USER
+  // *************************
+  pub fn get_lists(&mut self, lists_request: GetListsRequest)
+  -> Result<Box<Vec<List>>, AppError>
+  {
+    let users_lists = lists::table
+      .inner_join(users::table.on(
+        lists::user_id.eq(users::id)
+      ))
+      .select((lists::id,
+        lists::user_id,
+        lists::name,
+        lists::watchlist,
+        lists::created_at))
+      .filter(users::username.eq(lists_request.username))
+      .load::<List>(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while gettings lists for a users")
+      });
 
-  Ok(Box::new(users_lists.unwrap()))
-}
+    Ok(Box::new(users_lists.unwrap()))
+  }
 
-// QUERIES FOR CREATING LIST AND LIST_ITEM DATA
-// *************************************************************************************
+  // GET ALL LIST ITEMS FOR A LIST
+  // ******************************
+  pub fn get_list_items(&mut self, list_items_request: GetListItemsRequest)
+  -> Result<Box<Vec<ListItem>>, AppError>
+  {
+    let users_list_items = list_items::table
+      .filter(list_items::list_id.eq(list_items_request.list_id))
+      .offset(list_items_request.offset)
+      .limit(list_items_request.limit)
+      .load::<ListItem>(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while gettings list_items for a list")
+      });
+    
+    Ok(Box::new(users_list_items.unwrap()))
+  }
+
+  // GET WATCHLIST ID FOR A USER
+  // ******************************
+  pub fn get_watchlist_id(&mut self, username: String)
+  -> Result<Uuid, AppError>
+  {
+    let watchlist = lists::table
+      .inner_join(users::table.on(
+        lists::user_id.eq(users::id)
+      ))
+      .select(lists::id)
+      .filter(lists::watchlist.eq(true))
+      .filter(users::username.eq(username))
+      .load::<Uuid>(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while getting user's watchlist")
+      });
+    
+    let watchlist = watchlist.unwrap();
+
+    if watchlist.len() != 1 {
+      return Err(AppError::new("can't find watchlist", ErrorType::WatchlistNotFound));
+    } else {
+      return Ok(watchlist[0]);
+    }
+  }
+
+  // QUERIES FOR CREATING LIST AND LIST_ITEM DATA
+  // *************************************************************************************
 
   // CREATE NEW LIST FOR A USER
   // ***************************
@@ -106,7 +150,7 @@ pub fn get_lists(&mut self, lists_request: GetListsRequest)
     }
   }
 
-  pub fn get_watchlst(&mut self, user_id: &Uuid)
+  pub fn get_watchlist_by_user_id(&mut self, user_id: &Uuid)
   -> Result<Uuid, AppError>
   {
     let watchlist = lists::table

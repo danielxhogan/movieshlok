@@ -69,6 +69,22 @@ pub struct ListItem {
   pub created_at: i64
 }
 
+// sent from client when requesting all list_items for a list
+#[derive(Deserialize)]
+pub struct GetListItemsRequest {
+  pub list_id: Uuid,
+  pub offset: i64,
+  pub limit: i64
+}
+
+// sent from client when requesting all list_items for the watchlist of a user
+#[derive(Deserialize)]
+pub struct GetWatchlistRequest {
+  pub username: String,
+  pub offset: i64,
+  pub limit: i64
+}
+
 // when a list is appended checks that the list being appended
 // belongs to the user appending
 pub struct UserList {

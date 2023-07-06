@@ -1,4 +1,12 @@
-import { getLists, createList, createListItem, List } from "@/redux/actions/lists";
+import {
+  getLists,
+  getListItems,
+  getWatchlist,
+  createList,
+  createListItem,
+  List,
+  ListItem
+} from "@/redux/actions/lists";
 
 import { createSlice } from "@reduxjs/toolkit";
 import { Status } from "@/redux/reducers/index"
@@ -21,6 +29,31 @@ const initialListsState: Lists = {
   success: null,
   message: "",
   lists: []
+}
+
+// GET ALL LIST ITEMS FOR A LIST
+// ******************************
+interface ListItems {
+  status: Status;
+  success: boolean | null;
+  message: string;
+  list_items: ListItem[] | null;
+}
+
+const initialListItemsState: ListItems = {
+  status: "idle",
+  success: null,
+  message: "",
+  list_items: null
+}
+
+// GET WATCHLIST FOR A USER
+// ******************************
+const initialWatchlistState: ListItems = {
+  status: "idle",
+  success: null,
+  message: "",
+  list_items: null
 }
 
 // CREATE NEW LIST FOR A USER
@@ -91,6 +124,58 @@ export const listsSlice = createSlice({
 export const { addNewList } = listsSlice.actions;
 export const selectLists = (state: AppState) => state.lists;
 export const listsReducer = listsSlice.reducer;
+
+// GET ALL LIST ITEMS FOR A LIST
+// ******************************
+export const listItemsSlice = createSlice({
+  name: "listItems",
+  initialState: initialListItemsState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(getListItems.pending, (state) => {
+        state.status = "loading",
+        state.success = null,
+        state.message = "",
+        state.list_items = null
+      })
+      .addCase(getListItems.fulfilled, (state, action) => {
+        state.status = "fulfilled",
+        state.success = action.payload.success,
+        state.message = action.payload.message,
+        state.list_items = action.payload.list_items
+      })
+  }
+})
+
+export const selectListItems = (state: AppState) => state.listItems;
+export const listItemsReducer = listItemsSlice.reducer;
+
+// GET WATCHLIST FOR A USER
+// ******************************
+export const watchlistSlice = createSlice({
+  name: "listItems",
+  initialState: initialWatchlistState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(getWatchlist.pending, (state) => {
+        state.status = "loading",
+        state.success = null,
+        state.message = "",
+        state.list_items = null
+      })
+      .addCase(getWatchlist.fulfilled, (state, action) => {
+        state.status = "fulfilled",
+        state.success = action.payload.success,
+        state.message = action.payload.message,
+        state.list_items = action.payload.list_items
+      })
+  }
+});
+
+export const selectWatchlist = (state: AppState) => state.watchlist;
+export const watchlistReducer = watchlistSlice.reducer;
 
 // CREATE NEW LIST FOR A USER
 // ***************************

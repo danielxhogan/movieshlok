@@ -7,7 +7,13 @@ import {
   newReviewReducer
 } from "@/redux/reducers/reviews";
 import { reviewDetailsReducer, newCommentReducer } from "@/redux/reducers/review";
-import { listsReducer, newListReducer, newListItemReducer } from "./lists";
+import {
+  listsReducer,
+  listItemsReducer,
+  watchlistReducer,
+  newListReducer,
+  newListItemReducer
+} from "./lists";
 import { combineReducers } from 'redux';
 
 export type Status = "fulfilled" | "loading" | "idle";
@@ -24,7 +30,9 @@ const reducers = combineReducers({
   ratings: ratingsReducer,
   lists: listsReducer,
   newList: newListReducer,
-  newListItem: newListItemReducer
+  newListItem: newListItemReducer,
+  listItems: listItemsReducer,
+  watchlist: watchlistReducer
 });
 
 export default reducers;

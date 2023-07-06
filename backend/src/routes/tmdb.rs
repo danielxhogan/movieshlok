@@ -217,6 +217,8 @@ struct SearchResults {
 }
 
 
+// ENDPOINTS
+// *******************************
 pub fn tmdb_filters()
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {

@@ -57,6 +57,8 @@ fn with_review_db_manager(pool: PgPool)
     }})
 }
 
+// ENDPOINTS
+// *******************************
 pub fn review_filters(pool: PgPool, ws_client_list: ClientList)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {

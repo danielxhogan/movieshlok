@@ -27,6 +27,41 @@ interface GetListsPayload {
   lists: List[] | null
 }
 
+// GET ALL LIST ITEMS FOR A LIST
+// ******************************
+export interface ListItem {
+  id: string;
+  list_id: string;
+  movie_id: string;
+  movie_title: string;
+  poster_path: string;
+  created_at: number;
+}
+
+interface GetListItemsRequest {
+  list_id: string;
+  page: number;
+}
+
+interface GetListItemsPayload {
+  success: boolean;
+  message: string;
+  list_items: ListItem[] | null;
+}
+
+// GET WATCHLIST FOR A USER
+// ******************************
+export interface GetWatchlistRequest {
+  username: string;
+  page: number;
+}
+
+interface GetWatchlistPayload {
+  success: boolean;
+  message: string;
+  list_items: ListItem[] | null;
+}
+
 // CREATE NEW LIST FOR A USER
 // ***************************
 export interface NewList {
@@ -99,6 +134,100 @@ export const getLists = createAsyncThunk(
         success: false,
         message: data.message,
         lists: null
+      }
+    }
+  }
+);
+
+// GET ALL LIST ITEMS FOR A LIST
+// ******************************
+export const getListItems = createAsyncThunk(
+  "lists/getListItems",
+  async (getListItemsRequest: GetListItemsRequest): Promise<GetListItemsPayload> => {
+    const limit = 10;
+    const offset = limit * (getListItemsRequest.page - 1);
+
+    const getListItemsUrl = `${BACKEND_URL}/get-list-items`;
+
+    const headers = new Headers();
+    headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+    const params = new URLSearchParams();
+    params.append("list_id", getListItemsRequest.list_id);
+    params.append("offset", offset.toString());
+    params.append("limtit", limit.toString());
+
+    const request = new Request(getListItemsUrl, { headers, body: params, method: "POST" });
+    const response = await fetch(request);
+
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        success: true,
+        message: "ok",
+        list_items: data
+      }
+
+    } else if (response.status >= 500) {
+      return {
+        success: false,
+        message: "server error",
+        list_items: null
+      }
+
+    } else {
+      const data = await response.json();
+      return {
+        success: false,
+        message: data.message,
+        list_items: null
+      }
+    }
+  }
+);
+
+// GET WATCHLIST FOR A USER
+// ******************************
+export const getWatchlist = createAsyncThunk(
+  "lists/getWatchlist",
+  async (getWatchlistsRequest: GetWatchlistRequest): Promise<GetWatchlistPayload> => {
+    const limit = 10;
+    const offset = limit * (getWatchlistsRequest.page - 1);
+
+    const getWatchlistsUrl = `${BACKEND_URL}/get-watchlist`;
+
+    const headers = new Headers();
+    headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+    const params = new URLSearchParams();
+    params.append("username", getWatchlistsRequest.username);
+    params.append("offset", offset.toString());
+    params.append("limit", limit.toString());
+
+    const request = new Request(getWatchlistsUrl, { headers, body: params, method: "POST" });
+    const response = await fetch(request);
+
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        success: true,
+        message: "ok",
+        list_items: data
+      }
+
+    } else if (response.status >= 500) {
+      return {
+        success: false,
+        message: "server error",
+        list_items: null
+      }
+
+    } else {
+      const data = await response.json();
+      return {
+        success: false,
+        message: data.message,
+        list_items: null
       }
     }
   }

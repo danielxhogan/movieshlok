@@ -1,5 +1,12 @@
 use crate::db::config::db_connect::PgPool;
-use crate::db::config::models::{GetListsRequest, InsertingNewList, UserList, InsertingNewListItem};
+use crate::db::config::models::{
+  GetListsRequest,
+  GetListItemsRequest,
+  GetWatchlistRequest,
+  InsertingNewList,
+  UserList,
+  InsertingNewListItem
+};
 use crate::db::lists::ListsDbManager;
 use crate::routes::{with_form_body, auth_check, respond};
 use crate::utils::error_handling::{AppError, ErrorType};
@@ -43,11 +50,12 @@ fn with_lists_db_manager(pool: PgPool)
 
 // ENDPOINTS
 // *******************************
-
 pub fn lists_filters(pool: PgPool,)
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
   get_lists_filters(pool.clone())
+    .or(get_list_items_filters(pool.clone()))
+    .or(get_watchlist_filters(pool.clone()))
     .or(create_list_filters(pool.clone()))
     .or(create_list_item_filters(pool.clone()))
 }
@@ -71,6 +79,59 @@ async fn get_lists(mut lists_db_manager: ListsDbManager, lists_request: GetLists
 -> Result<impl warp::Reply, warp::Rejection>
 {
   respond(lists_db_manager.get_lists(lists_request), warp::http::StatusCode::OK)
+}
+
+// GET ALL LIST ITEMS FOR A LIST
+// ******************************
+fn get_list_items_filters(pool: PgPool)
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
+  warp::path!("get-list-items")
+    .and(warp::post())
+    .and(with_lists_db_manager(pool))
+    .and(with_form_body::<GetListItemsRequest>())
+    .and_then(get_list_items)
+}
+
+async fn get_list_items(mut lists_db_manager: ListsDbManager, list_items_request: GetListItemsRequest)
+-> Result<impl warp::Reply, warp::Rejection>
+{
+  let response = lists_db_manager.get_list_items(list_items_request);
+  respond(response, warp::http::StatusCode::OK)
+}
+
+// GET WATCHLIST FOR A USER
+// ******************************
+fn get_watchlist_filters(pool: PgPool)
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
+  warp::path!("get-watchlist")
+    .and(warp::post())
+    .and(with_lists_db_manager(pool))
+    .and(with_form_body::<GetWatchlistRequest>())
+    .and_then(get_watchlist)
+}
+
+async fn get_watchlist(mut lists_db_manager: ListsDbManager, watchlist_request: GetWatchlistRequest)
+-> Result<impl warp::Reply, warp::Rejection>
+{
+  let watchlist_id = lists_db_manager.get_watchlist_id(watchlist_request.username);
+
+  match watchlist_id {
+    Err(err) => { return respond(Err(err), warp::http::StatusCode::NOT_FOUND) },
+    Ok(_) => ()
+  }
+
+  let watchlist_id = watchlist_id.unwrap();
+
+  let list_items_request = GetListItemsRequest {
+    list_id: watchlist_id,
+    offset: watchlist_request.offset,
+    limit: watchlist_request.limit
+  };
+
+  let response = lists_db_manager.get_list_items(list_items_request);
+  respond(response, warp::http::StatusCode::OK)
 }
 
 // ENDPOINTS FOR CREATING LIST AND LIST_ITEM DATA
@@ -141,7 +202,7 @@ async fn create_list_item(mut lists_db_manager: ListsDbManager, new_list_item: I
   let list_item: InsertingNewListItem;
 
   if new_list_item.watchlist {
-    let watchlist = lists_db_manager.get_watchlst(&user_id);
+    let watchlist = lists_db_manager.get_watchlist_by_user_id(&user_id);
 
     match watchlist {
       Ok(watchlist_id) => {
