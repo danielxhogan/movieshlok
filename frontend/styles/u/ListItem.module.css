@@ -1,0 +1,46 @@
+.wrapper {
+  width: 200px;
+  padding: 20px;
+  background-color: var(--light-grey);
+  border-radius: 10px;
+  box-shadow: 2px 2px 5px var(--dark-grey);
+  transition: 0.3s ease;
+}
+
+.wrapper:hover {
+  cursor: pointer;
+  box-shadow: 5px 5px 5px var(--dark-grey);
+  transform: translateX(-3px) translateY(-3px);
+}
+
+.movie-poster {
+  border-radius: 5px;
+}
+
+.movie-title {
+  text-align: center;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+@media screen and (max-width: 600px) {
+  .wrapper {
+    width: auto;
+    padding: 15px;
+  }
+
+  .flex-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .movie-poster {
+    height: 100px;
+    width: auto;
+  }
+
+  .movie-title {
+    margin: 0;
+  }
+}

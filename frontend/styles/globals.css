@@ -62,3 +62,29 @@
   display: flex;
   justify-content: center;
 }
+
+/* user profile page class: profile, ratings/ watchlist, lists, list */
+/* ***************************************************************** */
+
+
+.page-title {
+  margin: 40px 0;
+  font-size: 2rem;
+}
+
+.username {
+  font-weight: bold;
+}
+
+.list-item-cards {
+  display: flex;
+  justify-content: flex-start;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+@media screen and (max-width: 600px) {
+  .list-item-cards {
+    flex-direction: column;
+  }
+}

@@ -11,10 +11,10 @@ import { selectRatings } from "@/redux/reducers/reviews";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { Spinner } from "@chakra-ui/react";
 
 import getConfig from "next/config";
-import { JsxElement } from "typescript";
 const { publicRuntimeConfig } = getConfig();
 const TMDB_IMAGE_URL = publicRuntimeConfig.TMDB_IMAGE_URL;
 
@@ -167,18 +167,26 @@ export default function ReviewsPage() {
 
   }
 
-
   return <div className="wrapper">
     <Navbar />
 
     <div className="content">
       <ProfileNav />
 
-      <h1 className={styles["page-title"]}>
-        <span className={styles["username"]}>{ router.query.username }&apos;s</span> Ratings
+      <h1 className="page-title">
+        <span className="username">{ router.query.username }&apos;s</span> Ratings
       </h1>
 
-      { ratings.ratings && ratings.ratings.map(( rating, idx ) => makeRating(rating, idx)) }
+      { ratings.status === "fulfilled" ?
+      <>
+        { ratings.ratings && ratings.ratings.map(( rating, idx ) => makeRating(rating, idx)) }
+      </> : <>
+        <div className="spinner">
+          <Spinner size='xl' />
+        </div>
+      </>
+      }
+
     </div>
 
     <Footer />

@@ -38,7 +38,7 @@ export interface ListItem {
   created_at: number;
 }
 
-interface GetListItemsRequest {
+export interface GetListItemsRequest {
   list_id: string;
   page: number;
 }
@@ -155,7 +155,7 @@ export const getListItems = createAsyncThunk(
     const params = new URLSearchParams();
     params.append("list_id", getListItemsRequest.list_id);
     params.append("offset", offset.toString());
-    params.append("limtit", limit.toString());
+    params.append("limit", limit.toString());
 
     const request = new Request(getListItemsUrl, { headers, body: params, method: "POST" });
     const response = await fetch(request);
