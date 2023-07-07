@@ -4,18 +4,23 @@ import ProfileNav from "@/components/ProfileNav";
 import Footer from "@/components/Footer";
 
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
-import { getLists, List, GetListsRequest } from "@/redux/actions/lists";
-import { selectLists } from "@/redux/reducers/lists";
+import { selectCredentials } from "@/redux/reducers/auth";
+import { getLists, createList, List, GetListsRequest, NewList } from "@/redux/actions/lists";
+import { selectLists, selectNewList, addNewList, resetNewList } from "@/redux/reducers/lists";
 
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { useEffect } from "react";
-import { Spinner } from "@chakra-ui/react";
+import { useState, useEffect } from "react";
+import { FormControl, FormLabel, Input, Spinner } from "@chakra-ui/react";
 
 export default function ListsPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const credentials = useAppSelector(selectCredentials);
   const lists = useAppSelector(selectLists);
+  const newList = useAppSelector(selectNewList);
+
+  const [ newListTitle, setNewListTitle ] = useState("");
 
   useEffect(() => {
     if (typeof router.query.username === "string") {
@@ -26,6 +31,32 @@ export default function ListsPage() {
       dispatch(getLists(getListsRequest));
     }
   }, [dispatch, router.query.username]);
+
+  function onSubmitNewList(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    if (credentials.jwt_token && credentials.username === router.query.username) {
+      const newList: NewList = {
+        jwt_token: credentials.jwt_token,
+        name: newListTitle
+      }
+
+      dispatch(createList(newList));
+    }
+  }
+
+  // this useEffect detects when a new list is created
+  // and updates the list of lists in the redux store
+  useEffect(() => {
+    if (newList.status === "fulfilled" &&
+        newList.success === true &&
+        newList.list
+    ) {
+      setNewListTitle("");
+      dispatch(addNewList({ newList: newList.list }));
+      dispatch(resetNewList());
+    }
+  }, [newList, dispatch]);
 
   function makeList(list: List) {
     if (list.watchlist) { return; }
@@ -46,8 +77,32 @@ export default function ListsPage() {
         <span className="username">{ router.query.username }&apos;s</span> Lists
       </h1>
 
+    { credentials.jwt_token && credentials.username === router.query.username &&
+      <form onSubmit={onSubmitNewList} className={styles["new-list-form"]}>
+        <FormControl>
+          <FormLabel>
+          <i className="fa-solid fa-plus"></i>
+          <i> Add list</i>
+          </FormLabel>
+          <Input
+            type="text"
+            placeholder="Choose a name for your new list"
+            value={newListTitle}
+            onChange={e => setNewListTitle(e.target.value)}
+            variant="filled"
+          />
+        </FormControl>
+      </form>
+    }
+
       { lists.status === "fulfilled" ?
       <>
+        { lists.lists && lists.lists.length === 1 ?
+          <div className={styles["no-lists"]}>Create you first list</div>
+        :
+          <i>View list</i>
+        }
+
         { lists.lists && lists.lists.map(list => makeList(list)) }
       </> : <>
         <div className="spinner">

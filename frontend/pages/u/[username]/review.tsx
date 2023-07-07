@@ -44,6 +44,8 @@ export default function ReviewDetailsPage() {
 
   const [ commentText, setCommentText ] = useState("");
 
+  const score = movieDetails.data.vote_average ? (movieDetails.data.vote_average / 2).toFixed(1) : movieDetails.data.vote_average;
+
   useEffect(() => {
     if (typeof router.query.movieId === "string") {
       dispatch(getMovieDetails(router.query.movieId));
@@ -259,6 +261,9 @@ export default function ReviewDetailsPage() {
         directed by
         <span className={styles["director"]}> {director}</span>
       </h3>
+      <span className={styles["small-score"]}>
+        <span className={styles["score-number"]}>{ score }</span> / 5
+      </span>
     </div>
   }
 
@@ -269,18 +274,18 @@ export default function ReviewDetailsPage() {
       let monthText: string = "";
 
       switch (month) {
-        case 1: monthText = "January"; break;
-        case 2: monthText = "February"; break;
-        case 3: monthText = "March"; break;
-        case 4: monthText = "April"; break;
-        case 5: monthText = "May"; break;
-        case 6: monthText = "June"; break;
-        case 7: monthText = "July"; break;
-        case 8: monthText = "August"; break;
-        case 9: monthText = "September"; break;
-        case 10: monthText = "October"; break;
-        case 11: monthText = "November"; break;
-        case 12: monthText = "December"; break;
+        case 0: monthText = "January"; break;
+        case 1: monthText = "February"; break;
+        case 2: monthText = "March"; break;
+        case 3: monthText = "April"; break;
+        case 4: monthText = "May"; break;
+        case 5: monthText = "June"; break;
+        case 6: monthText = "July"; break;
+        case 7: monthText = "August"; break;
+        case 8: monthText = "September"; break;
+        case 9: monthText = "October"; break;
+        case 10: monthText = "November"; break;
+        case 11: monthText = "December"; break;
       }
 
       return <span>{`${monthText} ${date.getDate()}, ${date.getFullYear()}`}</span>
@@ -323,16 +328,21 @@ export default function ReviewDetailsPage() {
         <div className={styles["review-content"]}>
 
           <div className={styles["movie-poster-div"]}>
-          { movieDetails.data.poster_path &&
-            <Image
-              src={`${TMDB_IMAGE_URL}/w342${movieDetails.data.poster_path}`}
-              className={styles["movie-poster"]}
-              onClick={ () => { router.push(`/details/movie/${movieDetails.data.id}`) }}
-              width={300}
-              height={500}
-              alt="backdrop">
-            </Image>
-          }
+            <div className={styles["sticky-div"]}>
+              { movieDetails.data.poster_path &&
+                <Image
+                  src={`${TMDB_IMAGE_URL}/w342${movieDetails.data.poster_path}`}
+                  className={styles["movie-poster"]}
+                  onClick={ () => { router.push(`/details/movie/${movieDetails.data.id}`) }}
+                  width={300}
+                  height={500}
+                  alt="backdrop">
+                </Image>
+              }
+              <span className={styles["score"]}>
+                <span className={styles["score-number"]}>{ score }</span> / 5
+              </span>
+            </div>
           </div>
 
           <div className={styles["review-details"]}>

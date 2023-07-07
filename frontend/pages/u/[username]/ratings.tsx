@@ -50,18 +50,18 @@ export default function ReviewsPage() {
       currentMonth = month;
 
       switch (month) {
-        case 1: monthText = "January"; break;
-        case 2: monthText = "February"; break;
-        case 3: monthText = "March"; break;
-        case 4: monthText = "April"; break;
-        case 5: monthText = "May"; break;
-        case 6: monthText = "June"; break;
-        case 7: monthText = "July"; break;
-        case 8: monthText = "August"; break;
-        case 9: monthText = "September"; break;
-        case 10: monthText = "October"; break;
-        case 11: monthText = "November"; break;
-        case 12: monthText = "December"; break;
+        case 0: monthText = "January"; break;
+        case 1: monthText = "February"; break;
+        case 2: monthText = "March"; break;
+        case 3: monthText = "April"; break;
+        case 4: monthText = "May"; break;
+        case 5: monthText = "June"; break;
+        case 6: monthText = "July"; break;
+        case 7: monthText = "August"; break;
+        case 8: monthText = "September"; break;
+        case 9: monthText = "October"; break;
+        case 10: monthText = "November"; break;
+        case 11: monthText = "December"; break;
       }
       
       monthHeading = <h2 className={styles["month-heading"]}>
@@ -87,7 +87,9 @@ export default function ReviewsPage() {
           </Image>
 
           <span className={styles["title-section"]}>
-            <span className={styles["movie-title"]}>{ rating.movie_title }</span>
+            <span className={styles["movie-title"]}
+            onClick={ () => { router.push(`/details/movie/${rating.movie_id}`) }}
+            >{ rating.movie_title }</span>
 
             <span className={styles["icons"]}>
               <span className={styles["rating-like"]}>
@@ -180,6 +182,9 @@ export default function ReviewsPage() {
       { ratings.status === "fulfilled" ?
       <>
         { ratings.ratings && ratings.ratings.map(( rating, idx ) => makeRating(rating, idx)) }
+        { ratings.ratings && ratings.ratings[0] === null &&
+          <div className={styles["no-ratings"]}>No ratings from { router.query.username} yet</div>
+        }
       </> : <>
         <div className="spinner">
           <Spinner size='xl' />

@@ -23,7 +23,9 @@ pub enum ErrorType {
   InvalidListOwnership,
   DuplicateListItem,
   WatchlistNotFound,
-  NoListIdProvided
+  NoListIdProvided,
+  UserDoesntOwnReview,
+  UserDoesntOwnRating
 }
 
 #[derive(Debug)]
@@ -56,6 +58,8 @@ impl AppError {
       ErrorType::DuplicateListItem => warp::http::StatusCode::CONFLICT,
       ErrorType::WatchlistNotFound => warp::http::StatusCode::NOT_FOUND,
       ErrorType::NoListIdProvided => warp::http::StatusCode::BAD_REQUEST,
+      ErrorType::UserDoesntOwnReview => warp::http::StatusCode::UNAUTHORIZED,
+      ErrorType::UserDoesntOwnRating => warp::http::StatusCode::UNAUTHORIZED,
     }
   }
 

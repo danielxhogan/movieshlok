@@ -45,6 +45,9 @@ export default function ListPage() {
             return <ListItemCard listItem={listItem} key={listItem.id} />
           })
         }
+        { listItems.list_items && listItems.list_items.length === 0 &&
+          <div className={styles["no-movies"]}>No movies in this list yet</div>
+        }
       </div> : <>
         <div className="spinner">
           <Spinner size='xl' />

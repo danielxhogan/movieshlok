@@ -265,7 +265,7 @@ export default function Ratings() {
                 <FormControl>
                   <FormLabel>
                   <i className="fa-solid fa-plus"></i>
-                    <i> Add list</i>
+                  <i> Add list</i>
                   </FormLabel>
                   <Input
                     type="text"

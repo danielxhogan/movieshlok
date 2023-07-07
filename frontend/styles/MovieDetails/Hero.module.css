@@ -42,16 +42,23 @@
   font-weight: 600;
 }
 
+.score {
+  display: none;
+}
+
+
 @media screen and (max-width: 1000px) {
   .title-section {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 15px;
     padding: 20px 0 0;
   }
 
-  .title-text {
+  .title {
     align-self: center;
+    font-size: 2.5rem;
   }
 
   .movie-poster-div {
@@ -60,6 +67,16 @@
 
   .movie-poster {
     border-radius: 10px;
+  }
+
+  .score {
+    display: inline;
+    font-size: 1.5rem;
+  }
+
+  .score-number {
+    font-size: 2.0rem;
+    font-weight: bold;
   }
 }
 

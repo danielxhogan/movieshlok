@@ -38,8 +38,24 @@
 }
 
 .movie-poster-image {
-  width: 200px;
-  height: 300px;
+  border-radius: 5px;
+}
+
+.movie-details {
+  width: 80%;
+}
+
+.movie-overview {
+  margin-bottom: 10px;
+}
+
+.score {
+  font-size: 1.3rem;
+}
+
+.score-number {
+  font-size: 1.8rem;
+  font-weight: bold;
 }
 
 .person-result-content {
@@ -48,8 +64,7 @@
 }
 
 .cast-crew-profile {
-  width: 200px;
-  height: 300px;
+  border-radius: 5px;
 }
 
 .known-for {

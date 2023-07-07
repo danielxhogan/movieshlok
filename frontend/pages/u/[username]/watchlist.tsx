@@ -45,6 +45,9 @@ export default function WatchlistPage() {
             return <ListItemCard listItem={listItem} key={listItem.id} />
           })
         }
+        { watchlist.list_items && watchlist.list_items.length === 0 &&
+          <div className={styles["no-movies"]}>No movies in this watchlist yet</div>
+        }
       </span> : <>
         <div className="spinner">
           <Spinner size='xl' />

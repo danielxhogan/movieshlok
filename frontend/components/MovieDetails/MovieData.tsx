@@ -21,6 +21,32 @@ enum CastCrewType {
 export default function MovieContent() {
   const movieDetails = useAppSelector(selectMovieDetails);
 
+  function reformatDate(date: string) {
+    const year = date.substring(0, 4);
+    const month = date.substring(5, 7);
+    const day = date.substring(8, 10);
+    let monthText;
+
+    switch (month) {
+      case "01": monthText = "January"; break;
+      case "02": monthText = "February"; break;
+      case "03": monthText = "March"; break;
+      case "04": monthText = "April"; break;
+      case "05": monthText = "May"; break;
+      case "06": monthText = "June"; break;
+      case "07": monthText = "July"; break;
+      case "08": monthText = "August"; break;
+      case "09": monthText = "September"; break;
+      case "10": monthText = "October"; break;
+      case "11": monthText = "November"; break;
+      case "12": monthText = "December"; break;
+    }
+
+    return `${monthText} ${day}, ${year}`;
+  }
+
+  const date = movieDetails.data.release_date ? reformatDate(movieDetails.data.release_date) : movieDetails.data.release_date;
+
   function makeCastCrew(castCrewMembers: [CastCrewMember], castCrewType: CastCrewType) {
     let buttons = [];
 
@@ -65,7 +91,6 @@ export default function MovieContent() {
 
   return <div className={`${styles["wrapper"]} block`}>
 
-
     { movieDetails.data.tagline &&
       <p className={styles["tagline"]}>&quot;{ movieDetails.data.tagline }&quot;</p>
     }
@@ -77,7 +102,8 @@ export default function MovieContent() {
     { movieDetails.data.overview &&
       <p className={styles["overview"]}>{ movieDetails.data.overview }</p>
     }
-    <br />
+    <span>Released on <strong>{ date }</strong></span>
+    <br /><br />
 
     <Tabs variant='enclosed'>
       <TabList className={styles["tab-list"]}>

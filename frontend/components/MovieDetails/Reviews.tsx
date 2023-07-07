@@ -239,18 +239,18 @@ export default function Reviews() {
     let monthText: string = "";
 
     switch (month) {
-      case 1: monthText = "January"; break;
-      case 2: monthText = "February"; break;
-      case 3: monthText = "March"; break;
-      case 4: monthText = "April"; break;
-      case 5: monthText = "May"; break;
-      case 6: monthText = "June"; break;
-      case 7: monthText = "July"; break;
-      case 8: monthText = "August"; break;
-      case 9: monthText = "September"; break;
-      case 10: monthText = "October"; break;
-      case 11: monthText = "November"; break;
-      case 12: monthText = "December"; break;
+      case 0: monthText = "January"; break;
+      case 1: monthText = "February"; break;
+      case 2: monthText = "March"; break;
+      case 3: monthText = "April"; break;
+      case 4: monthText = "May"; break;
+      case 5: monthText = "June"; break;
+      case 6: monthText = "July"; break;
+      case 7: monthText = "August"; break;
+      case 8: monthText = "September"; break;
+      case 9: monthText = "October"; break;
+      case 10: monthText = "November"; break;
+      case 11: monthText = "December"; break;
     }
 
     return <Link href={`/u/${review.username}/review?id=${review.id}&movieId=${review.movie_id}`} key={review.id}>

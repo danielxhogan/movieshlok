@@ -32,6 +32,8 @@ export default function MovieDetailsPage() {
   const movieDetails = useAppSelector(selectMovieDetails);
   const router = useRouter();
 
+  const score = movieDetails.data.vote_average ? (movieDetails.data.vote_average / 2).toFixed(1) : movieDetails.data.vote_average;
+
   useEffect(() => {
     if (router.query.movieId && typeof router.query.movieId === "string") {
       const getReviewsRequest: GetReviewsRequest = {
@@ -73,16 +75,23 @@ export default function MovieDetailsPage() {
 
         <div className={styles["sub-hero"]}>
           <div className={styles["movie-poster-div"]}>
-          { movieDetails.data.poster_path &&
-            <Image
-              src={`${TMDB_IMAGE_URL}/w342${movieDetails.data.poster_path}`}
-              className={styles["movie-poster"]}
-              width={300}
-              height={500}
-              alt="backdrop">
-            </Image>
-          }
+            <div className={styles["sticky-div"]}>
+              { movieDetails.data.poster_path &&
+                <Image
+                  src={`${TMDB_IMAGE_URL}/w342${movieDetails.data.poster_path}`}
+                  className={styles["movie-poster"]}
+                  width={300}
+                  height={500}
+                  alt="backdrop">
+                </Image>
+              }
+              <span className={styles["score"]}>
+                <span className={styles["score-number"]}>{ score }</span> / 5
+              </span><br />
+
+            </div>
           </div>
+
           <div className={styles["movie-content"]}>
             <MovieData />
             <Ratings />

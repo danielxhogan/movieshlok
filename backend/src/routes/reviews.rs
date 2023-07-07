@@ -5,7 +5,8 @@ use crate::db::config::models::{
   GetRatingsRequest,
   InsertingNewReview,
   InsertingNewRating,
-  InsertingNewLike
+  InsertingNewLike,
+  DeleteRatingRequest
 };
 
 use crate::db::reviews::ReviewsDbManager;
@@ -26,6 +27,7 @@ use crate::utils::websockets::{
 use warp::{Filter, reject, ws::Message};
 use serde::Deserialize;
 use chrono::Utc;
+use uuid::Uuid;
 
 // STRUCTS FOR QUERYING DATABASE
 // **************************************************
@@ -67,6 +69,12 @@ struct IncomingNewLike {
   liked: bool
 }
 
+#[derive(Deserialize)]
+struct IncomingDeleteRatingRequest {
+  jwt_token: String,
+  rating_id: Uuid,
+}
+
 // STRUCTS FOR MANAGING WEBSOCKETS
 // **************************************************
 
@@ -106,6 +114,7 @@ pub fn reviews_filters(pool: PgPool, ws_client_list: ClientList)
     .or(post_review_filters(pool.clone()))
     .or(post_rating_filters(pool.clone()))
     .or(post_like_filters(pool.clone()))
+    .or(delete_rating_filters(pool.clone()))
     .or(register_reviews_ws_client_filters(ws_client_list.clone()))
     .or(unregister_reviews_ws_client_filters(ws_client_list.clone()))
     .or(make_reviews_ws_connection_filters(ws_client_list.clone()))
@@ -189,7 +198,7 @@ async fn get_ratings(mut reviews_db_manager: ReviewsDbManager, get_ratings_reque
   respond(response, warp::http::StatusCode::OK)
 }
 
-// ENDPOINTS FOR INSERTING INTO/UPDATING DATABASE
+// ENDPOINTS FOR INSERTING INTO/UPDATING/DELETING DATABASE
 // *************************************************************************************************
 
 // CREATE A NEW REVIEW IN THE DATABASE
@@ -340,6 +349,40 @@ async fn post_like(mut reviews_db_manager: ReviewsDbManager, new_like: IncomingN
 
   let response = reviews_db_manager.post_like(inserting_new_like);
   respond(response, warp::http::StatusCode::CREATED)
+}
+
+// DELETE RATING
+// **************
+fn delete_rating_filters(pool: PgPool)
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
+  warp::path!("delete-rating")
+    .and(warp::delete())
+    .and(with_reviews_db_manager(pool))
+    .and(with_form_body::<IncomingDeleteRatingRequest>())
+    .and_then(delete_rating)
+}
+
+async fn delete_rating(mut reviews_db_manager: ReviewsDbManager, delete_request: IncomingDeleteRatingRequest)
+-> Result<impl warp::Reply, warp::Rejection>
+{
+  let payload = auth_check(delete_request.jwt_token);
+
+  match payload {
+    Err(err) => { return respond(Err(err), warp::http::StatusCode::UNAUTHORIZED) },
+    Ok(_) => ()
+  }
+
+  let payload = payload.unwrap();
+  let user_id = payload.claims.user_id;
+
+  let delete_rating_request = DeleteRatingRequest {
+    user_id,
+    rating_id: delete_request.rating_id
+  };
+
+  let response = reviews_db_manager.delete_rating(delete_rating_request);
+  respond(response, warp::http::StatusCode::OK)
 }
 
 // ENPOINTS FOR MANAGING WEBSOCKETS

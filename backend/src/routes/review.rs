@@ -1,5 +1,5 @@
 use crate::db::config::db_connect::PgPool;
-use crate::db::config::models::{GetReviewRequest, InsertingNewComment};
+use crate::db::config::models::{GetReviewRequest, InsertingNewComment, DeleteReviewRequest};
 use crate::db::review::ReviewDbManager;
 use crate::routes::{with_form_body, auth_check, respond};
 use crate::utils::websockets::{
@@ -27,6 +27,13 @@ struct IncomingNewComment {
   jwt_token: String,
   review_id: Uuid,
   comment: String
+}
+
+#[derive(Deserialize)]
+struct IncomingDeleteReviewRequest {
+  jwt_token: String,
+  review_id: Uuid,
+  movie_id: String
 }
 
 // STRUCTS FOR MANAGING WEBSOCKETS
@@ -64,6 +71,7 @@ pub fn review_filters(pool: PgPool, ws_client_list: ClientList)
 {
   get_review_filters(pool.clone())
     .or(post_comment_filters(pool.clone()))
+    .or(delete_review_filters(pool.clone()))
     .or(register_comments_ws_client_filters(ws_client_list.clone()))
     .or(unregister_comments_ws_client_filters(ws_client_list.clone()))
     .or(make_comments_ws_connection_filters(ws_client_list.clone()))
@@ -89,7 +97,7 @@ async fn get_review(mut review_db_manager: ReviewDbManager, get_review_request: 
   respond(review_db_manager.get_review(get_review_request), warp::http::StatusCode::OK)
 }
 
-// ENDPOINTS FOR INSERTING INTO/UPDATING DATABASE
+// ENDPOINTS FOR INSERTING INTO/UPDATING/DELETING DATABASE
 // ********************************************************
 
 fn post_comment_filters(pool: PgPool)
@@ -125,6 +133,41 @@ async fn post_comment(mut review_db_manager: ReviewDbManager, new_comment: Incom
 
   let response = review_db_manager.post_comment(inseting_new_comment);
   respond(response, warp::http::StatusCode::CREATED)
+}
+
+// DELETE REVIEW
+// **************
+fn delete_review_filters(pool: PgPool)
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
+  warp::path!("delete-review")
+    .and(warp::delete())
+    .and(with_review_db_manager(pool))
+    .and(with_form_body::<IncomingDeleteReviewRequest>())
+    .and_then(delete_review)
+}
+
+async fn delete_review(mut review_db_manager: ReviewDbManager, delete_request: IncomingDeleteReviewRequest)
+-> Result<impl warp::Reply, warp::Rejection>
+{
+  let payload = auth_check(delete_request.jwt_token);
+
+  match payload {
+    Err(err) => { return respond(Err(err), warp::http::StatusCode::UNAUTHORIZED) },
+    Ok(_) => ()
+  }
+
+  let payload = payload.unwrap();
+  let user_id = payload.claims.user_id;
+
+  let delete_review_request = DeleteReviewRequest {
+    user_id,
+    review_id: delete_request.review_id,
+    movie_id: delete_request.movie_id
+  };
+
+  let response = review_db_manager.delete_review(delete_review_request);
+  respond(response, warp::http::StatusCode::OK)
 }
 
 // ENPOINTS FOR MANAGING WEBSOCKETS

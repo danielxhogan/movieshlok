@@ -1,7 +1,8 @@
 .wrapper {
   width: 200px;
   padding: 20px;
-  background-color: var(--light-grey);
+  background-color: white;
+  /* background-color: var(--light-grey); */
   border-radius: 10px;
   box-shadow: 2px 2px 5px var(--dark-grey);
   transition: 0.3s ease;

@@ -25,9 +25,11 @@ use crate::db::config::models::{
   Review,
   InsertingNewRating,
   InsertingNewLike,
+
+  DeleteRatingRequest
 };
 
-use crate::utils::error_handling::AppError;
+use crate::utils::error_handling::{AppError, ErrorType};
 
 use diesel::prelude::*;
 use std::collections::VecDeque;
@@ -374,5 +376,30 @@ impl ReviewsDbManager {
           AppError::from_diesel_err(err, "while updating like")
         })
     }
+  }
+
+  // DELETE RATING
+  // **************
+  pub fn delete_rating(&mut self, delete_request: DeleteRatingRequest)
+  -> Result<Rating, AppError>
+  {
+    let verify = ratings::table
+      .filter(ratings::user_id.eq(delete_request.user_id))
+      .filter(ratings::id.eq(delete_request.rating_id))
+      .load::<Rating>(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while checking rating ownership")
+      });
+
+    if verify.unwrap().len() != 1 {
+      return Err(AppError::new("user doesn't own review", ErrorType::UserDoesntOwnRating));
+    }
+
+    diesel::delete(ratings::table)
+      .filter(ratings::id.eq(delete_request.rating_id))
+      .get_result(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while deleting review")
+      })
   }
 }

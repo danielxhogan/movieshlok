@@ -160,6 +160,12 @@ pub struct InsertingNewReview {
   pub created_at: i64
 }
 
+pub struct DeleteReviewRequest {
+  pub user_id: Uuid,
+  pub review_id: Uuid,
+  pub movie_id: String
+}
+
 // RATINGS AND LIKES
 // ***********************************************
 // sent from client when getting a user's rating and like status for a movie
@@ -248,6 +254,11 @@ pub struct InsertingNewRating {
   #[diesel(sql_type = Int8)]
   pub last_updated: i64,
   pub reviewed: bool
+}
+
+pub struct DeleteRatingRequest {
+  pub user_id: Uuid,
+  pub rating_id: Uuid
 }
 
 // LIKES

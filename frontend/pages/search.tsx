@@ -103,27 +103,31 @@ export default function SearchPage() {
 
   function makeMovieResult(result: SearchResult) {
     const date = result.release_date ? reformatDate(result.release_date) : result.release_date;
+    const score = result.vote_average ? (result.vote_average / 2).toFixed(1) : result.vote_average;
 
     return <div key={result.id} className="block block-btn">
       <Link href={`/details/movie/${result.id}`}>
-        <span className={styles["result-title"]}>{ result.title }</span><br />
+        <span className={styles["result-title"]}> { result.title } </span><br />
 
         <div className={styles["movie-result-content"]}>
-            { result.poster_path &&
-              <Image
-                src={`${TMDB_IMAGE_URL}/w185${result.poster_path}`}
-                className={styles["movie-poster-image"]}
-                width={200}
-                height={1}
-                alt="movie poster"
-              />
-            }
+            <div>
+              { result.poster_path &&
+                <Image
+                  src={`${TMDB_IMAGE_URL}/w185${result.poster_path}`}
+                  className={styles["movie-poster-image"]}
+                  width={100}
+                  height={1}
+                  alt="movie poster"
+                />
+              }
+            </div>
 
           <div className={styles["movie-details"]}>
-            <span>{ result.overview }</span><br /><br />
-            <span>Average score: { result.vote_average }</span><br />
-            <span>Votes: { result.vote_count }</span><br />
-            <span>Release date: { date }</span><br />
+            <div className={styles["movie-overview"]}>{ result.overview }</div>
+            <span className={styles["score"]}>
+              <span className={styles["score-number"]}>{ score }</span> / 5
+            </span><br />
+            <span>Released on <strong>{ date }</strong></span>
           </div>
         </div>
 
@@ -165,24 +169,26 @@ export default function SearchPage() {
       <Link href={`/details/person/${result.id}`}>
         <span className={styles["result-title"]}>{ result.name }</span><br />
 
-      <div className={styles["person-result-content"]}>
-          { result.profile_path &&
-            <Image
-              src={`${TMDB_IMAGE_URL}/w185${result.profile_path}`}
-              className={styles["cast-crew-profile"]}
-              width={200}
-              height={1}
-              alt="cast & crew profile"
-            />
-          }
+        <div className={styles["person-result-content"]}>
+            <div>
+              { result.profile_path &&
+                <Image
+                  src={`${TMDB_IMAGE_URL}/w185${result.profile_path}`}
+                  className={styles["cast-crew-profile"]}
+                  width={100}
+                  height={1}
+                  alt="cast & crew profile"
+                />
+              }
+            </div>
 
-        <div className={styles["known-for"]}>
-          { result.known_for && makeKnownFor(result.known_for) }
+          <div className={styles["known-for"]}>
+            { result.known_for && makeKnownFor(result.known_for) }
+          </div>
+
         </div>
-
-      </div>
-      <br />
-        </Link>
+        <br />
+      </Link>
     </div>
   }
 

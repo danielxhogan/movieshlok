@@ -42,6 +42,7 @@ export default function Hero() {
     let year: string = "";
     let directors: string[] = [];
     let director: string = "";
+    const score = movieDetails.data.vote_average ? (movieDetails.data.vote_average / 2).toFixed(1) : movieDetails.data.vote_average;
 
     if (movieDetails.data.release_date) {
       year = movieDetails.data.release_date.substring(0, 4);
@@ -71,6 +72,9 @@ export default function Hero() {
         directed by
         <span className={styles["director"]}> {director}</span>
       </h2>
+        <span className={styles["score"]}>
+          <span className={styles["score-number"]}>{ score }</span> / 5
+        </span>
     </div>
   }
 
