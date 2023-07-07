@@ -25,7 +25,9 @@ pub enum ErrorType {
   WatchlistNotFound,
   NoListIdProvided,
   UserDoesntOwnReview,
-  UserDoesntOwnRating
+  UserDoesntOwnRating,
+  UserDoesntOwnComment,
+  UserDoesntOwnItem
 }
 
 #[derive(Debug)]
@@ -60,6 +62,8 @@ impl AppError {
       ErrorType::NoListIdProvided => warp::http::StatusCode::BAD_REQUEST,
       ErrorType::UserDoesntOwnReview => warp::http::StatusCode::UNAUTHORIZED,
       ErrorType::UserDoesntOwnRating => warp::http::StatusCode::UNAUTHORIZED,
+      ErrorType::UserDoesntOwnComment => warp::http::StatusCode::UNAUTHORIZED,
+      ErrorType::UserDoesntOwnItem => warp::http::StatusCode::UNAUTHORIZED,
     }
   }
 

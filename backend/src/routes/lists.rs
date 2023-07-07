@@ -5,7 +5,9 @@ use crate::db::config::models::{
   GetWatchlistRequest,
   InsertingNewList,
   UserList,
-  InsertingNewListItem
+  InsertingNewListItem,
+  DeleteListRequest,
+  DeleteListItemRequest
 };
 use crate::db::lists::ListsDbManager;
 use crate::routes::{with_form_body, auth_check, respond};
@@ -35,6 +37,18 @@ struct IncomingNewListItem {
   watchlist: bool
 }
 
+#[derive(Deserialize)]
+struct IncomingDeleteListRequest {
+  jwt_token: String,
+  list_id: Uuid
+}
+
+#[derive(Deserialize)]
+struct IncomingDeleteListItemRequest {
+  jwt_token: String,
+  list_item_id: Uuid
+}
+
 fn with_lists_db_manager(pool: PgPool)
 -> impl Filter<Extract = (ListsDbManager,), Error = warp::Rejection> + Clone
 {
@@ -58,6 +72,8 @@ pub fn lists_filters(pool: PgPool,)
     .or(get_watchlist_filters(pool.clone()))
     .or(create_list_filters(pool.clone()))
     .or(create_list_item_filters(pool.clone()))
+    .or(delete_list_filters(pool.clone()))
+    .or(delete_list_item_filters(pool.clone()))
 }
 
 // ENDPOINTS FOR SELECTING LIST AND LIST_ITEM DATA
@@ -250,4 +266,72 @@ async fn create_list_item(mut lists_db_manager: ListsDbManager, new_list_item: I
 
   let response = lists_db_manager.create_list_item(list_item);
   respond(response, warp::http::StatusCode::CREATED)
+}
+
+// DELETE LIST
+// ************
+fn delete_list_filters(pool: PgPool)
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
+  warp::path!("delete-list")
+    .and(warp::delete())
+    .and(with_lists_db_manager(pool))
+    .and(with_form_body::<IncomingDeleteListRequest>())
+    .and_then(delete_list)
+}
+
+async fn delete_list(mut lists_db_manager: ListsDbManager, delete_request: IncomingDeleteListRequest)
+-> Result<impl warp::Reply, warp::Rejection>
+{
+  let payload = auth_check(delete_request.jwt_token);
+
+  match payload {
+    Err(err) => { return respond(Err(err), warp::http::StatusCode::UNAUTHORIZED) },
+    Ok(_) => ()
+  }
+
+  let payload = payload.unwrap();
+  let user_id = payload.claims.user_id;
+
+  let delete_list_request = DeleteListRequest {
+    user_id,
+    list_id: delete_request.list_id
+  };
+
+  let response = lists_db_manager.delete_list(delete_list_request);
+  respond(response, warp::http::StatusCode::OK)
+}
+
+// DELETE LIST ITEM
+// *****************
+fn delete_list_item_filters(pool: PgPool)
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
+  warp::path!("delete-list-item")
+    .and(warp::delete())
+    .and(with_lists_db_manager(pool))
+    .and(with_form_body::<IncomingDeleteListItemRequest>())
+    .and_then(delete_list_item)
+}
+
+async fn delete_list_item(mut lists_db_manager: ListsDbManager, delete_request: IncomingDeleteListItemRequest)
+-> Result<impl warp::Reply, warp::Rejection>
+{
+  let payload = auth_check(delete_request.jwt_token);
+
+  match payload {
+    Err(err) => { return respond(Err(err), warp::http::StatusCode::UNAUTHORIZED) },
+    Ok(_) => ()
+  }
+
+  let payload = payload.unwrap();
+  let user_id = payload.claims.user_id;
+
+  let delete_list_item_request = DeleteListItemRequest {
+    user_id,
+    list_item_id: delete_request.list_item_id
+  };
+
+  let response = lists_db_manager.delete_list_item(delete_list_item_request);
+  respond(response, warp::http::StatusCode::OK)
 }

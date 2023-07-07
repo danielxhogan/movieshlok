@@ -102,6 +102,16 @@ pub struct InsertingNewListItem {
   pub created_at: i64
 }
 
+pub struct DeleteListRequest {
+  pub user_id: Uuid,
+  pub list_id: Uuid
+}
+
+pub struct DeleteListItemRequest {
+  pub user_id: Uuid,
+  pub list_item_id: Uuid
+}
+
 // REVIEWS
 // ***********************************************
 #[derive(Queryable, Serialize, Clone)]
@@ -325,4 +335,9 @@ pub struct InsertingNewComment {
   pub review_id: Uuid,
   pub comment: String,
   pub created_at: i64
+}
+
+pub struct DeleteCommentRequest {
+  pub user_id: Uuid,
+  pub comment_id: Uuid
 }

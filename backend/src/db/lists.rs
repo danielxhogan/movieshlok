@@ -6,7 +6,9 @@ use crate::db::config::models::{List,
   InsertingNewList,
   UserList,
   InsertingNewListItem,
-  ListItem
+  ListItem,
+  DeleteListRequest,
+  DeleteListItemRequest
 };
 use crate::utils::error_handling::{AppError, ErrorType};
 
@@ -172,5 +174,69 @@ impl ListsDbManager {
     } else {
       return Ok(watchlist[0]);
     }
+  }
+
+  // DELETE LIST
+  // ************
+  pub fn delete_list(&mut self, delete_request: DeleteListRequest)
+  -> Result<List, AppError>
+  {
+    // check that list belongs to user
+    let verify = lists::table
+      .filter(lists::user_id.eq(delete_request.user_id))
+      .filter(lists::id.eq(delete_request.list_id))
+      .count()
+      .get_result::<i64>(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while checking review ownership")
+      });
+    
+    if verify.unwrap() != 1 {
+      return Err(AppError::new("user doesn't own item", ErrorType::UserDoesntOwnItem));
+    }
+
+    // delete all list items for the list
+    let _ = diesel::delete(list_items::table)
+      .filter(list_items::list_id.eq(delete_request.list_id))
+      .execute(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while deleting list items for a list")
+      });
+    
+    diesel::delete(lists::table)
+      .filter(lists::id.eq(delete_request.list_id))
+      .get_result(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while deleting list")
+      })
+  }
+
+  // DELETE LIST ITEM
+  // *****************
+  pub fn delete_list_item(&mut self, delete_request: DeleteListItemRequest)
+  -> Result<ListItem, AppError>
+  {
+    let verify = list_items::table
+      .inner_join(lists::table.on(
+        list_items::list_id.eq(lists::id)
+      ))
+      .filter(lists::user_id.eq(delete_request.user_id))
+      .filter(list_items::id.eq(delete_request.list_item_id))
+      .count()
+      .get_result::<i64>(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while checking list item ownership")
+      });
+
+    if verify.unwrap() != 1 {
+      return Err(AppError::new("user doesn't own item", ErrorType::UserDoesntOwnItem));
+    }
+
+    diesel::delete(list_items::table)
+      .filter(list_items::id.eq(delete_request.list_item_id))
+      .get_result(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while deleting comment")
+      })
   }
 }

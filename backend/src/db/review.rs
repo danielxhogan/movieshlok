@@ -7,7 +7,8 @@ use crate::db::config::models::{Review,
   GetReviewRequest,
   GetReviewResponse,
   InsertingNewComment,
-  DeleteReviewRequest
+  DeleteReviewRequest,
+  DeleteCommentRequest
 };
 use crate::utils::error_handling::{AppError, ErrorType};
 
@@ -161,6 +162,31 @@ impl ReviewDbManager {
       .get_result(&mut self.connection)
       .map_err(|err| {
         AppError::from_diesel_err(err, "while deleting review")
+      })
+  }
+
+  // DELETE COMMENT
+  // **************
+  pub fn delete_comment(&mut self, delete_request: DeleteCommentRequest)
+  -> Result<Comment, AppError>
+  {
+    let verify = comments::table
+      .filter(comments::user_id.eq(delete_request.user_id))
+      .filter(comments::id.eq(delete_request.comment_id))
+      .load::<Comment>(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while checking comment ownership")
+      });
+
+    if verify.unwrap().len() != 1 {
+      return Err(AppError::new("user doesn't own comment", ErrorType::UserDoesntOwnComment));
+    }
+
+    diesel::delete(comments::table)
+      .filter(comments::id.eq(delete_request.comment_id))
+      .get_result(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while deleting comment")
       })
   }
 }
