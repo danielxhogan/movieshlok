@@ -9,8 +9,7 @@ const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeC
 // GET REVIEW, LIKE, AND COMMENTS
 // *******************************
 
-// passed in when getReview action is dispatched,
-// sent to the /get-review endpoint
+// type passed in to getReview action
 export interface GetReviewRequest {
   review_id: string;
   page: number;
@@ -48,7 +47,7 @@ interface GetReviewPayload {
 
 // POST NEW COMMENT IN DATABASE
 // *******************************
-
+// type passed in to postComment action
 export interface NewComment {
   jwt_token: string;
   review_id: string;
@@ -68,6 +67,55 @@ interface NewCommentPayload {
   code: number;
   message: string;
   data: ReturnedNewComment | null;
+}
+
+
+// DELETE REVIEW
+// **************
+// type passed in to deleteReview action
+interface DeleteReviewRequest {
+  jwt_token: string;
+  review_id: string;
+  movie_id: string;
+}
+
+export interface ReturnedDeletedReview {
+  id: string;
+  user_id: string;
+  movie_id: string;
+  rating: number;
+  review: string;
+  created_at: number;
+}
+
+interface DeleteReviewPayload {
+  success: boolean;
+  message: string;
+  code: number;
+  review: ReturnedDeletedReview | null;
+}
+
+// DELETE COMMENT
+// ***************
+// type passed in to deleteComment action
+interface DeleteCommentRequest {
+  jwt_token: string;
+  comment_id: string;
+}
+
+export interface ReturnedDeletedComment {
+  id: string;
+  user_id: string;
+  review_id: string;
+  comment: string;
+  created_at: number;
+}
+
+interface DeleteCommentPayload {
+  success: boolean;
+  message: string;
+  code: number;
+  comment: ReturnedDeletedComment | null;
 }
 
 // ACTIONS
@@ -171,6 +219,99 @@ export const postComment = createAsyncThunk(
         code: response.status,
         message: data.message,
         data: null
+      }
+    }
+  }
+);
+
+// DELETE REVIEW
+// **************
+export const deleteReview = createAsyncThunk(
+  "review/deleteReview",
+  async (deleteRequest: DeleteReviewRequest): Promise<DeleteReviewPayload> => {
+    const deleteReviewUrl = `${BACKEND_URL}/delete-review`;
+
+    const headers = new Headers();
+    headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+    const params = new URLSearchParams();
+    params.append("jwt_token", deleteRequest.jwt_token);
+    params.append("review_id", deleteRequest.review_id);
+    params.append("movie_id", deleteRequest.movie_id);
+
+    const request = new Request(deleteReviewUrl, { headers, body: params, method: "DELETE" });
+    const response = await fetch(request);
+
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        success: true,
+        message: "ok",
+        code: response.status,
+        review: data
+      }
+
+    } else if (response.status >= 500) {
+      return{
+        success: false,
+        message: "server error",
+        code: response.status,
+        review: null
+      }
+
+    } else {
+      const data = await response.json();
+      return {
+        success: false,
+        message: data.message,
+        code: response.status,
+        review: null
+      }
+    }
+  }
+);
+
+// DELETE COMMENT
+// ***************
+export const deleteComment = createAsyncThunk(
+  "review/deleteComment",
+  async (deleteRequest: DeleteCommentRequest): Promise<DeleteCommentPayload> => {
+    const deleteCommentUrl = `${BACKEND_URL}/delete-comment`;
+
+    const headers = new Headers();
+    headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+    const params = new URLSearchParams();
+    params.append("jwt_token", deleteRequest.jwt_token);
+    params.append("comment_id", deleteRequest.comment_id);
+
+    const request = new Request(deleteCommentUrl, { headers, body: params, method: "DELETE" });
+    const response = await fetch(request);
+
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        success: true,
+        message: "ok",
+        code: response.status,
+        comment: data
+      }
+
+    } else if (response.status >= 500) {
+      return{
+        success: false,
+        message: "server error",
+        code: response.status,
+        comment: null
+      }
+
+    } else {
+      const data = await response.json();
+      return {
+        success: false,
+        message: data.message,
+        code: response.status,
+        comment: null
       }
     }
   }

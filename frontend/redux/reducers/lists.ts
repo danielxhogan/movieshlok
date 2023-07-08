@@ -4,6 +4,8 @@ import {
   getWatchlist,
   createList,
   createListItem,
+  deleteList,
+  deleteListItem,
   List,
   ListItem
 } from "@/redux/actions/lists";
@@ -17,6 +19,7 @@ import { AppState } from "@/redux/store";
 
 // GET ALL LISTS FOR A USER
 // *************************
+// type for value of lists in redux store
 interface Lists {
   status: Status;
   success: boolean | null;
@@ -33,6 +36,7 @@ const initialListsState: Lists = {
 
 // GET ALL LIST ITEMS FOR A LIST
 // ******************************
+// type for value of listItems in redux store
 interface ListItems {
   status: Status;
   success: boolean | null;
@@ -49,6 +53,7 @@ const initialListItemsState: ListItems = {
 
 // GET WATCHLIST FOR A USER
 // ******************************
+// type for value of watchlist in redux store
 const initialWatchlistState: ListItems = {
   status: "idle",
   success: null,
@@ -58,6 +63,7 @@ const initialWatchlistState: ListItems = {
 
 // CREATE NEW LIST FOR A USER
 // ***************************
+// type for value of newList in redux store
 interface NewList {
   status: Status;
   success: boolean | null;
@@ -76,7 +82,7 @@ const initialNewListState: NewList = {
 
 // ADD A MOVIE TO A LIST
 // ***************************
-
+// type for value of newListItem in redux store
 interface NewListItem {
   status: Status;
   success: boolean | null;
@@ -93,11 +99,50 @@ const initialNewListItemState: NewListItem = {
   list_name: null
 }
 
+// DELETE A LIST
+// **************
+// type for value of deletedList in redux store
+interface DeletedList {
+  status: Status;
+  success: boolean | null;
+  message: string,
+  code: number | null;
+  list: List | null;
+}
+
+const initialDeletedListState: DeletedList = {
+  status: "idle",
+  success: null,
+  message: "",
+  code: null,
+  list: null
+}
+
+// DELETE AN ITEM FROM A LIST
+// ****************************
+// type for value of deletedListItem in redux store
+interface DeletedListItem {
+  status: Status;
+  success: boolean | null;
+  message: string;
+  code: number | null;
+  list_item: ListItem | null;
+}
+
+const initialDeletedListItemState: DeletedListItem = {
+  status: "idle",
+  success: null,
+  message: "",
+  code: null,
+  list_item: null
+}
+
 // REDUCERS
 // *************************
 
 // GET ALL LISTS FOR A USER
 // *************************
+// this reducer sets the value for lists in redux store
 export const listsSlice = createSlice({
   name: "lists",
   initialState: initialListsState,
@@ -129,6 +174,7 @@ export const listsReducer = listsSlice.reducer;
 
 // GET ALL LIST ITEMS FOR A LIST
 // ******************************
+// this reducer sets the value for listItems in redux store
 export const listItemsSlice = createSlice({
   name: "listItems",
   initialState: initialListItemsState,
@@ -155,6 +201,7 @@ export const listItemsReducer = listItemsSlice.reducer;
 
 // GET WATCHLIST FOR A USER
 // ******************************
+// this reducer sets the value for watchlist in redux store
 export const watchlistSlice = createSlice({
   name: "listItems",
   initialState: initialWatchlistState,
@@ -181,6 +228,7 @@ export const watchlistReducer = watchlistSlice.reducer;
 
 // CREATE NEW LIST FOR A USER
 // ***************************
+// this reducer sets the value for newList in redux store
 export const newListSlice = createSlice({
   name: "newList",
   initialState: initialNewListState,
@@ -218,6 +266,7 @@ export const newListReducer = newListSlice.reducer;
 
 // ADD A MOVIE TO A LIST
 // ***************************
+// this reducer sets the value for newListItem in redux store
 export const newListItemSlice = createSlice({
   name: "newListItem",
   initialState: initialNewListItemState,
@@ -252,3 +301,79 @@ export const newListItemSlice = createSlice({
 export const { resetNewListItem } = newListItemSlice.actions;
 export const selectNewListItem = (state: AppState) => state.newListItem;
 export const newListItemReducer = newListItemSlice.reducer;
+
+// DELETE A LIST
+// **************
+// this reducer sets the value for deletedList in redux store
+export const deletedListSlice = createSlice({
+  name: "deletedList",
+  initialState: initialDeletedListState,
+  reducers: {
+    resetDeletedList(state) {
+      state.status = "idle",
+      state.success = null,
+      state.message = "",
+      state.code = null,
+      state.list = null
+    }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(deleteList.pending, (state) => {
+        state.status = "loading",
+        state.success = null,
+        state.message = "",
+        state.code = null,
+      state.list = null
+      })
+      .addCase(deleteList.fulfilled, (state, action) => {
+        state.status = "fulfilled",
+        state.success = action.payload.success,
+        state.message = action.payload.message,
+        state.code = action.payload.code,
+        state.list = action.payload.list
+      })
+  }
+});
+
+export const { resetDeletedList } = deletedListSlice.actions;
+export const selectDeletedList = (state: AppState) => state.deletedList;
+export const deletedListReducer = deletedListSlice.reducer;
+
+// DELETE AN ITEM FROM A LIST
+// ****************************
+// this reducer sets the value for deletedListItem in redux store
+export const deletedListItemSlice = createSlice({
+  name: "deletedListItem",
+  initialState: initialDeletedListItemState,
+  reducers: {
+    resetDeletedListItem(state) {
+      state.status = "idle",
+      state.success = null,
+      state.message = "",
+      state.code = null,
+      state.list_item = null
+    }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(deleteListItem.pending, (state) => {
+        state.status = "loading",
+        state.success = null,
+        state.message = "",
+        state.code = null,
+      state.list_item = null
+      })
+      .addCase(deleteListItem.fulfilled, (state, action) => {
+        state.status = "fulfilled",
+        state.success = action.payload.success,
+        state.message = action.payload.message,
+        state.code = action.payload.code,
+        state.list_item = action.payload.list_item
+      })
+  }
+});
+
+export const { resetDeletedListItem } = deletedListItemSlice.actions;
+export const selectDeletedListItem = (state: AppState) => state.deletedListItem;
+export const deletedListItemReducer = deletedListItemSlice.reducer;

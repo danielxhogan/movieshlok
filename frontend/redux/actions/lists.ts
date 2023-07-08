@@ -95,6 +95,34 @@ interface CreateListItemPayload {
   list_name: string | null;
 }
 
+// DELETE A LIST
+// **************
+interface DeleteListRequest {
+  jwt_token: string;
+  list_id: string;
+}
+
+interface DeleteListPayload {
+  success: boolean;
+  message: string;
+  code: number;
+  list: List | null;
+}
+
+// DELETE AN ITEM FROM A LIST
+// ****************************
+interface DeleteListItemRequest {
+  jwt_token: string;
+  list_item_id: string;
+}
+
+interface DeleteListItemPayload {
+  success: boolean;
+  message: string;
+  code: number;
+  list_item: ListItem | null;
+}
+
 // ACTIONS
 // *************************
 
@@ -324,6 +352,98 @@ export const createListItem = createAsyncThunk(
         message: data.message,
         code: response.status,
         list_name: newListItem.list_name
+      }
+    }
+  }
+);
+
+// DELETE A LIST
+// **************
+export const deleteList = createAsyncThunk(
+  "lists/deleteList",
+  async (deleteRequest: DeleteListRequest): Promise<DeleteListPayload> => {
+    const deleteListUrl = `${BACKEND_URL}/delete-list`;
+
+    const headers = new Headers();
+    headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+    const params = new URLSearchParams();
+    params.append("jwt_token", deleteRequest.jwt_token);
+    params.append("list_id", deleteRequest.list_id);
+
+    const request = new Request(deleteListUrl, { headers, body: params, method: "DELETE" });
+    const response = await fetch(request);
+
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        success: true,
+        message: "ok",
+        code: response.status,
+        list: data
+      }
+
+    } else if (response.status >= 500) {
+      return{
+        success: false,
+        message: "server error",
+        code: response.status,
+        list: null
+      }
+
+    } else {
+      const data = await response.json();
+      return {
+        success: false,
+        message: data.message,
+        code: response.status,
+        list: null
+      }
+    }
+  }
+);
+
+// DELETE AN ITEM FROM A LIST
+// ****************************
+export const deleteListItem = createAsyncThunk(
+  "lists/deleteListItem",
+  async (deleteRequest: DeleteListItemRequest): Promise<DeleteListItemPayload> => {
+    const deleteListItemUrl = `${BACKEND_URL}/delete-list-item`;
+
+    const headers = new Headers();
+    headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+    const params = new URLSearchParams();
+    params.append("jwt_token", deleteRequest.jwt_token);
+    params.append("list_item_id", deleteRequest.list_item_id);
+
+    const request = new Request(deleteListItemUrl, { headers, body: params, method: "DELETE" });
+    const response = await fetch(request);
+
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        success: true,
+        message: "ok",
+        code: response.status,
+        list_item: data
+      }
+
+    } else if (response.status >= 500) {
+      return{
+        success: false,
+        message: "server error",
+        code: response.status,
+        list_item: null
+      }
+
+    } else {
+      const data = await response.json();
+      return {
+        success: false,
+        message: data.message,
+        code: response.status,
+        list_item: null
       }
     }
   }
