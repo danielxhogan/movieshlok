@@ -5,6 +5,7 @@ import {
   ratingLikeReducer,
   ratingsReducer,
   newReviewReducer,
+  deletedRatingReducer
 } from "@/redux/reducers/reviews";
 import {
   reviewDetailsReducer,
@@ -48,6 +49,7 @@ const reducers = combineReducers({
 
   // ratings page
   ratings: ratingsReducer,
+  deletedRating: deletedRatingReducer,
 
   // list/watchlist pages
   listItems: listItemsReducer,

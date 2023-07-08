@@ -6,7 +6,9 @@ import {
   Review,
   RatingLikeResponse,
   RatingReview,
-  ReturnedNewReview
+  ReturnedNewReview,
+  deleteRating,
+  ReturnedDeletedRating
 } from "@/redux/actions/reviews";
 
 import { createSlice } from "@reduxjs/toolkit";
@@ -100,6 +102,25 @@ const initialNewReviewState: NewReview = {
   code: null,
   message: "",
   data: null
+}
+
+// DELETE RATING
+// ***************
+// type for value of deletedRating in redux store
+interface DeletedRating {
+  status: Status;
+  success: boolean | null;
+  message: string;
+  code: number | null;
+  rating: ReturnedDeletedRating | null;
+}
+
+const initialDeletedRatingState: DeletedRating = {
+  status: "idle",
+  success: null,
+  message: "",
+  code: null,
+  rating: null
 }
 
 // REDUCERS
@@ -248,3 +269,41 @@ export const newReviewSlice = createSlice({
 export const { resetNewReview } = newReviewSlice.actions;
 export const selectNewReview = (state: AppState) => state.newReview;
 export const newReviewReducer = newReviewSlice.reducer;
+
+// DELETE RATING
+// ***************
+// this reducer sets the value for deletedRating in redux store
+export const deletedRatingSlice = createSlice({
+  name: "deletedRatingItem",
+  initialState: initialDeletedRatingState,
+  reducers: {
+    resetDeletedRating(state) {
+      state.status = "idle",
+      state.success = null,
+      state.message = "",
+      state.code = null,
+      state.rating = null
+    }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(deleteRating.pending, (state) => {
+        state.status = "loading",
+        state.success = null,
+        state.message = "",
+        state.code = null,
+      state.rating = null
+      })
+      .addCase(deleteRating.fulfilled, (state, action) => {
+        state.status = "fulfilled",
+        state.success = action.payload.success,
+        state.message = action.payload.message,
+        state.code = action.payload.code,
+        state.rating = action.payload.rating
+      })
+  }
+});
+
+export const { resetDeletedRating } = deletedRatingSlice.actions;
+export const selectDeletedRating = (state: AppState) => state.deletedRating;
+export const deletedRatingReducer = deletedRatingSlice.reducer;

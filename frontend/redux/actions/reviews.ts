@@ -118,6 +118,32 @@ interface NewReviewPayload {
   data: ReturnedNewReview | null
 }
 
+// DELETE RATING
+// ***************
+// type passed in to deleteRating action
+interface DeleteRatingRequest {
+  jwt_token: string;
+  rating_id: string;
+}
+
+export interface ReturnedDeletedRating {
+  id: string;
+  user_id: string;
+  movie_id: string;
+  movie_title: string;
+  poster_path: string;
+  rating: number;
+  last_updated: number;
+  reviewed: boolean;
+}
+
+interface DeleteRatingPayload {
+  success: boolean;
+  message: string;
+  code: number;
+  rating: ReturnedDeletedRating | null;
+}
+
 // ACTIONS
 // ****************************
 
@@ -337,4 +363,50 @@ export const postReview = createAsyncThunk(
       };
     }
   }
-)
+);
+
+// DELETE RATING
+// ***************
+export const deleteRating = createAsyncThunk(
+  "reviews/deleteRating",
+  async (deleteRequest: DeleteRatingRequest): Promise<DeleteRatingPayload> => {
+    const deleteRatingUrl = `${BACKEND_URL}/delete-rating`;
+
+    const headers = new Headers();
+    headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+    const params = new URLSearchParams();
+    params.append("jwt_token", deleteRequest.jwt_token);
+    params.append("rating_id", deleteRequest.rating_id);
+
+    const request = new Request(deleteRatingUrl, { headers, body: params, method: "DELETE" });
+    const response = await fetch(request);
+
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        success: true,
+        message: "ok",
+        code: response.status,
+        rating: data
+      }
+
+    } else if (response.status >= 500) {
+      return{
+        success: false,
+        message: "server error",
+        code: response.status,
+        rating: null
+      }
+
+    } else {
+      const data = await response.json();
+      return {
+        success: false,
+        message: data.message,
+        code: response.status,
+        rating: null
+      }
+    }
+  }
+);
