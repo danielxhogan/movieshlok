@@ -53,7 +53,6 @@ interface RatingLike {
   data: RatingLikeResponse | null;
 }
 
-// default value for ratingLike
 const intialRatingLikeState: RatingLike = {
   status: "idle",
   success: null,
@@ -74,7 +73,6 @@ interface Ratings {
   ratings: RatingReview[] | null
 }
 
-// default value for ratings
 const initialRatingsState: Ratings = {
   status: "idle",
   success: null,
@@ -95,7 +93,6 @@ interface NewReview {
   data: ReturnedNewReview | null;
 }
 
-// default value for newReview
 const initialNewReviewState: NewReview = {
   status: "idle",
   success: null,

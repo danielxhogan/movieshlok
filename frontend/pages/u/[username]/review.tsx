@@ -12,27 +12,50 @@ import {
   getReviewDetails,
   postComment,
   GetReviewRequest,
+  deleteComment,
   Comment,
-  NewComment
+  NewComment,
+  DeleteCommentRequest
 } from "@/redux/actions/review";
 import {
   selectReviewDetails,
   addNewComment,
   selectNewComment,
-  resetNewComment
+  resetNewComment,
+  selectDeletedComment,
+  resetDeletedComment,
+  removeDeletedComment
 } from "@/redux/reducers/review";
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Image from "next/image";
-import { Textarea, Button, useToast, Spinner } from "@chakra-ui/react";
+import {
+  Textarea,
+  Button,
+  Tooltip,
+  useToast,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalBody,
+  ModalHeader,
+  ModalCloseButton,
+  ModalFooter,
+  Spinner
+} from "@chakra-ui/react";
 
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
 const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
 const TMDB_IMAGE_URL = publicRuntimeConfig.TMDB_IMAGE_URL;
 
+enum ModalType {
+  DELETE_REVIEW,
+  DELETE_COMMENT
+}
 
 export default function ReviewDetailsPage() {
   const router = useRouter();
@@ -41,10 +64,15 @@ export default function ReviewDetailsPage() {
   const movieDetails = useAppSelector(selectMovieDetails);
   const reviewDetails = useAppSelector(selectReviewDetails);
   const newComment = useAppSelector(selectNewComment);
+  const deletedComment = useAppSelector(selectDeletedComment);
 
   const [ commentText, setCommentText ] = useState("");
+  const [ deletingCommentId, setDeletingCommentId ] = useState("");
+  const [ deletingCommentText, setDeletingCommentText ] = useState("");
+  const [ modalType, setModalType ] = useState(ModalType.DELETE_REVIEW);
 
   const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const score = movieDetails.data.vote_average ? (movieDetails.data.vote_average / 2).toFixed(1) : movieDetails.data.vote_average;
 
   useEffect(() => {
@@ -62,6 +90,8 @@ export default function ReviewDetailsPage() {
     }
   }, [dispatch, router.query]);
 
+  // SETUP WEBSOCKETS
+  // ********************************************************************
   // this is the onmessage functions assigned to the websocket object.
   // It takes a string from the server with all the relevant data for
   // creating a new Review type object, parses the data out of the string,
@@ -186,6 +216,8 @@ export default function ReviewDetailsPage() {
 
   }, [credentials.jwt_token, onNewComment, router.query.id]);
 
+  // DETECT NEW COMMENT
+  // *********************************************
   useEffect(() => {
     if (newComment.status === "fulfilled" &&
         newComment.success === true &&
@@ -301,11 +333,25 @@ export default function ReviewDetailsPage() {
     }
   }
 
-  function makeComment(comment: Comment) {
-    return <div className="block">
+  function makeComment(comment: Comment, idx: number) {
+    return <div className="block" key={comment.id} id={comment.id}>
       <div className={styles["comment-title"]}>
         <h3 className={styles["username"]}><strong>{comment.username}</strong></h3>
-        <div><i>{ makeDate(comment.created_at) }</i></div>
+
+        <div className={styles["comment-title-right"]}>
+          <i>{ makeDate(comment.created_at) }</i>
+          { credentials.username === comment.username &&
+            <Tooltip
+              label={"delete comment"}
+              placement="top"
+              >
+              <i
+              className={`${styles["delete-comment"]} fa-solid fa-trash fa-lg`}
+              onClick={() => onClickDeleteComment(comment, idx)}
+              />
+            </Tooltip>
+          }
+        </div>
       </div>
 
       <p>{comment.comment}</p>
@@ -327,6 +373,73 @@ export default function ReviewDetailsPage() {
       dispatch(postComment(newComment));
     }
   }
+
+  // MODAL OPEN
+  // **********************************************
+  function onClickDeleteComment(comment: Comment, idx: number) {
+    setDeletingCommentId(comment.id);
+    setDeletingCommentText(comment.comment);
+    setModalType(ModalType.DELETE_COMMENT);
+    onOpen();
+  }
+
+  // MODAL RENDER
+  // **********************************************
+  function makeModal(type: ModalType) {
+    switch (type) {
+      case ModalType.DELETE_REVIEW:
+        return <></>
+      case ModalType.DELETE_COMMENT:
+        return <>
+          <ModalContent className={styles["modal"]}>
+            <ModalHeader>Delete Comment</ModalHeader>
+            <ModalCloseButton />
+
+            <ModalBody>
+                  <i>Are you sure you want to delete the comment:</i>
+                  <br /><br />
+                  <p>{ deletingCommentText }</p>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button
+                className={styles["submit-review"]}
+                colorScheme="teal" variant="outline"
+                mr={3}
+                onClick={dispatchDeleteComment}
+                >
+                Delete Comment
+              </Button>
+            </ModalFooter>
+
+          </ModalContent>
+        </>
+    }
+  }
+
+  // DELETE COMMENT
+  // *********************************
+  function dispatchDeleteComment() {
+    onClose();
+
+    if (credentials.jwt_token) {
+      const deleteRequest: DeleteCommentRequest = {
+        jwt_token: credentials.jwt_token,
+        comment_id: deletingCommentId
+      }
+
+      dispatch(deleteComment(deleteRequest));
+    }
+  }
+
+  useEffect(() => {
+    if (deletedComment.status === "fulfilled" &&
+        deletedComment.success === true
+    ) {
+      dispatch(removeDeletedComment({ commentId: deletingCommentId}));
+      dispatch(resetDeletedComment());
+    }
+  }, [deletedComment, deletingCommentId, dispatch]);
 
   return <div className="wrapper">
     <Navbar />
@@ -356,6 +469,12 @@ export default function ReviewDetailsPage() {
 
           <div className={styles["review-details"]}>
             <div className={styles["title-section"]}>
+
+            { credentials.username === router.query.username &&
+              <Tooltip label={"delete review"} placement="top">
+                <i className={`${styles["delete-review"]} fa-solid fa-trash fa-lg`} />
+              </Tooltip>
+            }
 
               <div className={styles["title-movie-poster"]}>
                 { movieDetails.data.poster_path &&
@@ -436,7 +555,7 @@ export default function ReviewDetailsPage() {
               <h2 className={styles["comments-title"]}>Comments</h2>
               { reviewDetails.status === "fulfilled" ?
                   reviewDetails.data && reviewDetails.data.comments.length > 0 ?
-                  <>{reviewDetails.data.comments.map(comment => makeComment(comment)) }</>
+                  <>{reviewDetails.data.comments.map((comment, idx) => makeComment(comment, idx)) }</>
                   :
                   <h2 className={styles["no-comments"]}>Be the first to comment</h2>
                   // <>no Comments</>
@@ -473,6 +592,12 @@ export default function ReviewDetailsPage() {
             </div>
           </div>
 
+          <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
+            <ModalOverlay />
+
+            { makeModal(modalType) }
+
+          </Modal>
         </div>
       :
         <div className="spinner">

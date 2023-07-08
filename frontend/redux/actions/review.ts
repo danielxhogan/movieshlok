@@ -6,9 +6,9 @@ const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeC
 
 // TYPES
 // *******************************
+
 // GET REVIEW, LIKE, AND COMMENTS
 // *******************************
-
 // type passed in to getReview action
 export interface GetReviewRequest {
   review_id: string;
@@ -33,7 +33,7 @@ export interface ReviewDetails {
     created_at: number;
   };
   liked: boolean;
-  comments: [Comment];
+  comments: Comment[];
 }
 
 // payload sent by getReview to reviewDetails reducer
@@ -98,7 +98,7 @@ interface DeleteReviewPayload {
 // DELETE COMMENT
 // ***************
 // type passed in to deleteComment action
-interface DeleteCommentRequest {
+export interface DeleteCommentRequest {
   jwt_token: string;
   comment_id: string;
 }

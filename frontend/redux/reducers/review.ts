@@ -105,6 +105,12 @@ export const reviewDetailsSlice = createSlice({
   reducers: {
     addNewComment(state, action) {
       state.data?.comments.push(action.payload);
+    },
+    removeDeletedComment(state, action) {
+      if (state.data) {
+        const newComments = state.data.comments.filter(comment => comment.id !== action.payload.commentId);
+        state.data.comments = newComments;
+      }
     }
   },
   extraReducers: (builder) => {
@@ -129,6 +135,7 @@ export const reviewDetailsSlice = createSlice({
 });
 
 export const { addNewComment } = reviewDetailsSlice.actions;
+export const { removeDeletedComment } = reviewDetailsSlice.actions;
 export const selectReviewDetails = (state: AppState) => state.reviewDetails;
 export const reviewDetailsReducer = reviewDetailsSlice.reducer;
 

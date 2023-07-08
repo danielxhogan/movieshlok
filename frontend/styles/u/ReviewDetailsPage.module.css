@@ -34,6 +34,21 @@
   width: 80%;
 }
 
+.title-section {
+  position: relative;
+  padding-right: 35px;
+}
+
+.delete-review {
+  position: absolute;
+  right: 0;
+  top: 20px;
+}
+
+.delete-review:hover {
+  cursor: pointer;
+}
+
 .title-movie-poster {
   display: none;
 }
@@ -126,6 +141,16 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 15px;
+}
+
+.comment-title-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.delete-comment:hover {
+  cursor: pointer;
 }
 
 .no-comments {
