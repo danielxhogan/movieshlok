@@ -400,6 +400,7 @@ export default function Ratings() {
         isClosable: true
       });
 
+      dispatch(resetNewListItem());
 
     } else if (newListItem.status === "fulfilled" &&
       newListItem.code === 401

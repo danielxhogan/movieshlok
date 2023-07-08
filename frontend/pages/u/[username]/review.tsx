@@ -12,9 +12,11 @@ import {
   getReviewDetails,
   postComment,
   GetReviewRequest,
+  deleteReview,
   deleteComment,
   Comment,
   NewComment,
+  DeleteReviewRequest,
   DeleteCommentRequest
 } from "@/redux/actions/review";
 import {
@@ -22,6 +24,8 @@ import {
   addNewComment,
   selectNewComment,
   resetNewComment,
+  selectDeletedReview,
+  resetDeletedReview,
   selectDeletedComment,
   resetDeletedComment,
   removeDeletedComment
@@ -64,6 +68,7 @@ export default function ReviewDetailsPage() {
   const movieDetails = useAppSelector(selectMovieDetails);
   const reviewDetails = useAppSelector(selectReviewDetails);
   const newComment = useAppSelector(selectNewComment);
+  const deletedReview = useAppSelector(selectDeletedReview);
   const deletedComment = useAppSelector(selectDeletedComment);
 
   const [ commentText, setCommentText ] = useState("");
@@ -270,6 +275,8 @@ export default function ReviewDetailsPage() {
     }
   }, [newComment, credentials.username, dispatch, credentials.jwt_token, toast]);
 
+  // RENDERING FUNCTIONS
+  // *********************************************************
   function makeTitle() {
     let year: string = "";
     let directors: string[] = [];
@@ -383,12 +390,40 @@ export default function ReviewDetailsPage() {
     onOpen();
   }
 
+  function onCickDeleteReview() {
+    setModalType(ModalType.DELETE_REVIEW);
+    onOpen();
+  }
+
   // MODAL RENDER
   // **********************************************
   function makeModal(type: ModalType) {
     switch (type) {
       case ModalType.DELETE_REVIEW:
-        return <></>
+        return <>
+          <ModalContent className={styles["modal"]}>
+            <ModalHeader>Delete Review</ModalHeader>
+            <ModalCloseButton />
+
+            <ModalBody>
+                  <i>Are you sure you want to delete your review for <strong>{movieDetails.data.title}</strong></i>
+                  <br /><br />
+                  <p>{ deletingCommentText }</p>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button
+                className={styles["submit-review"]}
+                colorScheme="teal" variant="outline"
+                mr={3}
+                onClick={dispatchDeleteReview}
+                >
+                Delete Review
+              </Button>
+            </ModalFooter>
+
+          </ModalContent>
+        </>
       case ModalType.DELETE_COMMENT:
         return <>
           <ModalContent className={styles["modal"]}>
@@ -417,6 +452,32 @@ export default function ReviewDetailsPage() {
     }
   }
 
+  // DELETE REVIEW
+  // *********************************
+  function dispatchDeleteReview() {
+    if (credentials.jwt_token &&
+        typeof router.query.id === "string" &&
+        typeof router.query.movieId === "string"
+    ) {
+      const deleteRequest: DeleteReviewRequest = {
+        jwt_token:credentials.jwt_token,
+        review_id: router.query.id,
+        movie_id: router.query.movieId,
+      }
+
+      dispatch(deleteReview(deleteRequest));
+    }
+  }
+  
+  useEffect(() => {
+    if (deletedReview.status === "fulfilled" &&
+        deletedReview.success === true
+    ) {
+      router.back();
+      dispatch(resetDeletedReview());
+    }
+  }, [deletedReview]);
+
   // DELETE COMMENT
   // *********************************
   function dispatchDeleteComment() {
@@ -441,6 +502,8 @@ export default function ReviewDetailsPage() {
     }
   }, [deletedComment, deletingCommentId, dispatch]);
 
+  // JSX
+  // *************************************************************************
   return <div className="wrapper">
     <Navbar />
 
@@ -472,7 +535,10 @@ export default function ReviewDetailsPage() {
 
             { credentials.username === router.query.username &&
               <Tooltip label={"delete review"} placement="top">
-                <i className={`${styles["delete-review"]} fa-solid fa-trash fa-lg`} />
+                <i
+                className={`${styles["delete-review"]} fa-solid fa-trash fa-lg`}
+                onClick={onCickDeleteReview}
+                />
               </Tooltip>
             }
 
