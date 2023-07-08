@@ -14,7 +14,7 @@ import {
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useEffect, useCallback } from "react";
-import { Spinner } from "@chakra-ui/react";
+import { useToast, Spinner } from "@chakra-ui/react";
 
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
@@ -27,6 +27,8 @@ export default function Reviews() {
   const credentials = useAppSelector(selectCredentials);
   const reviews = useAppSelector(selectReveiws);
   const newReview = useAppSelector(selectNewReview);
+
+  const toast = useToast();
 
   // this is the onmessage functions assigned to the websocket object.
   // It takes a string from the server with all the relevant data for
@@ -230,8 +232,16 @@ export default function Reviews() {
       dispatch(unsetCredentials());
       localStorage.removeItem("jwt_token");
       localStorage.removeItem("username");
+
+      toast({
+        title: "Youv'e been logged out",
+        description: "",
+        status: "error",
+        duration: 5000,
+        isClosable: true
+      });
     }
-  }, [newReview, credentials.jwt_token, credentials.username, dispatch, router])
+  }, [newReview, credentials.jwt_token, credentials.username, dispatch, router, toast])
 
   function makeReview(review: Review) {
     const date = new Date(review.created_at * 1000);

@@ -26,7 +26,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Image from "next/image";
-import { Textarea, Button, Spinner } from "@chakra-ui/react";
+import { Textarea, Button, useToast, Spinner } from "@chakra-ui/react";
 
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
@@ -44,6 +44,7 @@ export default function ReviewDetailsPage() {
 
   const [ commentText, setCommentText ] = useState("");
 
+  const toast = useToast();
   const score = movieDetails.data.vote_average ? (movieDetails.data.vote_average / 2).toFixed(1) : movieDetails.data.vote_average;
 
   useEffect(() => {
@@ -221,13 +222,21 @@ export default function ReviewDetailsPage() {
       dispatch(resetNewComment());
 
     } else if (newComment.code === 401) {
+      toast({
+        title: "You need to log in again",
+        description: "",
+        status: "error",
+        duration: 3000,
+        isClosable: true
+      });
+
       dispatch(resetNewComment());
 
       dispatch(unsetCredentials());
       localStorage.removeItem("jwt_token");
       localStorage.removeItem("username");
     }
-  }, [newComment, credentials.username, dispatch, credentials.jwt_token]);
+  }, [newComment, credentials.username, dispatch, credentials.jwt_token, toast]);
 
   function makeTitle() {
     let year: string = "";

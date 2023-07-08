@@ -4,6 +4,7 @@ import ProfileNav from "@/components/ProfileNav";
 import Footer from "@/components/Footer";
 
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+import { unsetCredentials } from "@/redux/reducers/auth";
 import { selectCredentials } from "@/redux/reducers/auth";
 import { getLists, createList, List, GetListsRequest, NewList } from "@/redux/actions/lists";
 import { selectLists, selectNewList, addNewList, resetNewList } from "@/redux/reducers/lists";
@@ -11,7 +12,7 @@ import { selectLists, selectNewList, addNewList, resetNewList } from "@/redux/re
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { FormControl, FormLabel, Input, Spinner } from "@chakra-ui/react";
+import { FormControl, FormLabel, Input, useToast, Spinner } from "@chakra-ui/react";
 
 export default function ListsPage() {
   const router = useRouter();
@@ -21,6 +22,8 @@ export default function ListsPage() {
   const newList = useAppSelector(selectNewList);
 
   const [ newListTitle, setNewListTitle ] = useState("");
+
+  const toast = useToast();
 
   useEffect(() => {
     if (typeof router.query.username === "string") {
@@ -55,8 +58,24 @@ export default function ListsPage() {
       setNewListTitle("");
       dispatch(addNewList({ newList: newList.list }));
       dispatch(resetNewList());
+
+    } else if (newList.status === "fulfilled" &&
+        newList.code === 401
+    ) {
+      toast({
+        title: "You need to log in again",
+        description: "",
+        status: "error",
+        duration: 3000,
+        isClosable: true
+      });
+
+      dispatch(resetNewList());
+      dispatch(unsetCredentials());
+      localStorage.removeItem("jwt_token");
+      localStorage.removeItem("username");
     }
-  }, [newList, dispatch]);
+  }, [newList, dispatch, toast]);
 
   function makeList(list: List) {
     if (list.watchlist) { return; }

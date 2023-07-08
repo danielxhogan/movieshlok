@@ -62,6 +62,7 @@ interface NewList {
   status: Status;
   success: boolean | null;
   message: string;
+  code: number | null;
   list: List | null;
 }
 
@@ -69,6 +70,7 @@ const initialNewListState: NewList = {
   status: "idle",
   success: null,
   message: "",
+  code: null,
   list: null
 }
 
@@ -187,6 +189,7 @@ export const newListSlice = createSlice({
       state.status = "idle",
       state.success = null,
       state.message = "",
+      state.code = null,
       state.list = null
     }
   },
@@ -196,12 +199,14 @@ export const newListSlice = createSlice({
         state.status = "loading",
         state.success = null,
         state.message = "",
+        state.code = null,
         state.list = null
       })
       .addCase(createList.fulfilled, (state, action) => {
         state.status = "fulfilled",
         state.success = action.payload.success,
         state.message = action.payload.message,
+        state.code = action.payload.code,
         state.list = action.payload.list
       })
   }

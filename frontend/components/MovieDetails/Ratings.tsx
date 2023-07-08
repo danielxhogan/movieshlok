@@ -67,7 +67,6 @@ export default function Ratings() {
   const [ likedClass, setLikedClass ] = useState(HIDDEN);
   const [ unlikedClass, setUnlikedClass ] = useState(SHOWN);
 
-
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
 
@@ -86,6 +85,14 @@ export default function Ratings() {
         localStorage.removeItem("jwt_token");
         localStorage.removeItem("username");
 
+        toast({
+          title: "You need to log in again",
+          description: "",
+          status: "error",
+          duration: 3000,
+          isClosable: true
+        });
+
       } else if (ratingLike.data) {
         setRating(ratingLike.data.rating);
         if (ratingLike.data.liked) {
@@ -93,7 +100,7 @@ export default function Ratings() {
         }
       }
     }
-  }, [dispatch, ratingLike, router, setLikeTrue]);
+  }, [ratingLike, dispatch, router, setLikeTrue, toast]);
 
 
   function updateRating(newRating: Rating) {
@@ -326,10 +333,8 @@ export default function Ratings() {
         movieDetails.data.title &&
         movieDetails.data.poster_path
     ) {
-      let newListItem: NewListItem;
-
       if (!watchlist && list_id) {
-        newListItem = {
+        const newListItem: NewListItem = {
           jwt_token: credentials.jwt_token,
           list_id,
           list_name,
@@ -352,7 +357,7 @@ export default function Ratings() {
         }
 
         if (watchlist_id) {
-          newListItem = {
+          const newListItem: NewListItem = {
             jwt_token: credentials.jwt_token,
             list_id: watchlist_id,
             list_name,
@@ -395,7 +400,23 @@ export default function Ratings() {
         isClosable: true
       });
 
+
+    } else if (newListItem.status === "fulfilled" &&
+      newListItem.code === 401
+    ) {
+      toast({
+        title: "You need to log in again",
+        description: "",
+        status: "error",
+        duration: 3000,
+        isClosable: true
+      });
+
       dispatch(resetNewListItem());
+      dispatch(unsetCredentials());
+      localStorage.removeItem("jwt_token");
+      localStorage.removeItem("username");
+
     }
   }, [newListItem, movieDetails.data.title, toast, dispatch]);
 
@@ -424,8 +445,24 @@ export default function Ratings() {
       setNewListTitle("");
       dispatch(addNewList({ newList: newList.list }));
       dispatch(resetNewList());
+
+    } else if (newList.status === "fulfilled" &&
+        newList.code === 401
+    ) {
+      toast({
+        title: "You need to log in again",
+        description: "",
+        status: "error",
+        duration: 3000,
+        isClosable: true
+      });
+
+      dispatch(resetNewList());
+      dispatch(unsetCredentials());
+      localStorage.removeItem("jwt_token");
+      localStorage.removeItem("username");
     }
-  }, [newList, dispatch]);
+  }, [newList, dispatch, toast]);
 
   // JSX
   // ***********************************************************************************

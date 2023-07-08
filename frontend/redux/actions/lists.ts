@@ -72,6 +72,7 @@ export interface NewList {
 interface CreateListPayload {
   success: boolean;
   message: string;
+  code: number;
   list: List | null;
 }
 
@@ -255,6 +256,7 @@ export const createList = createAsyncThunk(
       return {
         success: true,
         message: "ok",
+        code: response.status,
         list: data
       }
 
@@ -262,6 +264,7 @@ export const createList = createAsyncThunk(
       return {
         success: false,
         message: "server error",
+        code: response.status,
         list: null
       }
 
@@ -270,6 +273,7 @@ export const createList = createAsyncThunk(
       return {
         success: false,
         message: data.message,
+        code: response.status,
         list: null
       }
     }
