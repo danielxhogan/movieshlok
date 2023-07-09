@@ -1,7 +1,9 @@
 import styles from "@/styles/MovieDetails/Reviews.module.css";
 import Stars from "@/components/Stars";
 import Pagination, { UseCases } from "../Pagination";
-import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "@/redux/hooks";
 import { selectCredentials, unsetCredentials } from "@/redux/reducers/auth";
 import { Review } from "@/redux/actions/reviews";
 import {
@@ -23,7 +25,7 @@ const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeC
 
 export default function Reviews() {
   const router = useRouter();
-  const dispatch = useAppDispatch();
+  const dispatch = useDispatch();
   const credentials = useAppSelector(selectCredentials);
   const reviews = useAppSelector(selectReveiws);
   const newReview = useAppSelector(selectNewReview);
@@ -72,7 +74,7 @@ export default function Reviews() {
         created_at
       }
 
-      dispatch(addNewReview({ newReview: insertingNewReview }));
+      dispatch<any>(addNewReview({ newReview: insertingNewReview }));
     }
 
   }, [dispatch]);
@@ -307,6 +309,7 @@ export default function Reviews() {
     { reviews.status === "loading"
     ?
       <div className="spinner">
+        {/* @ts-ignore */}
         <Spinner size='xl' />
       </div>
     :

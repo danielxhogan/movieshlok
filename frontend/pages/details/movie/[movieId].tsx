@@ -6,7 +6,8 @@ import Ratings from "@/components/MovieDetails/Ratings";
 import Reviews from "@/components/MovieDetails/Reviews";
 import Footer from "@/components/Footer";
 
-import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "@/redux/hooks";
 import { getMovieDetails } from "@/redux/actions/tmdb";
 import { getReviews, getRatingLike, UserMovie, GetReviewsRequest } from "@/redux/actions/reviews";
 import { getLists, GetListsRequest } from "@/redux/actions/lists";
@@ -27,7 +28,8 @@ const TMDB_IMAGE_URL = publicRuntimeConfig.TMDB_IMAGE_URL;
 
 
 export default function MovieDetailsPage() {
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
+  const dispatch = useDispatch();
   const credentials = useAppSelector(selectCredentials);
   const movieDetails = useAppSelector(selectMovieDetails);
   const router = useRouter();
@@ -41,8 +43,8 @@ export default function MovieDetailsPage() {
         page: 1
       };
 
-      dispatch(getMovieDetails(router.query.movieId));
-      dispatch(getReviews(getReviewsRequest));
+      dispatch<any>(getMovieDetails(router.query.movieId));
+      dispatch<any>(getReviews(getReviewsRequest));
     }
   }, [dispatch, router.query]);
 
@@ -61,8 +63,8 @@ export default function MovieDetailsPage() {
         username: credentials.username
       }
 
-      dispatch(getRatingLike(userMovie));
-      dispatch(getLists(getListsRequest));
+      dispatch<any>(getRatingLike(userMovie));
+      dispatch<any>(getLists(getListsRequest));
     }
   })
 
@@ -100,6 +102,7 @@ export default function MovieDetailsPage() {
         </div>
       </> : <>
         <div className="spinner">
+          {/* @ts-ignore */}
           <Spinner size='xl' />
         </div>
       </>}

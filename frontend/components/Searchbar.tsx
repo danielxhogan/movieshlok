@@ -8,10 +8,11 @@ import { useRouter } from 'next/router';
 import { InputGroup, InputLeftElement, Input } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
 
-export interface SearchbarProps {
-  filter?: FilterResults;
-  setParentSeachQuery?: Function;
-  size?: string;
+import { NavbarProps } from "@/components/Navbar";
+
+interface SearchbarProps {
+  navbarProps: NavbarProps,
+  size: string;
 }
 
 export default function Searchbar(props: SearchbarProps) {
@@ -38,8 +39,8 @@ export default function Searchbar(props: SearchbarProps) {
 
   function onChangeSearchQuery(value: string) {
     setSearchQuery(value);
-    if (props.setParentSeachQuery !== undefined) {
-      props.setParentSeachQuery(value);
+    if (props.navbarProps.setParentSeachQuery !== undefined) {
+      props.navbarProps.setParentSeachQuery(value);
     }
   }
 
@@ -47,7 +48,7 @@ export default function Searchbar(props: SearchbarProps) {
     e.preventDefault();
 
     let defaultFilter: FilterResults;
-    if (props.filter !== undefined) { defaultFilter = props.filter; }
+    if (props.navbarProps.filter !== undefined) { defaultFilter = props.navbarProps.filter; }
     else { defaultFilter = FilterResults.ALL; }
 
     if (searchQuery !== "") {
@@ -60,11 +61,13 @@ export default function Searchbar(props: SearchbarProps) {
       onSubmit={onSubmitSearchForm}
       className={`${styles["wrapper"]} ${styles[props.size]}`}
       >
+      {/* @ts-ignore */}
       <InputGroup>
         <InputLeftElement
           pointerEvents='none'
-          children={<SearchIcon color='gray.500' />}
-        />
+        >
+          <SearchIcon color="gray.500" />
+        </ InputLeftElement>
         <Input
           type="text"
           variant="filled"

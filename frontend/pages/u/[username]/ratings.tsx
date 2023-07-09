@@ -4,7 +4,8 @@ import ProfileNav from "@/components/ProfileNav";
 import Stars from "@/components/Stars";
 import Footer from "@/components/Footer";
 
-import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "@/redux/hooks";
 import { getRatings, GetRatingsRequest, RatingReview } from "@/redux/actions/reviews";
 import { selectRatings } from "@/redux/reducers/reviews";
 
@@ -20,7 +21,7 @@ const TMDB_IMAGE_URL = publicRuntimeConfig.TMDB_IMAGE_URL;
 
 export default function ReviewsPage() {
   const router = useRouter();
-  const dispatch = useAppDispatch();
+  const dispatch = useDispatch();
   const ratings = useAppSelector(selectRatings);
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export default function ReviewsPage() {
         page: 1
       }
 
-      dispatch(getRatings(getRatingsRequest));
+      dispatch<any>(getRatings(getRatingsRequest));
     }
   }, [dispatch, router.query.username]);
 
@@ -187,6 +188,7 @@ export default function ReviewsPage() {
         }
       </> : <>
         <div className="spinner">
+          {/* @ts-ignore */}
           <Spinner size='xl' />
         </div>
       </>

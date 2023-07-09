@@ -3,7 +3,8 @@ import Navbar from "@/components/Navbar";
 import ProfileNav from "@/components/ProfileNav";
 import Footer from "@/components/Footer";
 
-import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "@/redux/hooks";
 import { unsetCredentials } from "@/redux/reducers/auth";
 import { selectCredentials } from "@/redux/reducers/auth";
 import { getLists, createList, List, GetListsRequest, NewList } from "@/redux/actions/lists";
@@ -16,7 +17,7 @@ import { FormControl, FormLabel, Input, useToast, Spinner } from "@chakra-ui/rea
 
 export default function ListsPage() {
   const router = useRouter();
-  const dispatch = useAppDispatch();
+  const dispatch = useDispatch();
   const credentials = useAppSelector(selectCredentials);
   const lists = useAppSelector(selectLists);
   const newList = useAppSelector(selectNewList);
@@ -31,7 +32,7 @@ export default function ListsPage() {
         username: router.query.username
       }
 
-      dispatch(getLists(getListsRequest));
+      dispatch<any>(getLists(getListsRequest));
     }
   }, [dispatch, router.query.username]);
 
@@ -44,7 +45,7 @@ export default function ListsPage() {
         name: newListTitle
       }
 
-      dispatch(createList(newList));
+      dispatch<any>(createList(newList));
     }
   }
 
@@ -98,10 +99,11 @@ export default function ListsPage() {
 
     { credentials.jwt_token && credentials.username === router.query.username &&
       <form onSubmit={onSubmitNewList} className={styles["new-list-form"]}>
+        {/* @ts-ignore */}
         <FormControl>
           <FormLabel>
-          <i className="fa-solid fa-plus"></i>
-          <i> Add list</i>
+            <i className="fa-solid fa-plus"></i>
+            <i> Add list</i>
           </FormLabel>
           <Input
             type="text"

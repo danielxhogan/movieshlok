@@ -1,7 +1,9 @@
 import styles from "@/styles/components/Navbar.module.css";
 import logo from "@/public/logo.png";
 import Searchbar, { SearchbarProps } from "@/components/Searchbar";
-import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "@/redux/hooks";
 import { setCredentials, unsetCredentials, selectCredentials, Credentials } from "@/redux/reducers/auth";
 
 import { useRouter } from "next/router";
@@ -19,12 +21,17 @@ import {
   MenuDivider,
 } from '@chakra-ui/react'
 
-export default function Navbar(props: SearchbarProps) {
-  const router = useRouter();
-  const [ authenticated, setAuthenticated ] = useState(false);
+export interface NavbarProps {
+  filter?: FilterResults;
+  setParentSeachQuery?: Function;
+}
 
-  const dispatch = useAppDispatch();
+export default function Navbar(props: NavbarProps) {
+  const router = useRouter();
+  const dispatch = useDispatch();
   const credentials = useAppSelector(selectCredentials);
+
+  const [ authenticated, setAuthenticated ] = useState(false);
 
 
   // set current location in localStorage unless on login or register page
@@ -37,18 +44,20 @@ export default function Navbar(props: SearchbarProps) {
     }
   }, [router.asPath]);
 
-  async function setCreds(newCredentials: Credentials) {
-    await dispatch(setCredentials(newCredentials));
-  }
 
   useEffect(() => {
     const jwt_token = localStorage.getItem("jwt_token");
     const username = localStorage.getItem("username");
 
     if (jwt_token !== "undefined" && username !== "undefined") {
+
+      async function setCreds(newCredentials: Credentials) {
+        await dispatch(setCredentials(newCredentials));
+      }
+
       setCreds({ jwt_token, username });
     }
-  }, [])
+  }, [dispatch])
 
   useEffect(() => {
     if (credentials.jwt_token !== null) {
@@ -113,6 +122,7 @@ export default function Navbar(props: SearchbarProps) {
           <Menu>
 
             {/* authenticated */}
+            {/* @ts-ignore */}
             <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
               { credentials.username }
             </MenuButton>

@@ -5,7 +5,7 @@ import { FilterResults } from "@/pages/search";
 import { useRouter } from "next/router";
 
 // imports for REVIEWS use case
-import { useAppDispatch } from "@/redux/hooks";
+import { useDispatch } from "react-redux";
 import { getReviews, GetReviewsRequest } from "@/redux/actions/reviews";
 
 export enum UseCases {
@@ -32,7 +32,7 @@ type Props = SearchResultsData | ReviewsData;
 
 export default function Pagination(props: Props) {
   const router = useRouter();
-  const dispatch = useAppDispatch();
+  const dispatch = useDispatch();
 
   function searchResultsOnClick(page: number) {
     if (props.useCase === UseCases.SEARCH_RESULTS) {
@@ -47,7 +47,7 @@ export default function Pagination(props: Props) {
       movie_id: props.movieId
     };
 
-    dispatch(getReviews(getReviewsRequest));
+    dispatch<any>(getReviews(getReviewsRequest));
     }
   }
 

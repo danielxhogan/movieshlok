@@ -4,7 +4,8 @@ import ProfileNav from "@/components/ProfileNav";
 import ListItemCard from "@/components/ListItemCard";
 import Footer from "@/components/Footer";
 
-import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "@/redux/hooks";
 import { getWatchlist, GetWatchlistRequest, ListItem } from "@/redux/actions/lists";
 import { selectWatchlist } from "@/redux/reducers/lists";
 
@@ -14,7 +15,7 @@ import { Spinner } from "@chakra-ui/react";
 
 export default function WatchlistPage() {
   const router = useRouter();
-  const dispatch = useAppDispatch();
+  const dispatch = useDispatch();
   const watchlist = useAppSelector(selectWatchlist);
 
   useEffect(() => {
@@ -24,7 +25,7 @@ export default function WatchlistPage() {
         page: 1
       };
 
-      dispatch(getWatchlist(watchlistRequest));
+      dispatch<any>(getWatchlist(watchlistRequest));
     }
   }, [dispatch, router.query.username])
 
@@ -50,6 +51,7 @@ export default function WatchlistPage() {
         }
       </span> : <>
         <div className="spinner">
+          {/* @ts-ignore */}
           <Spinner size='xl' />
         </div>
       </>

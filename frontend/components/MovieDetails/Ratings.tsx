@@ -216,6 +216,7 @@ export default function Ratings() {
     switch (type) {
       case ModalType.Review:
         return <>
+          {/* @ts-ignore */}
           <ModalContent className={styles["modal"]}>
             <ModalHeader>{ makeReviewModalHeader() }</ModalHeader>
             <ModalCloseButton />

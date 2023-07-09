@@ -4,7 +4,8 @@ import ProfileNav from "@/components/ProfileNav";
 import Stars from "@/components/Stars";
 import Footer from "@/components/Footer";
 
-import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "@/redux/hooks";
 import { selectCredentials, unsetCredentials } from "@/redux/reducers/auth";
 import { getMovieDetails } from "@/redux/actions/tmdb";
 import { selectMovieDetails } from "@/redux/reducers/tmdb";
@@ -63,7 +64,7 @@ enum ModalType {
 
 export default function ReviewDetailsPage() {
   const router = useRouter();
-  const dispatch = useAppDispatch();
+  const dispatch = useDispatch();
   const credentials = useAppSelector(selectCredentials);
   const movieDetails = useAppSelector(selectMovieDetails);
   const reviewDetails = useAppSelector(selectReviewDetails);
@@ -82,7 +83,7 @@ export default function ReviewDetailsPage() {
 
   useEffect(() => {
     if (typeof router.query.movieId === "string") {
-      dispatch(getMovieDetails(router.query.movieId));
+      dispatch<any>(getMovieDetails(router.query.movieId));
     }
     if (typeof router.query.id === "string") {
       const getReviewRequest: GetReviewRequest = {
@@ -90,7 +91,7 @@ export default function ReviewDetailsPage() {
         page: 1
       };
 
-      dispatch(getReviewDetails(getReviewRequest));
+      dispatch<any>(getReviewDetails(getReviewRequest));
 
     }
   }, [dispatch, router.query]);
@@ -377,7 +378,7 @@ export default function ReviewDetailsPage() {
         comment: commentText
       }
 
-      dispatch(postComment(newComment));
+      dispatch<any>(postComment(newComment));
     }
   }
 
@@ -401,6 +402,7 @@ export default function ReviewDetailsPage() {
     switch (type) {
       case ModalType.DELETE_REVIEW:
         return <>
+          {/* @ts-ignore */}
           <ModalContent className={styles["modal"]}>
             <ModalHeader>Delete Review</ModalHeader>
             <ModalCloseButton />
@@ -465,7 +467,7 @@ export default function ReviewDetailsPage() {
         movie_id: router.query.movieId,
       }
 
-      dispatch(deleteReview(deleteRequest));
+      dispatch<any>(deleteReview(deleteRequest));
     }
   }
   
@@ -489,7 +491,7 @@ export default function ReviewDetailsPage() {
         comment_id: deletingCommentId
       }
 
-      dispatch(deleteComment(deleteRequest));
+      dispatch<any>(deleteComment(deleteRequest));
     }
   }
 

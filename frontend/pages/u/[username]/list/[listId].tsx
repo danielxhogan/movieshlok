@@ -4,7 +4,8 @@ import ProfileNav from "@/components/ProfileNav";
 import ListItemCard from "@/components/ListItemCard";
 import Footer from "@/components/Footer";
 
-import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "@/redux/hooks";
 import { getListItems, GetListItemsRequest } from "@/redux/actions/lists";
 import { selectListItems } from "@/redux/reducers/lists";
 
@@ -14,7 +15,7 @@ import { Spinner } from "@chakra-ui/react";
 
 export default function ListPage() {
   const router = useRouter();
-  const dispatch = useAppDispatch();
+  const dispatch = useDispatch();
   const listItems = useAppSelector(selectListItems);
 
   useEffect(() => {
@@ -24,7 +25,7 @@ export default function ListPage() {
         page: 1
       };
 
-      dispatch(getListItems(listItemsRequest));
+      dispatch<any>(getListItems(listItemsRequest));
     }
   }, [dispatch, router.query.listId]);
 
@@ -50,6 +51,7 @@ export default function ListPage() {
         }
       </div> : <>
         <div className="spinner">
+          {/* @ts-ignore */}
           <Spinner size='xl' />
         </div>
       </>

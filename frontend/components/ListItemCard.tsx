@@ -12,7 +12,6 @@ type Props = {
   listItem: ListItem;
 }
 
-
 export default function ListItemCard(props: Props) {
   return <div className={styles["wrapper"]}>
     <Link href={`/details/movie/${props.listItem.movie_id}`}>

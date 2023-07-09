@@ -73,7 +73,7 @@ interface NewCommentPayload {
 // DELETE REVIEW
 // **************
 // type passed in to deleteReview action
-interface DeleteReviewRequest {
+export interface DeleteReviewRequest {
   jwt_token: string;
   review_id: string;
   movie_id: string;
