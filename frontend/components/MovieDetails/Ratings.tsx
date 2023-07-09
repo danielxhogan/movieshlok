@@ -1,6 +1,8 @@
 import styles from "@/styles/MovieDetails/Ratings.module.css";
 import Stars, { Rating } from "@/components/Stars";
-import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "@/redux/hooks";
 import { selectCredentials, unsetCredentials } from "@/redux/reducers/auth";
 import { selectMovieDetails } from "@/redux/reducers/tmdb";
 import { selectRatingLike, unsetRatingLike } from "@/redux/reducers/reviews";
@@ -49,7 +51,7 @@ enum ModalType {
 
 export default function Ratings() {
   const router = useRouter();
-  const dispatch = useAppDispatch();
+  const dispatch = useDispatch();
   const credentials = useAppSelector(selectCredentials);
   const movieDetails = useAppSelector(selectMovieDetails);
   const ratingLike = useAppSelector(selectRatingLike);
@@ -322,7 +324,7 @@ export default function Ratings() {
         liked
       };
 
-      dispatch(postReview(newReview));
+      dispatch<any>(postReview(newReview));
     }
   }
 
@@ -345,7 +347,7 @@ export default function Ratings() {
           watchlist: false
         };
 
-        dispatch(createListItem(newListItem));
+        dispatch<any>(createListItem(newListItem));
 
       } else if (watchlist && lists.lists) {
         let watchlist_id: string | null = null;
@@ -368,7 +370,7 @@ export default function Ratings() {
             watchlist: false
           };
 
-          dispatch(createListItem(newListItem));
+          dispatch<any>(createListItem(newListItem));
         }
       }
     }
@@ -433,7 +435,7 @@ export default function Ratings() {
         name: newListTitle
       }
 
-      dispatch(createList(newList));
+      dispatch<any>(createList(newList));
     }
   }
 

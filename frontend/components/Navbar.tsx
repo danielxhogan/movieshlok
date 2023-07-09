@@ -1,6 +1,7 @@
 import styles from "@/styles/components/Navbar.module.css";
 import logo from "@/public/logo.png";
-import Searchbar, { SearchbarProps } from "@/components/Searchbar";
+import Searchbar from "@/components/Searchbar";
+import { FilterResults } from "@/pages/search";
 
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/hooks";
@@ -50,12 +51,7 @@ export default function Navbar(props: NavbarProps) {
     const username = localStorage.getItem("username");
 
     if (jwt_token !== "undefined" && username !== "undefined") {
-
-      async function setCreds(newCredentials: Credentials) {
-        await dispatch(setCredentials(newCredentials));
-      }
-
-      setCreds({ jwt_token, username });
+      dispatch(setCredentials({ jwt_token, username }));
     }
   }, [dispatch])
 
@@ -103,9 +99,8 @@ export default function Navbar(props: NavbarProps) {
       </div>
 
       <Searchbar
+        navbarProps={props}
         size={"lg"}
-        filter={props.filter}
-        setParentSeachQuery={props.setParentSeachQuery}
       />
 
       <div className={styles["dropdown"]}>
@@ -187,9 +182,8 @@ export default function Navbar(props: NavbarProps) {
       </div>
 
       <Searchbar
+        navbarProps={props}
         size={"sm"}
-        filter={props.filter}
-        setParentSeachQuery={props.setParentSeachQuery}
       />
     </div>
   </>

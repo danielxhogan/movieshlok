@@ -23,7 +23,6 @@ interface Props {
   size: string;
 }
 
-
 export default function Stars(props: Props) {
   const [ currentRating, setCurrentRating ] = useState(props.initialRating);
   const [ newRating, setNewRating ] = useState(currentRating);

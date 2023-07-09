@@ -92,17 +92,11 @@ export default function ReviewDetailsPage() {
       };
 
       dispatch<any>(getReviewDetails(getReviewRequest));
-
     }
   }, [dispatch, router.query]);
 
-  // SETUP WEBSOCKETS
+  // WEBSOCKET ON MESSAGE
   // ********************************************************************
-  // this is the onmessage functions assigned to the websocket object.
-  // It takes a string from the server with all the relevant data for
-  // creating a new Review type object, parses the data out of the string,
-  // and inserts it into the array of Reviews stored in the redux store by
-  // passing it into the addNewReveiw redux action.
   const onNewComment = useCallback((newComment: string) => {
     console.log("new Comment");
     let id: string | null = null;
@@ -139,11 +133,9 @@ export default function ReviewDetailsPage() {
     }
   }, [dispatch]);
 
-  // this useEffect is for handling connection and disconnection process for websockets
+  // WEBSOCKET SETUP
+  // *************************************************************
   useEffect(() => {
-    // this function is called on page mount, it registers users on server,
-    // establishes websocket connection and attaches the onmessage handler
-    // function when a message is recieved on the ws channel.
     async function wsSetup() {
       const registerWsUrl = `${BACKEND_URL}/register-comments-ws`;
 
@@ -196,10 +188,8 @@ export default function ReviewDetailsPage() {
 
     wsSetup();
 
-    // this useEffect return function is called when the component unmounts
-    // as in, user has navigated away from the page. It sends a request to
-    // the unregister-comments-ws endpoint with the uuid for the websocket connection
-    // created in the function above when the page first loaded.
+    // WEBSOCKET CLEANUP
+    // *************************************************************
     return (() => {
       const ws_uuid = localStorage.getItem("ws-uuid");
       if (ws_uuid) {
@@ -222,6 +212,23 @@ export default function ReviewDetailsPage() {
 
   }, [credentials.jwt_token, onNewComment, router.query.id]);
 
+  // MAKE NEW COMMENT
+  // **********************************
+  function onClickAddComment() {
+    if (commentText !== "" &&
+        credentials.jwt_token &&
+        reviewDetails.data
+      ) {
+      const newComment: NewComment = {
+        jwt_token: credentials.jwt_token,
+        review_id: reviewDetails.data?.review.id,
+        comment: commentText
+      }
+
+      dispatch<any>(postComment(newComment));
+    }
+  }
+
   // DETECT NEW COMMENT
   // *********************************************
   useEffect(() => {
@@ -231,6 +238,7 @@ export default function ReviewDetailsPage() {
         credentials.username &&
         credentials.jwt_token
     ) {
+      // ADD TO REDUX
       const insertingNewComment: Comment = {
         id: newComment.data.id,
         username: credentials.username,
@@ -242,6 +250,7 @@ export default function ReviewDetailsPage() {
       dispatch(addNewComment(insertingNewComment));
       setCommentText("");
 
+      // SEND WS MESSAGE
       const emitCommentUrl = `${BACKEND_URL}/emit-comment`;
 
       const headers = new Headers();
@@ -259,7 +268,8 @@ export default function ReviewDetailsPage() {
       fetch(request);
       dispatch(resetNewComment());
 
-    } else if (newComment.code === 401) {
+    // INVALID JWT TOKEN
+    } else if (newComment.status === "fulfilled" && newComment.code === 401) {
       toast({
         title: "You need to log in again",
         description: "",
@@ -275,6 +285,163 @@ export default function ReviewDetailsPage() {
       localStorage.removeItem("username");
     }
   }, [newComment, credentials.username, dispatch, credentials.jwt_token, toast]);
+
+  // MODAL OPEN - DELETE COMMENT OR REVIEW
+  // **********************************************
+  function onClickDeleteComment(comment: Comment) {
+    setDeletingCommentId(comment.id);
+    setDeletingCommentText(comment.comment);
+    setModalType(ModalType.DELETE_COMMENT);
+    onOpen();
+  }
+
+  function onCickDeleteReview() {
+    setModalType(ModalType.DELETE_REVIEW);
+    onOpen();
+  }
+
+  // MODAL RENDER
+  // **********************************************
+  function makeModal(type: ModalType) {
+    switch (type) {
+      case ModalType.DELETE_REVIEW:
+        return <>
+          {/* @ts-ignore */}
+          <ModalContent className={styles["modal"]}>
+            <ModalHeader>Delete Review</ModalHeader>
+            <ModalCloseButton />
+
+            <ModalBody>
+              <i>Are you sure you want to delete your review for <strong>{movieDetails.data.title}</strong></i>
+              <br /><br />
+            </ModalBody>
+
+            <ModalFooter>
+              <Button
+                className={styles["submit-review"]}
+                colorScheme="red" variant="outline"
+                mr={3}
+                onClick={dispatchDeleteReview}
+                >
+                Delete Review
+              </Button>
+            </ModalFooter>
+
+          </ModalContent>
+        </>
+      case ModalType.DELETE_COMMENT:
+        return <>
+          <ModalContent className={styles["modal"]}>
+            <ModalHeader>Delete Comment</ModalHeader>
+            <ModalCloseButton />
+
+            <ModalBody>
+              <i>Are you sure you want to delete the comment:</i>
+              <br /><br />
+              <p>{ deletingCommentText }</p>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button
+                className={styles["submit-review"]}
+                colorScheme="red" variant="outline"
+                mr={3}
+                onClick={dispatchDeleteComment}
+                >
+                Delete Comment
+              </Button>
+            </ModalFooter>
+
+          </ModalContent>
+        </>
+    }
+  }
+
+  // DELETE REVIEW
+  // *********************************
+  function dispatchDeleteReview() {
+    if (credentials.jwt_token &&
+        typeof router.query.id === "string" &&
+        typeof router.query.movieId === "string"
+    ) {
+      const deleteRequest: DeleteReviewRequest = {
+        jwt_token:credentials.jwt_token,
+        review_id: router.query.id,
+        movie_id: router.query.movieId,
+      }
+
+      dispatch<any>(deleteReview(deleteRequest));
+    }
+  }
+  
+  useEffect(() => {
+    if (deletedReview.status === "fulfilled" &&
+        deletedReview.success === true
+    ) {
+      router.back();
+      dispatch(resetDeletedReview());
+    
+    // INVALID JWT TOKEN
+    } else if (deletedReview.status === "fulfilled" &&
+        deletedReview.code === 401
+    ) {
+      toast({
+        title: "You need to log in again",
+        description: "",
+        status: "error",
+        duration: 3000,
+        isClosable: true
+      });
+
+      dispatch(resetDeletedComment());
+
+      dispatch(unsetCredentials());
+      localStorage.removeItem("jwt_token");
+      localStorage.removeItem("username");
+    }
+  }, [deletedReview, dispatch, router, toast]);
+
+  // DELETE COMMENT
+  // *********************************
+  function dispatchDeleteComment() {
+    onClose();
+
+    if (credentials.jwt_token) {
+      const deleteRequest: DeleteCommentRequest = {
+        jwt_token: credentials.jwt_token,
+        comment_id: deletingCommentId
+      }
+
+      dispatch<any>(deleteComment(deleteRequest));
+    }
+  }
+
+  useEffect(() => {
+    if (deletedComment.status === "fulfilled" &&
+        deletedComment.success === true
+    ) {
+      dispatch(removeDeletedComment({ commentId: deletingCommentId}));
+      dispatch(resetDeletedComment());
+
+    // INVALID JWT TOKEN
+    } else if (deletedComment.status === "fulfilled" &&
+        deletedComment.code === 401
+    ) {
+      toast({
+        title: "You need to log in again",
+        description: "",
+        status: "error",
+        duration: 3000,
+        isClosable: true
+      });
+
+      dispatch(resetDeletedComment());
+
+      dispatch(unsetCredentials());
+      localStorage.removeItem("jwt_token");
+      localStorage.removeItem("username");
+    }
+  }, [deletedComment, deletingCommentId, dispatch, toast]);
 
   // RENDERING FUNCTIONS
   // *********************************************************
@@ -298,14 +465,16 @@ export default function ReviewDetailsPage() {
     }
     
     return <div className={styles["title-text"]}>
-      <h1>
-        <span className={styles["title"]}>
-          { movieDetails.data.title },
-        </span>
-        <span className={styles["year"]}>
-          { year }
-        </span>
-      </h1>
+      <Link href={`/details/movie/${movieDetails.data.id}`}>
+        <h1>
+          <span className={styles["title"]}>
+            { movieDetails.data.title },
+          </span>
+          <span className={styles["year"]}>
+            { year }
+          </span>
+        </h1>
+      </Link>
       <h3>
         directed by
         <span className={styles["director"]}> {director}</span>
@@ -344,7 +513,9 @@ export default function ReviewDetailsPage() {
   function makeComment(comment: Comment, idx: number) {
     return <div className="block" key={comment.id} id={comment.id}>
       <div className={styles["comment-title"]}>
-        <h3 className={styles["username"]}><strong>{comment.username}</strong></h3>
+        <Link href={`/u/${comment.username}/profile`}>
+          <h3 className={styles["username"]}><strong>{comment.username}</strong></h3>
+        </Link>
 
         <div className={styles["comment-title-right"]}>
           <i>{ makeDate(comment.created_at) }</i>
@@ -355,7 +526,7 @@ export default function ReviewDetailsPage() {
               >
               <i
               className={`${styles["delete-comment"]} fa-solid fa-trash fa-lg`}
-              onClick={() => onClickDeleteComment(comment, idx)}
+              onClick={() => onClickDeleteComment(comment)}
               />
             </Tooltip>
           }
@@ -367,143 +538,6 @@ export default function ReviewDetailsPage() {
     </div>
   }
 
-  function onClickAddComment() {
-    if (commentText !== "" &&
-        credentials.jwt_token &&
-        reviewDetails.data
-      ) {
-      const newComment: NewComment = {
-        jwt_token: credentials.jwt_token,
-        review_id: reviewDetails.data?.review.id,
-        comment: commentText
-      }
-
-      dispatch<any>(postComment(newComment));
-    }
-  }
-
-  // MODAL OPEN
-  // **********************************************
-  function onClickDeleteComment(comment: Comment, idx: number) {
-    setDeletingCommentId(comment.id);
-    setDeletingCommentText(comment.comment);
-    setModalType(ModalType.DELETE_COMMENT);
-    onOpen();
-  }
-
-  function onCickDeleteReview() {
-    setModalType(ModalType.DELETE_REVIEW);
-    onOpen();
-  }
-
-  // MODAL RENDER
-  // **********************************************
-  function makeModal(type: ModalType) {
-    switch (type) {
-      case ModalType.DELETE_REVIEW:
-        return <>
-          {/* @ts-ignore */}
-          <ModalContent className={styles["modal"]}>
-            <ModalHeader>Delete Review</ModalHeader>
-            <ModalCloseButton />
-
-            <ModalBody>
-                  <i>Are you sure you want to delete your review for <strong>{movieDetails.data.title}</strong></i>
-                  <br /><br />
-                  <p>{ deletingCommentText }</p>
-            </ModalBody>
-
-            <ModalFooter>
-              <Button
-                className={styles["submit-review"]}
-                colorScheme="teal" variant="outline"
-                mr={3}
-                onClick={dispatchDeleteReview}
-                >
-                Delete Review
-              </Button>
-            </ModalFooter>
-
-          </ModalContent>
-        </>
-      case ModalType.DELETE_COMMENT:
-        return <>
-          <ModalContent className={styles["modal"]}>
-            <ModalHeader>Delete Comment</ModalHeader>
-            <ModalCloseButton />
-
-            <ModalBody>
-                  <i>Are you sure you want to delete the comment:</i>
-                  <br /><br />
-                  <p>{ deletingCommentText }</p>
-            </ModalBody>
-
-            <ModalFooter>
-              <Button
-                className={styles["submit-review"]}
-                colorScheme="teal" variant="outline"
-                mr={3}
-                onClick={dispatchDeleteComment}
-                >
-                Delete Comment
-              </Button>
-            </ModalFooter>
-
-          </ModalContent>
-        </>
-    }
-  }
-
-  // DELETE REVIEW
-  // *********************************
-  function dispatchDeleteReview() {
-    if (credentials.jwt_token &&
-        typeof router.query.id === "string" &&
-        typeof router.query.movieId === "string"
-    ) {
-      const deleteRequest: DeleteReviewRequest = {
-        jwt_token:credentials.jwt_token,
-        review_id: router.query.id,
-        movie_id: router.query.movieId,
-      }
-
-      dispatch<any>(deleteReview(deleteRequest));
-    }
-  }
-  
-  useEffect(() => {
-    if (deletedReview.status === "fulfilled" &&
-        deletedReview.success === true
-    ) {
-      router.back();
-      dispatch(resetDeletedReview());
-    }
-  }, [deletedReview]);
-
-  // DELETE COMMENT
-  // *********************************
-  function dispatchDeleteComment() {
-    onClose();
-
-    if (credentials.jwt_token) {
-      const deleteRequest: DeleteCommentRequest = {
-        jwt_token: credentials.jwt_token,
-        comment_id: deletingCommentId
-      }
-
-      dispatch<any>(deleteComment(deleteRequest));
-    }
-  }
-
-  useEffect(() => {
-    if (deletedComment.status === "fulfilled" &&
-        deletedComment.success === true
-    ) {
-      dispatch(removeDeletedComment({ commentId: deletingCommentId}));
-      dispatch(resetDeletedComment());
-    }
-  }, [deletedComment, deletingCommentId, dispatch]);
-
   // JSX
   // *************************************************************************
   return <div className="wrapper">
@@ -511,6 +545,7 @@ export default function ReviewDetailsPage() {
 
     <div className="content">
       <ProfileNav />
+
       { movieDetails.status === "fulfilled" ?
         <div className={styles["review-content"]}>
 
@@ -535,14 +570,14 @@ export default function ReviewDetailsPage() {
           <div className={styles["review-details"]}>
             <div className={styles["title-section"]}>
 
-            { credentials.username === router.query.username &&
-              <Tooltip label={"delete review"} placement="top">
-                <i
-                className={`${styles["delete-review"]} fa-solid fa-trash fa-lg`}
-                onClick={onCickDeleteReview}
-                />
-              </Tooltip>
-            }
+              { credentials.username === router.query.username &&
+                <Tooltip label={"delete review"} placement="top">
+                  <i
+                  className={`${styles["delete-review"]} fa-solid fa-trash fa-lg`}
+                  onClick={onCickDeleteReview}
+                  />
+                </Tooltip>
+              }
 
               <div className={styles["title-movie-poster"]}>
                 { movieDetails.data.poster_path &&
@@ -658,7 +693,7 @@ export default function ReviewDetailsPage() {
               <p>Login to leave a comment</p>
               }
             </div>
-          </div>
+          </div>  {/* end review-details */}
 
           <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
             <ModalOverlay />
@@ -666,14 +701,14 @@ export default function ReviewDetailsPage() {
             { makeModal(modalType) }
 
           </Modal>
-        </div>
+        </div>  // end review-content
       :
         <div className="spinner">
           <Spinner size='xl' />
         </div>
       }
 
-    </div>
+    </div>  {/* end content */}
     <Footer />
   </div>
 }

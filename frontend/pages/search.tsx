@@ -1,11 +1,11 @@
-/* eslint-disable react/no-children-prop */
 import styles from "@/styles/SearchPage.module.css";
 import Navbar from "@/components/Navbar";
 import Searchbar from "@/components/Searchbar";
 import Pagination, { UseCases } from "@/components/Pagination";
 import Footer from "@/components/Footer";
 
-import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "@/redux/hooks";
 import { getSearchResults, SearchParams } from "@/redux/actions/tmdb";
 import { selectSearchResults, SearchResult, KnownFor } from "@/redux/reducers/tmdb";
 
@@ -26,10 +26,9 @@ export enum FilterResults {
   CAST_AND_CREW
 }
 
-
 export default function SearchPage() {
   const router = useRouter();
-  const dispatch = useAppDispatch();
+  const dispatch = useDispatch();
   const searchResults = useAppSelector(selectSearchResults);
 
   const [ searchQuery, setSearchQuery ] = useState("");
@@ -67,7 +66,7 @@ export default function SearchPage() {
             filter: filterResults
           }
 
-          dispatch(getSearchResults(searchParams));
+          dispatch<any>(getSearchResults(searchParams));
         }
   }, [dispatch, router.query.filter, router.query.page, router.query.query]);
 
@@ -149,6 +148,7 @@ export default function SearchPage() {
 
         return (
         <Link key={movie.id} href={`/details/movie/${movie.id}`}>
+          {/* @ts-ignore */}
           <Button
             colorScheme="teal"
             size="sm"

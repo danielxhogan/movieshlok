@@ -1,14 +1,14 @@
 import styles from "@/styles/components/Searchbar.module.css";
+import { FilterResults } from "@/pages/search";
+import { NavbarProps } from "@/components/Navbar";
 import { useAppSelector } from "@/redux/hooks";
 import { selectSearchResults } from "@/redux/reducers/tmdb";
-import { FilterResults } from "@/pages/search";
 
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/router';
 import { InputGroup, InputLeftElement, Input } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
 
-import { NavbarProps } from "@/components/Navbar";
 
 interface SearchbarProps {
   navbarProps: NavbarProps,

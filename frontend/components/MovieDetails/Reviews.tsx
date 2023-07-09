@@ -12,11 +12,26 @@ import {
   addNewReview,
   resetNewReview
 } from "@/redux/reducers/reviews";
+import { selectMovieDetails } from "@/redux/reducers/tmdb";
+import { deleteReview, DeleteReviewRequest } from "@/redux/actions/review";
 
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { useEffect, useCallback } from "react";
-import { useToast, Spinner } from "@chakra-ui/react";
+import { useState, useEffect, useCallback } from "react";
+import {
+  useToast,
+  Tooltip,
+  Spinner,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalBody,
+  ModalHeader,
+  ModalCloseButton,
+  Button,
+  ModalFooter,
+} from "@chakra-ui/react";
 
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
@@ -29,8 +44,12 @@ export default function Reviews() {
   const credentials = useAppSelector(selectCredentials);
   const reviews = useAppSelector(selectReveiws);
   const newReview = useAppSelector(selectNewReview);
+  const movieDetails = useAppSelector(selectMovieDetails);
+
+  const [ deletingReviewId, setDeletingReviewId ] = useState("");
 
   const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   // this is the onmessage functions assigned to the websocket object.
   // It takes a string from the server with all the relevant data for
@@ -245,6 +264,22 @@ export default function Reviews() {
     }
   }, [newReview, credentials.jwt_token, credentials.username, dispatch, router, toast])
 
+  function onClickDeleteReview(review: Review) {
+    onOpen();
+  }
+
+  function dispatchDeleteReview() {
+    if (credentials.jwt_token && movieDetails.data && movieDetails.data.id) {
+      const deleteRequest: DeleteReviewRequest = {
+        jwt_token: credentials.jwt_token,
+        review_id: deletingReviewId,
+        movie_id: movieDetails.data.id.toString()
+      };
+
+      dispatch<any>(deleteReview(deleteRequest));
+    }
+  }
+
   function makeReview(review: Review) {
     const date = new Date(review.created_at * 1000);
     const month = date.getMonth();
@@ -265,12 +300,14 @@ export default function Reviews() {
       case 11: monthText = "December"; break;
     }
 
-    return <Link href={`/u/${review.username}/review?id=${review.id}&movieId=${review.movie_id}`} key={review.id}>
-      <div className="block block-btn">
+    // return <Link href={`/u/${review.username}/review?id=${review.id}&movieId=${review.movie_id}`} key={review.id}>
+      return <div className="block block-btn" key={review.id}>
       
         <div className={styles["review-title"]}>
           <div className={styles["username-rating"]}>
-            <h3 className={styles["username"]}>{review.username}</h3>
+            <Link href={`/u/${review.username}/profile`}>
+              <h3 className={styles["username"]}>{review.username}</h3>
+            </Link>
             <Stars
               id="reviews"
               initialRating={review.rating}
@@ -278,14 +315,30 @@ export default function Reviews() {
               interactive={false}
               size="lg"
             />
+          </div>
+          
+          <div className={styles["review-title-right"]}>
+            <i>{ `${monthText} ${date.getDate()}, ${date.getFullYear()}` }</i>
+            { credentials.username === review.username &&
+              <Tooltip
+                label={"delete review"}
+                placement="top"
+                >
+                <i
+                className={`${styles["delete-review"]} fa-solid fa-trash fa-lg`}
+                onClick={() => onClickDeleteReview(review)}
+                />
+              </Tooltip>
+            }
 
           </div>
-        <div>{ `${monthText} ${date.getDate()}, ${date.getFullYear()}` }</div>
         </div>
 
-        <p>{review.review}</p>
+        <Link href={`/u/${review.username}/review?id=${review.id}&movieId=${review.movie_id}`} key={review.id}>
+          <p>{review.review}</p>
+        </Link>
       </div>
-    </Link>
+    {/* </Link> */}
   }
 
   function sortAndMakeReviews(reviews: Review[]) {
@@ -327,6 +380,34 @@ export default function Reviews() {
           movieId={router.query.movieId}
         />
       }
+
+      
+      <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
+        <ModalOverlay />
+
+          <ModalContent className={styles["modal"]}>
+            <ModalHeader>Delete Review</ModalHeader>
+            <ModalCloseButton />
+
+            <ModalBody>
+              <i>Are you sure you want to delete your review for <strong>{movieDetails.data.title}</strong></i>
+              <br /><br />
+            </ModalBody>
+
+            <ModalFooter>
+              <Button
+                className={styles["submit-review"]}
+                colorScheme="red" variant="outline"
+                mr={3}
+                onClick={dispatchDeleteReview}
+                >
+                Delete Review
+              </Button>
+            </ModalFooter>
+
+          </ModalContent>
+
+      </Modal>
     </>
     }
   </div>
