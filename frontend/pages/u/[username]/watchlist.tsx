@@ -6,7 +6,11 @@ import Footer from "@/components/Footer";
 
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/hooks";
-import { getWatchlist, GetWatchlistRequest, ListItem } from "@/redux/actions/lists";
+import {
+  getWatchlist,
+  GetWatchlistRequest,
+  ListItem
+} from "@/redux/actions/lists";
 import { selectWatchlist } from "@/redux/reducers/lists";
 
 import { useEffect } from "react";
@@ -27,36 +31,42 @@ export default function WatchlistPage() {
 
       dispatch<any>(getWatchlist(watchlistRequest));
     }
-  }, [dispatch, router.query.username])
+  }, [dispatch, router.query.username]);
 
-  return <div className="wrapper">
-    <Navbar />
+  return (
+    <div className="wrapper">
+      <Navbar />
 
-    <div className="content">
-      <ProfileNav />
+      <div className="content">
+        <ProfileNav />
 
-      <h1 className="page-title">
-        <span className="username">{ router.query.username }&apos;s</span> Watchlist
-      </h1>
+        <h1 className="page-title">
+          <span className="username">{router.query.username}&apos;s</span>{" "}
+          Watchlist
+        </h1>
 
-      { watchlist.status === "fulfilled" ?
-      <span className="list-item-cards">
-        { watchlist.list_items &&
-          watchlist.list_items.map(listItem => {
-            return <ListItemCard listItem={listItem} key={listItem.id} />
-          })
-        }
-        { watchlist.list_items && watchlist.list_items.length === 0 &&
-          <div className={styles["no-movies"]}>No movies in this watchlist yet</div>
-        }
-      </span> : <>
-        <div className="spinner">
-          {/* @ts-ignore */}
-          <Spinner size='xl' />
-        </div>
-      </>
-      }
+        {watchlist.status === "fulfilled" ? (
+          <span className="list-item-cards">
+            {watchlist.list_items &&
+              watchlist.list_items.map(listItem => {
+                return <ListItemCard listItem={listItem} key={listItem.id} />;
+              })}
+            {watchlist.list_items && watchlist.list_items.length === 0 && (
+              <div className={styles["no-movies"]}>
+                No movies in this watchlist yet
+              </div>
+            )}
+          </span>
+        ) : (
+          <>
+            <div className="spinner">
+              {/* @ts-ignore */}
+              <Spinner size="xl" />
+            </div>
+          </>
+        )}
+      </div>
+      <Footer />
     </div>
-    <Footer />
-  </div>
+  );
 }

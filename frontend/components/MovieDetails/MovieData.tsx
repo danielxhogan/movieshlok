@@ -27,6 +27,7 @@ export default function MovieContent() {
     const day = date.substring(8, 10);
     let monthText;
 
+    // prettier-ignore
     switch (month) {
       case "01": monthText = "January"; break;
       case "02": monthText = "February"; break;
@@ -45,20 +46,30 @@ export default function MovieContent() {
     return `${monthText} ${day}, ${year}`;
   }
 
-  const date = movieDetails.data.release_date ? reformatDate(movieDetails.data.release_date) : movieDetails.data.release_date;
+  const date = movieDetails.data.release_date
+    ? reformatDate(movieDetails.data.release_date)
+    : movieDetails.data.release_date;
 
-  function makeCastCrew(castCrewMembers: [CastCrewMember], castCrewType: CastCrewType) {
+  function makeCastCrew(
+    castCrewMembers: [CastCrewMember],
+    castCrewType: CastCrewType
+  ) {
     let buttons = [];
 
-    for (let i=0; i<20; i++) {
-      if (castCrewMembers[i] === undefined) { break; }
+    for (let i = 0; i < 20; i++) {
+      if (castCrewMembers[i] === undefined) {
+        break;
+      }
       buttons.push(makeCastCrewButton(castCrewMembers[i], castCrewType));
     }
 
     return buttons;
   }
 
-  function makeCastCrewButton(castCrewMember: CastCrewMember, castCrewType: CastCrewType) {
+  function makeCastCrewButton(
+    castCrewMember: CastCrewMember,
+    castCrewType: CastCrewType
+  ) {
     let role = "";
 
     switch (castCrewType) {
@@ -72,55 +83,63 @@ export default function MovieContent() {
         if (castCrewMember.job) {
           role = castCrewMember.job;
         }
-
     }
-    return <span key={castCrewMember.credit_id}>
-      <Tooltip label={role} placement="top">
-        <Button
-          colorScheme='teal' variant='outline'
-          className={styles["cast-crew-button"]}
-          // onClick={onOpen}
+    return (
+      <span key={castCrewMember.credit_id}>
+        {/* @ts-ignore */}
+        <Tooltip label={role} placement="top">
+          <Button
+            colorScheme="teal"
+            variant="outline"
+            className={styles["cast-crew-button"]}
+            // onClick={onOpen}
           >
-          { castCrewMember && castCrewMember.name }
-        </Button>
-
-      </Tooltip>
-    </span>
+            {castCrewMember && castCrewMember.name}
+          </Button>
+        </Tooltip>
+      </span>
+    );
   }
 
+  return (
+    <div className={`${styles["wrapper"]} block`}>
+      {movieDetails.data.tagline && (
+        <p className={styles["tagline"]}>
+          &quot;{movieDetails.data.tagline}&quot;
+        </p>
+      )}
 
-  return <div className={`${styles["wrapper"]} block`}>
+      <br />
+      <Divider />
+      <br />
 
-    { movieDetails.data.tagline &&
-      <p className={styles["tagline"]}>&quot;{ movieDetails.data.tagline }&quot;</p>
-    }
+      {movieDetails.data.overview && (
+        <p className={styles["overview"]}>{movieDetails.data.overview}</p>
+      )}
+      <span>
+        Released on <strong>{date}</strong>
+      </span>
+      <br />
+      <br />
 
-    <br />
-    <Divider />
-    <br />
-
-    { movieDetails.data.overview &&
-      <p className={styles["overview"]}>{ movieDetails.data.overview }</p>
-    }
-    <span>Released on <strong>{ date }</strong></span>
-    <br /><br />
-
-    <Tabs variant='enclosed'>
-      <TabList className={styles["tab-list"]}>
-        <Tab>Cast</Tab>
-        <Tab>Crew</Tab>
-      </TabList>
-      <TabPanels>
-        <TabPanel>
-          { movieDetails.data.credits && movieDetails.data.credits.cast &&
-            makeCastCrew(movieDetails.data.credits.cast, CastCrewType.CAST) }
-        </TabPanel>
-        <TabPanel>
-          { movieDetails.data.credits && movieDetails.data.credits.crew &&
-            makeCastCrew(movieDetails.data.credits.crew, CastCrewType.CREW) }
-        </TabPanel>
-      </TabPanels>
-    </Tabs>
-
-  </div>
+      <Tabs variant="enclosed">
+        <TabList className={styles["tab-list"]}>
+          <Tab>Cast</Tab>
+          <Tab>Crew</Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            {movieDetails.data.credits &&
+              movieDetails.data.credits.cast &&
+              makeCastCrew(movieDetails.data.credits.cast, CastCrewType.CAST)}
+          </TabPanel>
+          <TabPanel>
+            {movieDetails.data.credits &&
+              movieDetails.data.credits.crew &&
+              makeCastCrew(movieDetails.data.credits.crew, CastCrewType.CREW)}
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </div>
+  );
 }

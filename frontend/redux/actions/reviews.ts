@@ -36,7 +36,7 @@ interface ReviewsResultsPayload {
   page: number;
   total_pages: number | null;
   data: {
-    reviews?: [Review]
+    reviews?: [Review];
   };
 }
 
@@ -65,8 +65,8 @@ interface RatingLikePayload {
 // GET ALL RATINGS FOR A USER
 // ***************************
 export interface GetRatingsRequest {
-  username: string,
-  page: number
+  username: string;
+  page: number;
 }
 
 export interface RatingReview {
@@ -75,6 +75,7 @@ export interface RatingReview {
   poster_path: string;
   rating: number;
   liked: boolean;
+  rating_id: string | null;
   review_id: string | null;
   timestamp: number;
 }
@@ -84,7 +85,7 @@ interface GetRatingsPayload {
   message: string;
   page: number;
   total_pages: number | null;
-  ratings: RatingReview[] | null
+  ratings: RatingReview[] | null;
 }
 
 // CREATE A NEW REVIEW IN THE DATABASE TYPES
@@ -115,13 +116,13 @@ interface NewReviewPayload {
   success: boolean;
   code: number;
   message: string;
-  data: ReturnedNewReview | null
+  data: ReturnedNewReview | null;
 }
 
 // DELETE RATING
 // ***************
 // type passed in to deleteRating action
-interface DeleteRatingRequest {
+export interface DeleteRatingRequest {
   jwt_token: string;
   rating_id: string;
 }
@@ -151,7 +152,9 @@ interface DeleteRatingPayload {
 // ****************************
 export const getReviews = createAsyncThunk(
   "reviews/fetchReviews",
-  async (getReviewsRequest: GetReviewsRequest): Promise<ReviewsResultsPayload> => {
+  async (
+    getReviewsRequest: GetReviewsRequest
+  ): Promise<ReviewsResultsPayload> => {
     const limit = 10;
     const offset = (getReviewsRequest.page - 1) * limit;
 
@@ -165,7 +168,12 @@ export const getReviews = createAsyncThunk(
     params.append("offset", offset.toString());
     params.append("limit", limit.toString());
 
-    const request = new Request(getReviewsUrl, { headers, body: params, method: "POST" });
+    const request = new Request(getReviewsUrl, {
+      headers,
+      body: params,
+      method: "POST"
+    });
+
     const response = await fetch(request);
 
     if (response.ok) {
@@ -179,7 +187,6 @@ export const getReviews = createAsyncThunk(
         total_pages,
         data: { reviews: data.reviews }
       };
-
     } else if (response.status >= 500) {
       return {
         success: false,
@@ -188,7 +195,6 @@ export const getReviews = createAsyncThunk(
         total_pages: null,
         data: {}
       };
-
     } else {
       const data = await response.json();
       return {
@@ -216,7 +222,12 @@ export const getRatingLike = createAsyncThunk(
     params.append("jwt_token", userMovie.jwt_token);
     params.append("movie_id", userMovie.movie_id);
 
-    const request = new Request(ratingLikeUrl, { headers, body:params, method: "POST" });
+    const request = new Request(ratingLikeUrl, {
+      headers,
+      body: params,
+      method: "POST"
+    });
+
     const response = await fetch(request);
 
     if (response.ok) {
@@ -227,7 +238,6 @@ export const getRatingLike = createAsyncThunk(
         code: response.status,
         data
       };
-
     } else if (response.status >= 500) {
       return {
         success: false,
@@ -235,7 +245,6 @@ export const getRatingLike = createAsyncThunk(
         code: response.status,
         data: null
       };
-
     } else {
       const data = await response.json();
       return {
@@ -252,7 +261,7 @@ export const getRatingLike = createAsyncThunk(
 // ***************************
 export const getRatings = createAsyncThunk(
   "ratings/getRatings",
-  async(getRatingsRequest: GetRatingsRequest): Promise<GetRatingsPayload> => {
+  async (getRatingsRequest: GetRatingsRequest): Promise<GetRatingsPayload> => {
     console.log(getRatingsRequest.username);
     const limit = 10;
     const offset = (getRatingsRequest.page - 1) * limit;
@@ -267,7 +276,12 @@ export const getRatings = createAsyncThunk(
     params.append("limit", limit.toString());
     params.append("offset", offset.toString());
 
-    const request = new Request(getRatingsUrl, { headers, body: params, method: "POST" });
+    const request = new Request(getRatingsUrl, {
+      headers,
+      body: params,
+      method: "POST"
+    });
+
     const response = await fetch(request);
 
     if (response.ok) {
@@ -278,8 +292,7 @@ export const getRatings = createAsyncThunk(
         page: getRatingsRequest.page,
         total_pages: data.total_pages,
         ratings: data.ratings
-      }
-
+      };
     } else if (response.status >= 500) {
       return {
         success: false,
@@ -287,8 +300,7 @@ export const getRatings = createAsyncThunk(
         page: getRatingsRequest.page,
         total_pages: null,
         ratings: null
-      }
-
+      };
     } else {
       const data = await response.json();
       return {
@@ -297,8 +309,7 @@ export const getRatings = createAsyncThunk(
         page: getRatingsRequest.page,
         total_pages: null,
         ratings: null
-      }
-
+      };
     }
   }
 );
@@ -312,7 +323,7 @@ export const postReview = createAsyncThunk(
 
     const headers = new Headers();
     headers.append("Content-Type", "application/x-www-form-urlencoded");
-    headers.append("Cookie", `jwt_token=${newReview.jwt_token}`)
+    headers.append("Cookie", `jwt_token=${newReview.jwt_token}`);
 
     const params = new URLSearchParams();
     params.append("jwt_token", newReview.jwt_token);
@@ -323,15 +334,13 @@ export const postReview = createAsyncThunk(
     params.append("rating", newReview.rating.toString());
     params.append("liked", newReview.liked.toString());
 
-    const request = new Request(postReviewUrl,
-      {
-        headers,
-        credentials: "include",
-        mode: "cors",
-        body: params,
-        method: "POST"
-      }
-    );
+    const request = new Request(postReviewUrl, {
+      headers,
+      credentials: "include",
+      mode: "cors",
+      body: params,
+      method: "POST"
+    });
 
     const response = await fetch(request);
 
@@ -344,7 +353,6 @@ export const postReview = createAsyncThunk(
         message: "ok",
         data
       };
-
     } else if (response.status >= 500) {
       return {
         success: false,
@@ -352,7 +360,6 @@ export const postReview = createAsyncThunk(
         message: "server error",
         data: null
       };
-
     } else {
       const data = await response.json();
       return {
@@ -379,7 +386,12 @@ export const deleteRating = createAsyncThunk(
     params.append("jwt_token", deleteRequest.jwt_token);
     params.append("rating_id", deleteRequest.rating_id);
 
-    const request = new Request(deleteRatingUrl, { headers, body: params, method: "DELETE" });
+    const request = new Request(deleteRatingUrl, {
+      headers,
+      body: params,
+      method: "DELETE"
+    });
+
     const response = await fetch(request);
 
     if (response.ok) {
@@ -389,16 +401,14 @@ export const deleteRating = createAsyncThunk(
         message: "ok",
         code: response.status,
         rating: data
-      }
-
+      };
     } else if (response.status >= 500) {
-      return{
+      return {
         success: false,
         message: "server error",
         code: response.status,
         rating: null
-      }
-
+      };
     } else {
       const data = await response.json();
       return {
@@ -406,7 +416,7 @@ export const deleteRating = createAsyncThunk(
         message: data.message,
         code: response.status,
         rating: null
-      }
+      };
     }
   }
 );

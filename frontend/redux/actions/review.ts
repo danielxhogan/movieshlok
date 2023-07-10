@@ -69,7 +69,6 @@ interface NewCommentPayload {
   data: ReturnedNewComment | null;
 }
 
-
 // DELETE REVIEW
 // **************
 // type passed in to deleteReview action
@@ -139,7 +138,12 @@ export const getReviewDetails = createAsyncThunk(
     params.append("offset", offset.toString());
     params.append("limit", limit.toString());
 
-    const request = new Request(getReviewsUrl, { headers, body: params, method: "POST" });
+    const request = new Request(getReviewsUrl, {
+      headers,
+      body: params,
+      method: "POST"
+    });
+
     const response = await fetch(request);
 
     if (response.ok) {
@@ -153,8 +157,7 @@ export const getReviewDetails = createAsyncThunk(
         page: getReviewRequest.page,
         total_pages,
         data
-      }
-
+      };
     } else if (response.status >= 500) {
       return {
         success: false,
@@ -162,8 +165,7 @@ export const getReviewDetails = createAsyncThunk(
         page: 0,
         total_pages: null,
         data: null
-      }
-
+      };
     } else {
       const data = await response.json();
       return {
@@ -172,7 +174,7 @@ export const getReviewDetails = createAsyncThunk(
         page: 0,
         total_pages: null,
         data: null
-      }
+      };
     }
   }
 );
@@ -181,7 +183,7 @@ export const getReviewDetails = createAsyncThunk(
 // *******************************
 export const postComment = createAsyncThunk(
   "review/postComment",
-  async(newComment: NewComment): Promise<NewCommentPayload> => {
+  async (newComment: NewComment): Promise<NewCommentPayload> => {
     const postCommentUrl = `${BACKEND_URL}/post-comment`;
 
     const headers = new Headers();
@@ -192,7 +194,11 @@ export const postComment = createAsyncThunk(
     params.append("review_id", newComment.review_id);
     params.append("comment", newComment.comment);
 
-    const request = new Request(postCommentUrl, { body: params, method: "POST" });
+    const request = new Request(postCommentUrl, {
+      body: params,
+      method: "POST"
+    });
+
     const response = await fetch(request);
 
     if (response.ok) {
@@ -202,16 +208,14 @@ export const postComment = createAsyncThunk(
         code: response.status,
         message: "ok",
         data
-      }
-
+      };
     } else if (response.status >= 500) {
       return {
         success: false,
         code: response.status,
         message: "server error",
         data: null
-      }
-
+      };
     } else {
       const data = await response.json();
       return {
@@ -219,7 +223,7 @@ export const postComment = createAsyncThunk(
         code: response.status,
         message: data.message,
         data: null
-      }
+      };
     }
   }
 );
@@ -239,7 +243,12 @@ export const deleteReview = createAsyncThunk(
     params.append("review_id", deleteRequest.review_id);
     params.append("movie_id", deleteRequest.movie_id);
 
-    const request = new Request(deleteReviewUrl, { headers, body: params, method: "DELETE" });
+    const request = new Request(deleteReviewUrl, {
+      headers,
+      body: params,
+      method: "DELETE"
+    });
+
     const response = await fetch(request);
 
     if (response.ok) {
@@ -249,16 +258,14 @@ export const deleteReview = createAsyncThunk(
         message: "ok",
         code: response.status,
         review: data
-      }
-
+      };
     } else if (response.status >= 500) {
-      return{
+      return {
         success: false,
         message: "server error",
         code: response.status,
         review: null
-      }
-
+      };
     } else {
       const data = await response.json();
       return {
@@ -266,7 +273,7 @@ export const deleteReview = createAsyncThunk(
         message: data.message,
         code: response.status,
         review: null
-      }
+      };
     }
   }
 );
@@ -275,7 +282,9 @@ export const deleteReview = createAsyncThunk(
 // ***************
 export const deleteComment = createAsyncThunk(
   "review/deleteComment",
-  async (deleteRequest: DeleteCommentRequest): Promise<DeleteCommentPayload> => {
+  async (
+    deleteRequest: DeleteCommentRequest
+  ): Promise<DeleteCommentPayload> => {
     const deleteCommentUrl = `${BACKEND_URL}/delete-comment`;
 
     const headers = new Headers();
@@ -285,7 +294,12 @@ export const deleteComment = createAsyncThunk(
     params.append("jwt_token", deleteRequest.jwt_token);
     params.append("comment_id", deleteRequest.comment_id);
 
-    const request = new Request(deleteCommentUrl, { headers, body: params, method: "DELETE" });
+    const request = new Request(deleteCommentUrl, {
+      headers,
+      body: params,
+      method: "DELETE"
+    });
+
     const response = await fetch(request);
 
     if (response.ok) {
@@ -295,16 +309,14 @@ export const deleteComment = createAsyncThunk(
         message: "ok",
         code: response.status,
         comment: data
-      }
-
+      };
     } else if (response.status >= 500) {
-      return{
+      return {
         success: false,
         message: "server error",
         code: response.status,
         comment: null
-      }
-
+      };
     } else {
       const data = await response.json();
       return {
@@ -312,7 +324,7 @@ export const deleteComment = createAsyncThunk(
         message: data.message,
         code: response.status,
         comment: null
-      }
+      };
     }
   }
 );

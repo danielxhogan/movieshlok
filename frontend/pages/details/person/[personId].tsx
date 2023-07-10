@@ -1,5 +1,3 @@
 export default function PersonDetailsPage() {
-  return <>
-    Person Details Page
-  </>
+  return <>Person Details Page</>;
 }

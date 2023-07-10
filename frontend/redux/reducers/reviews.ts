@@ -12,7 +12,7 @@ import {
 } from "@/redux/actions/reviews";
 
 import { createSlice } from "@reduxjs/toolkit";
-import { Status } from "@/redux/reducers/index"
+import { Status } from "@/redux/reducers/index";
 import { AppState } from "@/redux/store";
 
 // TYPES
@@ -28,8 +28,8 @@ interface Reviews {
   page: number;
   total_pages: number | null;
   data: {
-    reviews?: [Review]
-  }
+    reviews?: Review[];
+  };
 }
 
 // default value for reviews
@@ -40,7 +40,7 @@ const initialReviewsState: Reviews = {
   page: 0,
   total_pages: null,
   data: {}
-}
+};
 
 // GET RATING AND LIKE FOR A MOVIE
 // ********************************
@@ -59,7 +59,7 @@ const intialRatingLikeState: RatingLike = {
   message: "",
   code: null,
   data: null
-}
+};
 
 // GET ALL RATINGS FOR A USER
 // ***************************
@@ -70,7 +70,7 @@ interface Ratings {
   message: string;
   page: number;
   total_pages: number | null;
-  ratings: RatingReview[] | null
+  ratings: RatingReview[] | null;
 }
 
 const initialRatingsState: Ratings = {
@@ -80,7 +80,7 @@ const initialRatingsState: Ratings = {
   page: 0,
   total_pages: null,
   ratings: null
-}
+};
 
 // CREATE A NEW REVIEW IN THE DATABASE TYPES
 // ******************************************
@@ -99,7 +99,7 @@ const initialNewReviewState: NewReview = {
   code: null,
   message: "",
   data: null
-}
+};
 
 // DELETE RATING
 // ***************
@@ -118,7 +118,7 @@ const initialDeletedRatingState: DeletedRating = {
   message: "",
   code: null,
   rating: null
-}
+};
 
 // REDUCERS
 // ****************************
@@ -132,30 +132,39 @@ export const reviewsSlice = createSlice({
   reducers: {
     addNewReview(state, action) {
       state.data.reviews?.unshift(action.payload.newReview);
+    },
+    removeDeletedReview(state, action) {
+      if (state.data.reviews) {
+        const newReviews = state.data.reviews.filter(
+          review => review.id !== action.payload.review_id
+        );
+        state.data.reviews = newReviews;
+      }
     }
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
-      .addCase(getReviews.pending, (state) => {
-        state.status = "loading",
-        state.success = null,
-        state.message = "",
-        state.page = 1,
-        state.total_pages = null,
-        state.data = {}
+      .addCase(getReviews.pending, state => {
+        (state.status = "loading"),
+          (state.success = null),
+          (state.message = ""),
+          (state.page = 1),
+          (state.total_pages = null),
+          (state.data = {});
       })
       .addCase(getReviews.fulfilled, (state, action) => {
-        state.status = "fulfilled",
-        state.success = true,
-        state.message = action.payload.message,
-        state.page = action.payload.page,
-        state.total_pages = action.payload.total_pages,
-        state.data = action.payload.data
-      })
+        (state.status = "fulfilled"),
+          (state.success = true),
+          (state.message = action.payload.message),
+          (state.page = action.payload.page),
+          (state.total_pages = action.payload.total_pages),
+          (state.data = action.payload.data);
+      });
   }
 });
 
 export const { addNewReview } = reviewsSlice.actions;
+export const { removeDeletedReview } = reviewsSlice.actions;
 export const selectReveiws = (state: AppState) => state.reviews;
 export const reviewsReducer = reviewsSlice.reducer;
 
@@ -171,27 +180,26 @@ export const ratingLikeSlice = createSlice({
       state.success = null;
       state.code = null;
       state.message = "";
-      state.data = null
+      state.data = null;
     }
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
-      .addCase(getRatingLike.pending, (state) => {
-        state.status = "loading",
-        state.success = null,
-        state.message = "",
-        state.code = null,
-        state.data = null
+      .addCase(getRatingLike.pending, state => {
+        (state.status = "loading"),
+          (state.success = null),
+          (state.message = ""),
+          (state.code = null),
+          (state.data = null);
       })
-      .addCase(getRatingLike.fulfilled, (state,action) => {
-        state.status = "fulfilled",
-        state.success = action.payload.success,
-        state.message = action.payload.message,
-        state.code = action.payload.code,
-        state.data = action.payload.data
-      })
+      .addCase(getRatingLike.fulfilled, (state, action) => {
+        (state.status = "fulfilled"),
+          (state.success = action.payload.success),
+          (state.message = action.payload.message),
+          (state.code = action.payload.code),
+          (state.data = action.payload.data);
+      });
   }
-
 });
 
 export const { unsetRatingLike } = ratingLikeSlice.actions;
@@ -204,28 +212,64 @@ export const ratingLikeReducer = ratingLikeSlice.reducer;
 export const ratingsSlice = createSlice({
   name: "ratings",
   initialState: initialRatingsState,
-  reducers: {},
-  extraReducers: (builder) => {
+  reducers: {
+    removeRatingByRatingId(state, action) {
+      if (state.ratings) {
+        const newRatings = [];
+
+        for (let i = 0; i < state.ratings.length; i++) {
+          if (state.ratings[i] === null) {
+            break;
+          }
+
+          if (state.ratings[i].rating_id !== action.payload.rating_id) {
+            newRatings.push(state.ratings[i]);
+          }
+        }
+        state.ratings = newRatings;
+      }
+    },
+    removeRatingByReviewId(state, action) {
+      if (state.ratings) {
+        const newRatings = [];
+
+        for (let i = 0; i < state.ratings.length; i++) {
+          if (state.ratings[i] === null) {
+            break;
+          }
+
+          if (state.ratings[i].review_id !== action.payload.review_id) {
+            newRatings.push(state.ratings[i]);
+          }
+        }
+
+        state.ratings = newRatings;
+      }
+    }
+  },
+  extraReducers: builder => {
     builder
-      .addCase(getRatings.pending, (state) => {
-        state.status = "loading",
-        state.success = null,
-        state.message = "",
-        state.page = 0,
-        state.total_pages = null,
-        state.ratings = null
+      .addCase(getRatings.pending, state => {
+        (state.status = "loading"),
+          (state.success = null),
+          (state.message = ""),
+          (state.page = 0),
+          (state.total_pages = null),
+          (state.ratings = null);
       })
       .addCase(getRatings.fulfilled, (state, action) => {
-        state.status = "fulfilled",
-        state.success = action.payload.success,
-        state.message = action.payload.message,
-        state.page = action.payload.page,
-        state.total_pages = action.payload.total_pages,
-        state. ratings = action.payload.ratings
-      })
+        (state.status = "fulfilled"),
+          (state.success = action.payload.success),
+          (state.message = action.payload.message),
+          (state.page = action.payload.page),
+          (state.total_pages = action.payload.total_pages),
+          (state.ratings = action.payload.ratings);
+      });
   }
 });
 
+export const { removeRatingByRatingId } = ratingsSlice.actions;
+export const { removeRatingByReviewId } = ratingsSlice.actions;
 export const selectRatings = (state: AppState) => state.ratings;
 export const ratingsReducer = ratingsSlice.reducer;
 
@@ -237,29 +281,29 @@ export const newReviewSlice = createSlice({
   initialState: initialNewReviewState,
   reducers: {
     resetNewReview(state) {
-      state.status = "idle",
-      state.success = null,
-      state.code = null,
-      state.message = "",
-      state.data = null
+      (state.status = "idle"),
+        (state.success = null),
+        (state.code = null),
+        (state.message = ""),
+        (state.data = null);
     }
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
-      .addCase(postReview.pending, (state) => {
-        state.status = "loading",
-        state.success = null,
-        state.code = null,
-        state.message = "",
-        state.data = null
+      .addCase(postReview.pending, state => {
+        (state.status = "loading"),
+          (state.success = null),
+          (state.code = null),
+          (state.message = ""),
+          (state.data = null);
       })
       .addCase(postReview.fulfilled, (state, action) => {
-        state.status = "fulfilled",
-        state.success = action.payload.success,
-        state.code = action.payload.code,
-        state.message = action.payload.message,
-        state.data = action.payload.data
-      })
+        (state.status = "fulfilled"),
+          (state.success = action.payload.success),
+          (state.code = action.payload.code),
+          (state.message = action.payload.message),
+          (state.data = action.payload.data);
+      });
   }
 });
 
@@ -275,29 +319,29 @@ export const deletedRatingSlice = createSlice({
   initialState: initialDeletedRatingState,
   reducers: {
     resetDeletedRating(state) {
-      state.status = "idle",
-      state.success = null,
-      state.message = "",
-      state.code = null,
-      state.rating = null
+      (state.status = "idle"),
+        (state.success = null),
+        (state.message = ""),
+        (state.code = null),
+        (state.rating = null);
     }
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
-      .addCase(deleteRating.pending, (state) => {
-        state.status = "loading",
-        state.success = null,
-        state.message = "",
-        state.code = null,
-      state.rating = null
+      .addCase(deleteRating.pending, state => {
+        (state.status = "loading"),
+          (state.success = null),
+          (state.message = ""),
+          (state.code = null),
+          (state.rating = null);
       })
       .addCase(deleteRating.fulfilled, (state, action) => {
-        state.status = "fulfilled",
-        state.success = action.payload.success,
-        state.message = action.payload.message,
-        state.code = action.payload.code,
-        state.rating = action.payload.rating
-      })
+        (state.status = "fulfilled"),
+          (state.success = action.payload.success),
+          (state.message = action.payload.message),
+          (state.code = action.payload.code),
+          (state.rating = action.payload.rating);
+      });
   }
 });
 

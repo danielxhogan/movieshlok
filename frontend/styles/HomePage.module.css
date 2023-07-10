@@ -65,7 +65,7 @@
 .feature h3 {
   font-size: 2rem;
   font-weight: bold;
-  font-family: 'Audiowide', cursive;
+  font-family: "Audiowide", cursive;
   text-shadow: 4px 4px 2px var(--light-grey);
   margin-bottom: 30px;
 }

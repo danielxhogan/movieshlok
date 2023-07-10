@@ -14,7 +14,13 @@ import {
   selectNewListItem,
   resetNewListItem
 } from "@/redux/reducers/lists";
-import { createList, createListItem, List, NewList, NewListItem } from "@/redux/actions/lists";
+import {
+  createList,
+  createListItem,
+  List,
+  NewList,
+  NewListItem
+} from "@/redux/actions/lists";
 import { postReview, NewReview } from "@/redux/actions/reviews";
 
 import { useRouter } from "next/router";
@@ -47,7 +53,7 @@ const HIDDEN = "hidden";
 enum ModalType {
   Review,
   Lists
-};
+}
 
 export default function Ratings() {
   const router = useRouter();
@@ -59,23 +65,23 @@ export default function Ratings() {
   const newList = useAppSelector(selectNewList);
   const newListItem = useAppSelector(selectNewListItem);
 
-  const [ modalType, setModalType ] = useState(ModalType.Review);
-  const [ newListTitle, setNewListTitle ] = useState("");
-  const [ reviewRating, setReviewRating] = useState(Rating.ZERO);
-  const [ newReviewText, setNewReviewText ] = useState("");
+  const [modalType, setModalType] = useState(ModalType.Review);
+  const [newListTitle, setNewListTitle] = useState("");
+  const [reviewRating, setReviewRating] = useState(Rating.ZERO);
+  const [newReviewText, setNewReviewText] = useState("");
 
-  const [ rating, setRating ] = useState(Rating.ZERO);
-  const [ liked, setLiked ] = useState(false);
-  const [ likedClass, setLikedClass ] = useState(HIDDEN);
-  const [ unlikedClass, setUnlikedClass ] = useState(SHOWN);
+  const [rating, setRating] = useState(Rating.ZERO);
+  const [liked, setLiked] = useState(false);
+  const [likedClass, setLikedClass] = useState(HIDDEN);
+  const [unlikedClass, setUnlikedClass] = useState(SHOWN);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
 
   const setLikeTrue = useCallback(() => {
-        setLikedClass(SHOWN);
-        setUnlikedClass(HIDDEN);
-        setLiked(true);
+    setLikedClass(SHOWN);
+    setUnlikedClass(HIDDEN);
+    setLiked(true);
   }, []);
 
   useEffect(() => {
@@ -94,7 +100,6 @@ export default function Ratings() {
           duration: 3000,
           isClosable: true
         });
-
       } else if (ratingLike.data) {
         setRating(ratingLike.data.rating);
         if (ratingLike.data.liked) {
@@ -104,15 +109,15 @@ export default function Ratings() {
     }
   }, [ratingLike, dispatch, router, setLikeTrue, toast]);
 
-
   function updateRating(newRating: Rating) {
     setRating(newRating);
 
-    if (credentials.jwt_token &&
-        movieDetails.data.id &&
-        movieDetails.data &&
-        movieDetails.data.title &&
-        movieDetails.data.poster_path
+    if (
+      credentials.jwt_token &&
+      movieDetails.data.id &&
+      movieDetails.data &&
+      movieDetails.data.title &&
+      movieDetails.data.poster_path
     ) {
       const updateRatingUrl = `${BACKEND_URL}/post-rating`;
 
@@ -120,13 +125,17 @@ export default function Ratings() {
       headers.append("Content-Type", "application/x-www-form-urlencoded");
 
       const params = new URLSearchParams();
-      params.append("jwt_token",credentials.jwt_token);
+      params.append("jwt_token", credentials.jwt_token);
       params.append("movie_id", movieDetails.data.id.toString());
       params.append("movie_title", movieDetails.data.title);
       params.append("poster_path", movieDetails.data.poster_path);
       params.append("rating", newRating.toString());
 
-      const request = new Request(updateRatingUrl, { headers, body: params, method: "POST" });
+      const request = new Request(updateRatingUrl, {
+        headers,
+        body: params,
+        method: "POST"
+      });
       fetch(request);
     }
   }
@@ -157,12 +166,16 @@ export default function Ratings() {
     params.append("movie_id", movieId);
     params.append("liked", likeStatus.toString());
 
-    const request = new Request(updateRatingUrl, { headers, body: params, method: "POST" });
+    const request = new Request(updateRatingUrl, {
+      headers,
+      body: params,
+      method: "POST"
+    });
     fetch(request);
   }
 
   function toggleLike() {
-    switch(liked) {
+    switch (liked) {
       case true:
         setLiked(false);
         setLikedClass(HIDDEN);
@@ -196,103 +209,118 @@ export default function Ratings() {
   function makeReviewModalHeader() {
     let year;
     if (movieDetails.data.release_date) {
-      year = movieDetails.data.release_date.substring(0,4);
+      year = movieDetails.data.release_date.substring(0, 4);
     }
-    return <>
-      {movieDetails.data.title} <span className={styles["year"]}>{year}</span>
-    </>
+    return (
+      <>
+        {movieDetails.data.title} <span className={styles["year"]}>{year}</span>
+      </>
+    );
   }
 
   function makeList(list: List) {
-    if (list.watchlist) { return; }
+    if (list.watchlist) {
+      return;
+    }
 
-    return <>
-      <div className={styles["list"]} onClick={ () => onClickList(list.id, list.name, false) }>
-        { list.name }
-        <br />
-      </div>
-    </>
+    return (
+      <>
+        <div
+          className={styles["list"]}
+          onClick={() => onClickList(list.id, list.name, false)}
+        >
+          {list.name}
+          <br />
+        </div>
+      </>
+    );
   }
 
   function makeModal(type: ModalType) {
     switch (type) {
       case ModalType.Review:
-        return <>
-          {/* @ts-ignore */}
-          <ModalContent className={styles["modal"]}>
-            <ModalHeader>{ makeReviewModalHeader() }</ModalHeader>
-            <ModalCloseButton />
+        return (
+          <>
+            {/* @ts-ignore */}
+            <ModalContent className={styles["modal"]}>
+              <ModalHeader>{makeReviewModalHeader()}</ModalHeader>
+              <ModalCloseButton />
 
-            <ModalBody>
-              <FormControl>
-                <FormLabel className={styles["rating-label"]}>
-                  <i>What did you think?</i>
-                  <Stars
-                    id="review"
-                    initialRating={rating}
-                    setParentRating={setReviewRating}
-                    interactive={true}
-                    size="2xl"
-                  />
-                </FormLabel>
-                <Textarea
-                  value={newReviewText}
-                  onChange={e => setNewReviewText(e.target.value)}
-                  rows={10}
-                />
-              </FormControl>
-            </ModalBody>
-
-            <ModalFooter>
-            <span className={styles["heart"]} onClick={toggleLike}>
-              <i className={`${styles[unlikedClass]} fa-regular fa-heart fa-2xl`}></i>
-              <i className={`${styles[likedClass]} fa-solid fa-heart fa-2xl`}></i>
-            </span>
-              <Button
-                className={styles["submit-review"]}
-                colorScheme="teal" variant="outline"
-                mr={3}
-                onClick={onClickCloseReviewModal}
-                >
-                Submit Review
-              </Button>
-            </ModalFooter>
-
-          </ModalContent>
-        </>
-
-      case ModalType.Lists:
-        return <>
-          <ModalContent className={styles["modal"]}>
-            <ModalHeader>Lists</ModalHeader>
-            <ModalCloseButton />
-
-            <ModalBody>
-              { lists.lists && lists.lists.map(list => makeList(list))}
-              <br />
-
-              <form onSubmit={onSubmitNewList}>
+              <ModalBody>
                 <FormControl>
-                  <FormLabel>
-                  <i className="fa-solid fa-plus"></i>
-                  <i> Add list</i>
+                  <FormLabel className={styles["rating-label"]}>
+                    <i>What did you think?</i>
+                    <Stars
+                      id="review"
+                      initialRating={rating}
+                      setParentRating={setReviewRating}
+                      interactive={true}
+                      size="2xl"
+                    />
                   </FormLabel>
-                  <Input
-                    type="text"
-                    placeholder="Choose a name for your new list"
-                    value={newListTitle}
-                    onChange={e => setNewListTitle(e.target.value)}
-                    variant="filled"
+                  <Textarea
+                    value={newReviewText}
+                    onChange={e => setNewReviewText(e.target.value)}
+                    rows={10}
                   />
                 </FormControl>
-              </form>
-            </ModalBody>
+              </ModalBody>
 
-            <ModalFooter>
-            </ModalFooter>
+              <ModalFooter>
+                <span className={styles["heart"]} onClick={toggleLike}>
+                  <i
+                    className={`${styles[unlikedClass]} fa-regular fa-heart fa-2xl`}
+                  ></i>
+                  <i
+                    className={`${styles[likedClass]} fa-solid fa-heart fa-2xl`}
+                  ></i>
+                </span>
+                <Button
+                  className={styles["submit-review"]}
+                  colorScheme="teal"
+                  variant="outline"
+                  mr={3}
+                  onClick={onClickCloseReviewModal}
+                >
+                  Submit Review
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </>
+        );
 
-          </ModalContent>
-        </>
+      case ModalType.Lists:
+        return (
+          <>
+            <ModalContent className={styles["modal"]}>
+              <ModalHeader>Lists</ModalHeader>
+              <ModalCloseButton />
+
+              <ModalBody>
+                {lists.lists && lists.lists.map(list => makeList(list))}
+                <br />
+
+                <form onSubmit={onSubmitNewList}>
+                  <FormControl>
+                    <FormLabel>
+                      <i className="fa-solid fa-plus"></i>
+                      <i> Add list</i>
+                    </FormLabel>
+                    <Input
+                      type="text"
+                      placeholder="Choose a name for your new list"
+                      value={newListTitle}
+                      onChange={e => setNewListTitle(e.target.value)}
+                      variant="filled"
+                    />
+                  </FormControl>
+                </form>
+              </ModalBody>
+
+              <ModalFooter></ModalFooter>
+            </ModalContent>
+          </>
+        );
     }
   }
 
@@ -304,14 +332,15 @@ export default function Ratings() {
   function onClickCloseReviewModal() {
     onClose();
 
-    if (newReviewText !== "" &&
-        movieDetails.data &&
-        movieDetails.data.id &&
-        movieDetails.data.title &&
-        movieDetails.data.poster_path &&
-        credentials.jwt_token &&
-        credentials.username
-      ) {
+    if (
+      newReviewText !== "" &&
+      movieDetails.data &&
+      movieDetails.data.id &&
+      movieDetails.data.title &&
+      movieDetails.data.poster_path &&
+      credentials.jwt_token &&
+      credentials.username
+    ) {
       const movieId = movieDetails.data.id.toString();
 
       const newReview: NewReview = {
@@ -330,11 +359,16 @@ export default function Ratings() {
 
   // NEW LIST ITEM
   // *******************************
-  function onClickList(list_id: string | null, list_name: string, watchlist: boolean) {
-    if (credentials.jwt_token &&
-        movieDetails.data.id &&
-        movieDetails.data.title &&
-        movieDetails.data.poster_path
+  function onClickList(
+    list_id: string | null,
+    list_name: string,
+    watchlist: boolean
+  ) {
+    if (
+      credentials.jwt_token &&
+      movieDetails.data.id &&
+      movieDetails.data.title &&
+      movieDetails.data.poster_path
     ) {
       if (!watchlist && list_id) {
         const newListItem: NewListItem = {
@@ -348,11 +382,10 @@ export default function Ratings() {
         };
 
         dispatch<any>(createListItem(newListItem));
-
       } else if (watchlist && lists.lists) {
         let watchlist_id: string | null = null;
 
-        for (let i=0; i<lists.lists.length; i++) {
+        for (let i = 0; i < lists.lists.length; i++) {
           if (lists.lists[i].watchlist === true) {
             watchlist_id = lists.lists[i].id;
             break;
@@ -377,9 +410,10 @@ export default function Ratings() {
   }
 
   useEffect(() => {
-    if (newListItem.status === "fulfilled" &&
-        newListItem.success === true &&
-        newListItem.list_name
+    if (
+      newListItem.status === "fulfilled" &&
+      newListItem.success === true &&
+      newListItem.list_name
     ) {
       toast({
         title: `${movieDetails.data.title} added to ${newListItem.list_name}`,
@@ -390,10 +424,10 @@ export default function Ratings() {
       });
 
       dispatch(resetNewListItem());
-
-    } else if (newListItem.status === "fulfilled" &&
-        newListItem.success === false &&
-        newListItem.code === 409
+    } else if (
+      newListItem.status === "fulfilled" &&
+      newListItem.success === false &&
+      newListItem.code === 409
     ) {
       toast({
         title: newListItem.message,
@@ -404,10 +438,7 @@ export default function Ratings() {
       });
 
       dispatch(resetNewListItem());
-
-    } else if (newListItem.status === "fulfilled" &&
-      newListItem.code === 401
-    ) {
+    } else if (newListItem.status === "fulfilled" && newListItem.code === 401) {
       toast({
         title: "You need to log in again",
         description: "",
@@ -420,7 +451,6 @@ export default function Ratings() {
       dispatch(unsetCredentials());
       localStorage.removeItem("jwt_token");
       localStorage.removeItem("username");
-
     }
   }, [newListItem, movieDetails.data.title, toast, dispatch]);
 
@@ -433,7 +463,7 @@ export default function Ratings() {
       const newList: NewList = {
         jwt_token: credentials.jwt_token,
         name: newListTitle
-      }
+      };
 
       dispatch<any>(createList(newList));
     }
@@ -442,17 +472,15 @@ export default function Ratings() {
   // this useEffect detects when a new list is created
   // and updates the list of lists in the redux store
   useEffect(() => {
-    if (newList.status === "fulfilled" &&
-        newList.success === true &&
-        newList.list
+    if (
+      newList.status === "fulfilled" &&
+      newList.success === true &&
+      newList.list
     ) {
       setNewListTitle("");
       dispatch(addNewList({ newList: newList.list }));
       dispatch(resetNewList());
-
-    } else if (newList.status === "fulfilled" &&
-        newList.code === 401
-    ) {
+    } else if (newList.status === "fulfilled" && newList.code === 401) {
       toast({
         title: "You need to log in again",
         description: "",
@@ -470,78 +498,84 @@ export default function Ratings() {
 
   // JSX
   // ***********************************************************************************
-  return <div className={`${styles["wrapper"]} block`}>
-    { credentials.jwt_token ? <>
-      <div className={styles["rating-review"]}>
-        { ratingLike.data
-        ?
-          <span className={styles["stars"]}>
-            <Stars
-              id="rating"
-              initialRating={ratingLike.data.rating}
-              setParentRating={updateRating}
-              interactive={true}
-              size="2xl"
-            />
+  return (
+    <div className={`${styles["wrapper"]} block`}>
+      {credentials.jwt_token ? (
+        <>
+          <div className={styles["rating-review"]}>
+            {ratingLike.data ? (
+              <span className={styles["stars"]}>
+                <Stars
+                  id="rating"
+                  initialRating={ratingLike.data.rating}
+                  setParentRating={updateRating}
+                  interactive={true}
+                  size="2xl"
+                />
+              </span>
+            ) : (
+              <span>
+                <Stars
+                  id="rating"
+                  initialRating={Rating.ZERO}
+                  setParentRating={updateRating}
+                  interactive={true}
+                  size="2xl"
+                />
+              </span>
+            )}
 
-          </span>
-        :
-          <span>
-            <Stars
-              id="rating"
-              initialRating={Rating.ZERO}
-              setParentRating={updateRating}
-              interactive={true}
-              size="2xl"
-            />
-          </span>
-        }
+            <Button
+              colorScheme="teal"
+              variant="outline"
+              className={styles["review-button"]}
+              onClick={onOpenReviewModal}
+            >
+              Leave Review
+            </Button>
+          </div>
 
-        <Button
-          colorScheme="teal" variant="outline"
-          className={styles["review-button"]}
-          onClick={onOpenReviewModal}>
-          Leave Review
-        </Button>
-      </div>
+          <div className={styles["like"]} onClick={toggleLike}>
+            <div className={styles["heart"]}>
+              <i
+                className={`${styles[unlikedClass]} fa-regular fa-heart fa-2xl`}
+              ></i>
+              <i
+                className={`${styles[likedClass]} fa-solid fa-heart fa-2xl`}
+              ></i>
+            </div>
+            <span>Like</span>
+          </div>
 
-      <div className={styles["like"]} onClick={toggleLike}>
-        <div className={styles["heart"]}>
-          <i className={`${styles[unlikedClass]} fa-regular fa-heart fa-2xl`}></i>
-          <i className={`${styles[likedClass]} fa-solid fa-heart fa-2xl`}></i>
-        </div>
-        <span>Like</span>
-      </div>
+          <div className={styles["add-to-list"]}>
+            <Button
+              colorScheme="teal"
+              variant="outline"
+              className={styles["list-button"]}
+              onClick={() => onClickList(null, "watchlist", true)}
+            >
+              Add to Watchlist
+            </Button>
 
-      <div className={styles["add-to-list"]}>
-        <Button
-          colorScheme="teal" variant="outline"
-          className={styles["list-button"]}
-          onClick={ () => onClickList(null, "watchlist", true) }
-          >
-          Add to Watchlist
-        </Button>
+            <Button
+              colorScheme="teal"
+              variant="outline"
+              className={styles["list-button"]}
+              onClick={onOpenListsModal}
+            >
+              Add to other list
+            </Button>
+          </div>
 
-        <Button
-          colorScheme="teal" variant="outline"
-          className={styles["list-button"]}
-          onClick={onOpenListsModal}
-          >
-          Add to other list
-        </Button>
-      </div>
+          <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
+            <ModalOverlay />
 
-      <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
-        <ModalOverlay />
-
-        { makeModal(modalType) }
-
-      </Modal>
-    </> 
-    :
-    <>
-      Login to leave a review
-    </>
-    }
-  </div>
+            {makeModal(modalType)}
+          </Modal>
+        </>
+      ) : (
+        <>Login to leave a review</>
+      )}
+    </div>
+  );
 }

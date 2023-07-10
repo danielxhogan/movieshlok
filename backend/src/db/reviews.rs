@@ -177,6 +177,7 @@ impl ReviewsDbManager {
         poster_path: review.poster_path.clone(),
         rating: review.rating,
         liked: review.liked,
+        rating_id: None,
         review_id: Some(review.review_id),
         timestamp: review.timestamp
       });
@@ -198,6 +199,7 @@ impl ReviewsDbManager {
         ratings::poster_path,
         ratings::rating,
         likes::liked,
+        ratings::id,
         ratings::last_updated))
       .order(ratings::last_updated.desc())
       .filter(users::username.eq(get_ratings_request.username))
@@ -217,6 +219,7 @@ impl ReviewsDbManager {
         poster_path: rating.poster_path.clone(),
         rating: rating.rating,
         liked: rating.liked,
+        rating_id: Some(rating.rating_id),
         review_id: None,
         timestamp: rating.timestamp
       });

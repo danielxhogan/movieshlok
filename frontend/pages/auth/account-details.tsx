@@ -4,14 +4,15 @@ import Navbar from "@/components/Navbar";
 // import { GetServerSideProps } from "next";
 
 export default function AccountDetailsPage() {
-  return <div className={styles["wrapper"]}>
-    <Navbar />
+  return (
+    <div className={styles["wrapper"]}>
+      <Navbar />
 
-    <div className={styles["account-details-page"]}>
-
-      <h1>Account Details Page</h1>
+      <div className={styles["account-details-page"]}>
+        <h1>Account Details Page</h1>
+      </div>
     </div>
-  </div>
+  );
 }
 
 // export const getServerSideProps: GetServerSideProps = async (context) => {

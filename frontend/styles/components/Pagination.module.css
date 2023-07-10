@@ -6,7 +6,8 @@
   margin: auto;
 }
 
-.left-buttons, .right-buttons {
+.left-buttons,
+.right-buttons {
   display: flex;
   gap: 20px;
   cursor: pointer;

@@ -10,7 +10,7 @@ import {
 } from "../actions/review";
 
 import { createSlice } from "@reduxjs/toolkit";
-import { Status } from "@/redux/reducers/index"
+import { Status } from "@/redux/reducers/index";
 import { AppState } from "@/redux/store";
 
 // TYPES
@@ -33,17 +33,17 @@ const initialReviewDetailsState: ReviewDetail = {
   page: 0,
   total_pages: null,
   data: null
-}
+};
 
 // POST NEW COMMENT IN DATABASE
 // *******************************
 // type for value of newComment in redux store
 interface NewComment {
-  status: Status,
-  success: boolean | null,
-  code: number | null,
+  status: Status;
+  success: boolean | null;
+  code: number | null;
   message: string;
-  data: ReturnedNewComment | null
+  data: ReturnedNewComment | null;
 }
 
 // default value for newComment
@@ -53,7 +53,7 @@ const intialNewCommentState: NewComment = {
   code: null,
   message: "",
   data: null
-}
+};
 
 // DELETE REVIEW
 // **************
@@ -72,7 +72,7 @@ const initialDeletedReviewState: DeletedReview = {
   message: "",
   code: null,
   review: null
-}
+};
 
 // DELETE COMMENT
 // ***************
@@ -91,7 +91,7 @@ const initialDeletedCommentState: DeletedComment = {
   message: "",
   code: null,
   comment: null
-}
+};
 
 // REDUCERS
 // *******************************
@@ -108,29 +108,31 @@ export const reviewDetailsSlice = createSlice({
     },
     removeDeletedComment(state, action) {
       if (state.data) {
-        const newComments = state.data.comments.filter(comment => comment.id !== action.payload.commentId);
+        const newComments = state.data.comments.filter(
+          comment => comment.id !== action.payload.commentId
+        );
         state.data.comments = newComments;
       }
     }
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
-      .addCase(getReviewDetails.pending, (state) => {
-        state.status = "loading",
-        state.success = null,
-        state.message = "",
-        state.page = 0,
-        state.total_pages = null,
-        state.data = null
+      .addCase(getReviewDetails.pending, state => {
+        (state.status = "loading"),
+          (state.success = null),
+          (state.message = ""),
+          (state.page = 0),
+          (state.total_pages = null),
+          (state.data = null);
       })
       .addCase(getReviewDetails.fulfilled, (state, action) => {
-        state.status = "fulfilled",
-        state.success = action.payload.success,
-        state.message = action.payload.message,
-        state.page = action.payload.page,
-        state.total_pages = action.payload.total_pages,
-        state.data = action.payload.data
-      })
+        (state.status = "fulfilled"),
+          (state.success = action.payload.success),
+          (state.message = action.payload.message),
+          (state.page = action.payload.page),
+          (state.total_pages = action.payload.total_pages),
+          (state.data = action.payload.data);
+      });
   }
 });
 
@@ -147,29 +149,29 @@ export const newCommentSlice = createSlice({
   initialState: intialNewCommentState,
   reducers: {
     resetNewComment(state) {
-      state.status = "idle",
-      state.success = null,
-      state.code = null,
-      state.message = "",
-      state.data = null
+      (state.status = "idle"),
+        (state.success = null),
+        (state.code = null),
+        (state.message = ""),
+        (state.data = null);
     }
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
-      .addCase(postComment.pending, (state) => {
-        state.status = "loading",
-        state.success = null,
-        state.code = null,
-        state.message = "",
-        state.data = null
+      .addCase(postComment.pending, state => {
+        (state.status = "loading"),
+          (state.success = null),
+          (state.code = null),
+          (state.message = ""),
+          (state.data = null);
       })
       .addCase(postComment.fulfilled, (state, action) => {
-        state.status = "fulfilled",
-        state.success = action.payload.success,
-        state.code = action.payload.code,
-        state.message = action.payload.message,
-        state.data = action.payload.data
-      })
+        (state.status = "fulfilled"),
+          (state.success = action.payload.success),
+          (state.code = action.payload.code),
+          (state.message = action.payload.message),
+          (state.data = action.payload.data);
+      });
   }
 });
 
@@ -185,29 +187,29 @@ export const deletedReviewSlice = createSlice({
   initialState: initialDeletedReviewState,
   reducers: {
     resetDeletedReview(state) {
-      state.status = "idle",
-      state.success = null,
-      state.message = "",
-      state.code = null,
-      state.review = null
+      (state.status = "idle"),
+        (state.success = null),
+        (state.message = ""),
+        (state.code = null),
+        (state.review = null);
     }
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
-      .addCase(deleteReview.pending, (state) => {
-        state.status = "loading",
-        state.success = null,
-        state.message = "",
-        state.code = null,
-      state.review = null
+      .addCase(deleteReview.pending, state => {
+        (state.status = "loading"),
+          (state.success = null),
+          (state.message = ""),
+          (state.code = null),
+          (state.review = null);
       })
       .addCase(deleteReview.fulfilled, (state, action) => {
-        state.status = "fulfilled",
-        state.success = action.payload.success,
-        state.message = action.payload.message,
-        state.code = action.payload.code,
-        state.review = action.payload.review
-      })
+        (state.status = "fulfilled"),
+          (state.success = action.payload.success),
+          (state.message = action.payload.message),
+          (state.code = action.payload.code),
+          (state.review = action.payload.review);
+      });
   }
 });
 
@@ -223,29 +225,29 @@ export const deletedCommentSlice = createSlice({
   initialState: initialDeletedCommentState,
   reducers: {
     resetDeletedComment(state) {
-      state.status = "idle",
-      state.success = null,
-      state.message = "",
-      state.code = null,
-      state.comment = null
+      (state.status = "idle"),
+        (state.success = null),
+        (state.message = ""),
+        (state.code = null),
+        (state.comment = null);
     }
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
-      .addCase(deleteComment.pending, (state) => {
-        state.status = "loading",
-        state.success = null,
-        state.message = "",
-        state.code = null,
-      state.comment = null
+      .addCase(deleteComment.pending, state => {
+        (state.status = "loading"),
+          (state.success = null),
+          (state.message = ""),
+          (state.code = null),
+          (state.comment = null);
       })
       .addCase(deleteComment.fulfilled, (state, action) => {
-        state.status = "fulfilled",
-        state.success = action.payload.success,
-        state.message = action.payload.message,
-        state.code = action.payload.code,
-        state.comment = action.payload.comment
-      })
+        (state.status = "fulfilled"),
+          (state.success = action.payload.success),
+          (state.message = action.payload.message),
+          (state.code = action.payload.code),
+          (state.comment = action.payload.comment);
+      });
   }
 });
 

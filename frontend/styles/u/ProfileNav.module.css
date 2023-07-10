@@ -1,6 +1,6 @@
 .wrapper {
   margin: 30px auto 0;
-  font-family: 'Audiowide', cursive;
+  font-family: "Audiowide", cursive;
   display: flex;
   justify-content: space-around;
   max-width: 1000px;

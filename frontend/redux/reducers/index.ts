@@ -1,5 +1,8 @@
 import { authSliceReducer } from "@/redux/reducers/auth";
-import { searchResultsReducer, movieDetailsReducer } from "@/redux/reducers/tmdb";
+import {
+  searchResultsReducer,
+  movieDetailsReducer
+} from "@/redux/reducers/tmdb";
 import {
   reviewsReducer,
   ratingLikeReducer,
@@ -22,7 +25,7 @@ import {
   deletedListReducer,
   deletedListItemReducer
 } from "./lists";
-import { combineReducers } from 'redux';
+import { combineReducers } from "redux";
 
 export type Status = "fulfilled" | "loading" | "idle";
 

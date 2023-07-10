@@ -238,6 +238,7 @@ pub struct RatingsRating {
   pub poster_path: String,
   pub rating: i32,
   pub liked: bool,
+  pub rating_id: Uuid,
   pub timestamp: i64
 }
 
@@ -248,6 +249,7 @@ pub struct RatingReview {
   pub poster_path: String,
   pub rating: i32,
   pub liked: bool,
+  pub rating_id: Option<Uuid>,
   pub review_id: Option<Uuid>,
   pub timestamp: i64
 }

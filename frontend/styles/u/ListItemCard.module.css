@@ -2,10 +2,10 @@
   width: 200px;
   padding: 20px;
   background-color: white;
-  /* background-color: var(--light-grey); */
   border-radius: 10px;
   box-shadow: 2px 2px 5px var(--dark-grey);
   transition: 0.3s ease;
+  position: relative;
 }
 
 .wrapper:hover {
@@ -22,6 +22,16 @@
   text-align: center;
   font-weight: bold;
   margin-top: 5px;
+}
+
+.delete-item {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+
+.delete-item:hover {
+  font-weight: bold;
 }
 
 @media screen and (max-width: 600px) {

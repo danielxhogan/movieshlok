@@ -1,5 +1,5 @@
 import styles from "@/styles/u/ReviewDetailsPage.module.css";
-import Navbar from "@/components/Navbar"
+import Navbar from "@/components/Navbar";
 import ProfileNav from "@/components/ProfileNav";
 import Stars from "@/components/Stars";
 import Footer from "@/components/Footer";
@@ -72,14 +72,17 @@ export default function ReviewDetailsPage() {
   const deletedReview = useAppSelector(selectDeletedReview);
   const deletedComment = useAppSelector(selectDeletedComment);
 
-  const [ commentText, setCommentText ] = useState("");
-  const [ deletingCommentId, setDeletingCommentId ] = useState("");
-  const [ deletingCommentText, setDeletingCommentText ] = useState("");
-  const [ modalType, setModalType ] = useState(ModalType.DELETE_REVIEW);
+  const [commentText, setCommentText] = useState("");
+  const [deletingCommentId, setDeletingCommentId] = useState("");
+  const [deletingCommentText, setDeletingCommentText] = useState("");
+  const [modalType, setModalType] = useState(ModalType.DELETE_REVIEW);
 
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const score = movieDetails.data.vote_average ? (movieDetails.data.vote_average / 2).toFixed(1) : movieDetails.data.vote_average;
+
+  const score = movieDetails.data.vote_average
+    ? (movieDetails.data.vote_average / 2).toFixed(1)
+    : movieDetails.data.vote_average;
 
   useEffect(() => {
     if (typeof router.query.movieId === "string") {
@@ -97,41 +100,54 @@ export default function ReviewDetailsPage() {
 
   // WEBSOCKET ON MESSAGE
   // ********************************************************************
-  const onNewComment = useCallback((newComment: string) => {
-    console.log("new Comment");
-    let id: string | null = null;
-    let username: string | null = null;
-    let review_id: string | null = null;
-    let comment: string | null = null;
-    let created_at: number | null = null;
-    const newCommentArray = newComment.split(";");
+  const onNewComment = useCallback(
+    (newComment: string) => {
+      console.log("new Comment");
+      let id: string | null = null;
+      let username: string | null = null;
+      let review_id: string | null = null;
+      let comment: string | null = null;
+      let created_at: number | null = null;
+      const newCommentArray = newComment.split(";");
 
-    newCommentArray.forEach(commentField => {
-      const commentFieldArray = commentField.split("=");
-      const key = commentFieldArray[0];
-      const value = commentFieldArray[1];
+      newCommentArray.forEach(commentField => {
+        const commentFieldArray = commentField.split("=");
+        const key = commentFieldArray[0];
+        const value = commentFieldArray[1];
 
-      switch (key) {
-        case "id": id = value; break;
-        case "username": username = value; break;
-        case "review_id": review_id = value; break;
-        case "comment": comment = value; break;
-        case "created_at": created_at = parseInt(value); break;
+        switch (key) {
+          case "id":
+            id = value;
+            break;
+          case "username":
+            username = value;
+            break;
+          case "review_id":
+            review_id = value;
+            break;
+          case "comment":
+            comment = value;
+            break;
+          case "created_at":
+            created_at = parseInt(value);
+            break;
+        }
+      });
+
+      if (id && username && review_id && comment && created_at) {
+        const insertingNewComment: Comment = {
+          id,
+          username,
+          review_id,
+          comment,
+          created_at
+        };
+
+        dispatch(addNewComment(insertingNewComment));
       }
-    });
-
-    if (id && username && review_id && comment && created_at) {
-      const insertingNewComment: Comment = {
-        id,
-        username,
-        review_id,
-        comment,
-        created_at
-      };
-
-      dispatch(addNewComment(insertingNewComment));
-    }
-  }, [dispatch]);
+    },
+    [dispatch]
+  );
 
   // WEBSOCKET SETUP
   // *************************************************************
@@ -165,22 +181,29 @@ export default function ReviewDetailsPage() {
         params.append("uuid", ws_uuid);
       }
 
-      const request = new Request(registerWsUrl, { headers, body: params, method: "POST"});
+      const request = new Request(registerWsUrl, {
+        headers,
+        body: params,
+        method: "POST"
+      });
       try {
         const response = await fetch(request);
         const data = await response.json();
 
-        if ( !response.ok ) {
-          console.log(`ws-uuid: ${ws_uuid}, message: ${data.message}`)
+        if (!response.ok) {
+          console.log(`ws-uuid: ${ws_uuid}, message: ${data.message}`);
           return;
         }
 
         const ws = new WebSocket(data.ws_url);
-        ws.onopen = () => { console.log(`connected, uuid: ${data.uuid}`); };
-        ws.onmessage = (msg) => { onNewComment(msg.data); }
+        ws.onopen = () => {
+          console.log(`connected, uuid: ${data.uuid}`);
+        };
+        ws.onmessage = msg => {
+          onNewComment(msg.data);
+        };
 
         localStorage.setItem("ws-uuid", data.uuid);
-
       } catch (err) {
         return;
       }
@@ -190,7 +213,7 @@ export default function ReviewDetailsPage() {
 
     // WEBSOCKET CLEANUP
     // *************************************************************
-    return (() => {
+    return () => {
       const ws_uuid = localStorage.getItem("ws-uuid");
       if (ws_uuid) {
         const unregisterWsUrl = `${BACKEND_URL}/unregister-comments-ws`;
@@ -202,28 +225,27 @@ export default function ReviewDetailsPage() {
         console.log(`disconnecting, uuid: ${ws_uuid}`);
         params.append("uuid", ws_uuid);
 
-        const request = new Request(unregisterWsUrl, { headers, body: params, method: "POST" }
-        );
+        const request = new Request(unregisterWsUrl, {
+          headers,
+          body: params,
+          method: "POST"
+        });
 
         fetch(request);
         localStorage.setItem("ws-uuid", "");
       }
-    });
-
+    };
   }, [credentials.jwt_token, onNewComment, router.query.id]);
 
   // MAKE NEW COMMENT
   // **********************************
   function onClickAddComment() {
-    if (commentText !== "" &&
-        credentials.jwt_token &&
-        reviewDetails.data
-      ) {
+    if (commentText !== "" && credentials.jwt_token && reviewDetails.data) {
       const newComment: NewComment = {
         jwt_token: credentials.jwt_token,
         review_id: reviewDetails.data?.review.id,
         comment: commentText
-      }
+      };
 
       dispatch<any>(postComment(newComment));
     }
@@ -232,11 +254,12 @@ export default function ReviewDetailsPage() {
   // DETECT NEW COMMENT
   // *********************************************
   useEffect(() => {
-    if (newComment.status === "fulfilled" &&
-        newComment.success === true &&
-        newComment.data &&
-        credentials.username &&
-        credentials.jwt_token
+    if (
+      newComment.status === "fulfilled" &&
+      newComment.success === true &&
+      newComment.data &&
+      credentials.username &&
+      credentials.jwt_token
     ) {
       // ADD TO REDUX
       const insertingNewComment: Comment = {
@@ -245,7 +268,7 @@ export default function ReviewDetailsPage() {
         review_id: newComment.data.review_id,
         comment: newComment.data.comment,
         created_at: newComment.data.created_at
-      }
+      };
 
       dispatch(addNewComment(insertingNewComment));
       setCommentText("");
@@ -264,11 +287,15 @@ export default function ReviewDetailsPage() {
       params.append("comment", newComment.data.comment);
       params.append("created_at", newComment.data.created_at.toString());
 
-      const request = new Request(emitCommentUrl, { headers, body: params, method: "POST"});
+      const request = new Request(emitCommentUrl, {
+        headers,
+        body: params,
+        method: "POST"
+      });
       fetch(request);
       dispatch(resetNewComment());
 
-    // INVALID JWT TOKEN
+      // INVALID JWT TOKEN
     } else if (newComment.status === "fulfilled" && newComment.code === 401) {
       toast({
         title: "You need to log in again",
@@ -284,7 +311,13 @@ export default function ReviewDetailsPage() {
       localStorage.removeItem("jwt_token");
       localStorage.removeItem("username");
     }
-  }, [newComment, credentials.username, dispatch, credentials.jwt_token, toast]);
+  }, [
+    newComment,
+    credentials.username,
+    dispatch,
+    credentials.jwt_token,
+    toast
+  ]);
 
   // MODAL OPEN - DELETE COMMENT OR REVIEW
   // **********************************************
@@ -305,85 +338,97 @@ export default function ReviewDetailsPage() {
   function makeModal(type: ModalType) {
     switch (type) {
       case ModalType.DELETE_REVIEW:
-        return <>
-          {/* @ts-ignore */}
-          <ModalContent className={styles["modal"]}>
-            <ModalHeader>Delete Review</ModalHeader>
-            <ModalCloseButton />
+        return (
+          <>
+            {/* @ts-ignore */}
+            <ModalContent className={styles["modal"]}>
+              <ModalHeader>Delete Review</ModalHeader>
+              <ModalCloseButton />
 
-            <ModalBody>
-              <i>Are you sure you want to delete your review for <strong>{movieDetails.data.title}</strong></i>
-              <br /><br />
-            </ModalBody>
+              <ModalBody>
+                <i>
+                  Are you sure you want to delete your review for{" "}
+                  <strong>{movieDetails.data.title}</strong>
+                </i>
+                <br />
+                <br />
+              </ModalBody>
 
-            <ModalFooter>
-              <Button
-                className={styles["submit-review"]}
-                colorScheme="red" variant="outline"
-                mr={3}
-                onClick={dispatchDeleteReview}
+              <ModalFooter>
+                <Button
+                  className={styles["submit-review"]}
+                  colorScheme="red"
+                  variant="outline"
+                  mr={3}
+                  onClick={dispatchDeleteReview}
                 >
-                Delete Review
-              </Button>
-            </ModalFooter>
-
-          </ModalContent>
-        </>
+                  Delete Review
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </>
+        );
       case ModalType.DELETE_COMMENT:
-        return <>
-          <ModalContent className={styles["modal"]}>
-            <ModalHeader>Delete Comment</ModalHeader>
-            <ModalCloseButton />
+        return (
+          <>
+            <ModalContent className={styles["modal"]}>
+              <ModalHeader>Delete Comment</ModalHeader>
+              <ModalCloseButton />
 
-            <ModalBody>
-              <i>Are you sure you want to delete the comment:</i>
-              <br /><br />
-              <p>{ deletingCommentText }</p>
-            </ModalBody>
+              <ModalBody>
+                <i>Are you sure you want to delete the comment:</i>
+                <br />
+                <br />
+                <p>{deletingCommentText}</p>
+              </ModalBody>
 
-            <ModalFooter>
-              <Button
-                className={styles["submit-review"]}
-                colorScheme="red" variant="outline"
-                mr={3}
-                onClick={dispatchDeleteComment}
+              <ModalFooter>
+                <Button
+                  className={styles["submit-review"]}
+                  colorScheme="red"
+                  variant="outline"
+                  mr={3}
+                  onClick={dispatchDeleteComment}
                 >
-                Delete Comment
-              </Button>
-            </ModalFooter>
-
-          </ModalContent>
-        </>
+                  Delete Comment
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </>
+        );
     }
   }
 
   // DELETE REVIEW
   // *********************************
   function dispatchDeleteReview() {
-    if (credentials.jwt_token &&
-        typeof router.query.id === "string" &&
-        typeof router.query.movieId === "string"
+    if (
+      credentials.jwt_token &&
+      typeof router.query.id === "string" &&
+      typeof router.query.movieId === "string"
     ) {
       const deleteRequest: DeleteReviewRequest = {
-        jwt_token:credentials.jwt_token,
+        jwt_token: credentials.jwt_token,
         review_id: router.query.id,
-        movie_id: router.query.movieId,
-      }
+        movie_id: router.query.movieId
+      };
 
       dispatch<any>(deleteReview(deleteRequest));
     }
   }
-  
+
   useEffect(() => {
-    if (deletedReview.status === "fulfilled" &&
-        deletedReview.success === true
+    if (
+      deletedReview.status === "fulfilled" &&
+      deletedReview.success === true
     ) {
       router.back();
       dispatch(resetDeletedReview());
-    
-    // INVALID JWT TOKEN
-    } else if (deletedReview.status === "fulfilled" &&
-        deletedReview.code === 401
+
+      // INVALID JWT TOKEN
+    } else if (
+      deletedReview.status === "fulfilled" &&
+      deletedReview.code === 401
     ) {
       toast({
         title: "You need to log in again",
@@ -410,22 +455,24 @@ export default function ReviewDetailsPage() {
       const deleteRequest: DeleteCommentRequest = {
         jwt_token: credentials.jwt_token,
         comment_id: deletingCommentId
-      }
+      };
 
       dispatch<any>(deleteComment(deleteRequest));
     }
   }
 
   useEffect(() => {
-    if (deletedComment.status === "fulfilled" &&
-        deletedComment.success === true
+    if (
+      deletedComment.status === "fulfilled" &&
+      deletedComment.success === true
     ) {
-      dispatch(removeDeletedComment({ commentId: deletingCommentId}));
+      dispatch(removeDeletedComment({ commentId: deletingCommentId }));
       dispatch(resetDeletedComment());
 
-    // INVALID JWT TOKEN
-    } else if (deletedComment.status === "fulfilled" &&
-        deletedComment.code === 401
+      // INVALID JWT TOKEN
+    } else if (
+      deletedComment.status === "fulfilled" &&
+      deletedComment.code === 401
     ) {
       toast({
         title: "You need to log in again",
@@ -463,26 +510,24 @@ export default function ReviewDetailsPage() {
     if (directors.length > 0) {
       director = directors[0];
     }
-    
-    return <div className={styles["title-text"]}>
-      <Link href={`/details/movie/${movieDetails.data.id}`}>
-        <h1>
-          <span className={styles["title"]}>
-            { movieDetails.data.title },
-          </span>
-          <span className={styles["year"]}>
-            { year }
-          </span>
-        </h1>
-      </Link>
-      <h3>
-        directed by
-        <span className={styles["director"]}> {director}</span>
-      </h3>
-      <span className={styles["small-score"]}>
-        <span className={styles["score-number"]}>{ score }</span> / 5
-      </span>
-    </div>
+
+    return (
+      <div className={styles["title-text"]}>
+        <Link href={`/details/movie/${movieDetails.data.id}`}>
+          <h1>
+            <span className={styles["title"]}>{movieDetails.data.title},</span>
+            <span className={styles["year"]}>{year}</span>
+          </h1>
+        </Link>
+        <h3>
+          directed by
+          <span className={styles["director"]}> {director}</span>
+        </h3>
+        <span className={styles["small-score"]}>
+          <span className={styles["score-number"]}>{score}</span> / 5
+        </span>
+      </div>
+    );
   }
 
   function makeDate(timestamp: number) {
@@ -491,224 +536,241 @@ export default function ReviewDetailsPage() {
       const month = date.getMonth();
       let monthText: string = "";
 
+      // prettier-ignore
       switch (month) {
-        case 0: monthText = "January"; break;
-        case 1: monthText = "February"; break;
-        case 2: monthText = "March"; break;
-        case 3: monthText = "April"; break;
-        case 4: monthText = "May"; break;
-        case 5: monthText = "June"; break;
-        case 6: monthText = "July"; break;
-        case 7: monthText = "August"; break;
-        case 8: monthText = "September"; break;
-        case 9: monthText = "October"; break;
-        case 10: monthText = "November"; break;
-        case 11: monthText = "December"; break;
+        case 0:monthText = "January"; break;
+        case 1:monthText = "February"; break;
+        case 2:monthText = "March"; break;
+        case 3:monthText = "April"; break;
+        case 4:monthText = "May"; break;
+        case 5:monthText = "June"; break;
+        case 6:monthText = "July"; break;
+        case 7:monthText = "August"; break;
+        case 8:monthText = "September"; break;
+        case 9:monthText = "October"; break;
+        case 10:monthText = "November"; break;
+        case 11:monthText = "December"; break;
       }
 
-      return <span>{`${monthText} ${date.getDate()}, ${date.getFullYear()}`}</span>
+      return (
+        <span>{`${monthText} ${date.getDate()}, ${date.getFullYear()}`}</span>
+      );
     }
   }
 
   function makeComment(comment: Comment, idx: number) {
-    return <div className="block" key={comment.id} id={comment.id}>
-      <div className={styles["comment-title"]}>
-        <Link href={`/u/${comment.username}/profile`}>
-          <h3 className={styles["username"]}><strong>{comment.username}</strong></h3>
-        </Link>
+    return (
+      <div className="block" key={comment.id} id={comment.id}>
+        <div className={styles["comment-title"]}>
+          <Link href={`/u/${comment.username}/profile`}>
+            <h3 className={styles["username"]}>
+              <strong>{comment.username}</strong>
+            </h3>
+          </Link>
 
-        <div className={styles["comment-title-right"]}>
-          <i>{ makeDate(comment.created_at) }</i>
-          { credentials.username === comment.username &&
-            <Tooltip
-              label={"delete comment"}
-              placement="top"
-              >
-              <i
-              className={`${styles["delete-comment"]} fa-solid fa-trash fa-lg`}
-              onClick={() => onClickDeleteComment(comment)}
-              />
-            </Tooltip>
-          }
+          <div className={styles["comment-title-right"]}>
+            <i>{makeDate(comment.created_at)}</i>
+            {credentials.username === comment.username && (
+              <Tooltip label={"delete comment"} placement="top">
+                <i
+                  className={`${styles["delete-comment"]} fa-solid fa-trash fa-md`}
+                  onClick={() => onClickDeleteComment(comment)}
+                />
+              </Tooltip>
+            )}
+          </div>
         </div>
+
+        <p>{comment.comment}</p>
       </div>
-
-      <p>{comment.comment}</p>
-
-    </div>
+    );
   }
 
   // JSX
   // *************************************************************************
-  return <div className="wrapper">
-    <Navbar />
+  return (
+    <div className="wrapper">
+      <Navbar />
+      <div className="content">
+        <ProfileNav />
 
-    <div className="content">
-      <ProfileNav />
-
-      { movieDetails.status === "fulfilled" ?
-        <div className={styles["review-content"]}>
-
-          <div className={styles["movie-poster-div"]}>
-            <div className={styles["sticky-div"]}>
-              { movieDetails.data.poster_path &&
-                <Image
-                  src={`${TMDB_IMAGE_URL}/w342${movieDetails.data.poster_path}`}
-                  className={styles["movie-poster"]}
-                  onClick={ () => { router.push(`/details/movie/${movieDetails.data.id}`) }}
-                  width={300}
-                  height={500}
-                  alt="backdrop">
-                </Image>
-              }
-              <span className={styles["score"]}>
-                <span className={styles["score-number"]}>{ score }</span> / 5
-              </span>
-            </div>
-          </div>
-
-          <div className={styles["review-details"]}>
-            <div className={styles["title-section"]}>
-
-              { credentials.username === router.query.username &&
-                <Tooltip label={"delete review"} placement="top">
-                  <i
-                  className={`${styles["delete-review"]} fa-solid fa-trash fa-lg`}
-                  onClick={onCickDeleteReview}
-                  />
-                </Tooltip>
-              }
-
-              <div className={styles["title-movie-poster"]}>
-                { movieDetails.data.poster_path &&
+        {movieDetails.status === "fulfilled" ? (
+          <div className={styles["review-content"]}>
+            <div className={styles["movie-poster-div"]}>
+              <div className={styles["sticky-div"]}>
+                {movieDetails.data.poster_path && (
                   <Image
                     src={`${TMDB_IMAGE_URL}/w342${movieDetails.data.poster_path}`}
                     className={styles["movie-poster"]}
-                    onClick={ () => { router.push(`/details/movie/${movieDetails.data.id}`) }}
+                    onClick={() => {
+                      router.push(`/details/movie/${movieDetails.data.id}`);
+                    }}
                     width={300}
                     height={500}
-                    alt="backdrop">
-                  </Image>
-                }
+                    alt="backdrop"
+                  ></Image>
+                )}
+                <span className={styles["score"]}>
+                  <span className={styles["score-number"]}>{score}</span> / 5
+                </span>
               </div>
+            </div>
 
-              <div className={styles["user-title-data"]}>
-                <div className={styles["username-section"]}>
-                  <Link href={`/u/${router.query.username}/profile`}>
-                    <h2>{ typeof router.query.username === "string" && router.query.username }</h2>
-                  </Link>
+            <div className={styles["review-details"]}>
+              <div className={styles["title-section"]}>
+                {credentials.username === router.query.username && (
+                  <Tooltip label={"delete review"} placement="top">
+                    <i
+                      className={`${styles["delete-review"]} fa-solid fa-trash fa-md`}
+                      onClick={onCickDeleteReview}
+                    />
+                  </Tooltip>
+                )}
 
-                  <div className={styles["rating-heart"]}>
-                    {reviewDetails.data &&
-                      <Stars
-                        id="title-section"
-                        initialRating={reviewDetails.data.review.rating}
-                        setParentRating={()=>{}}
-                        interactive={false}
-                        size={"xl"}
-                      />
-                    }
-                    <span className={styles["heart"]}>
-                      { reviewDetails.data && reviewDetails.data.liked
-                      ?
-                        <i className={`fa-solid fa-heart fa-2xl`}></i>
-                      :
-                        <i className={`fa-regular fa-heart fa-2xl`}></i>
-                      }
-                    </span>
-                  </div>
-                </div>
-
-                <div className={styles["user-title-movie-poster"]}>
-                  { movieDetails.data.poster_path &&
+                <div className={styles["title-movie-poster"]}>
+                  {movieDetails.data.poster_path && (
                     <Image
                       src={`${TMDB_IMAGE_URL}/w342${movieDetails.data.poster_path}`}
                       className={styles["movie-poster"]}
-                      onClick={ () => { router.push(`/details/movie/${movieDetails.data.id}`) }}
+                      onClick={() => {
+                        router.push(`/details/movie/${movieDetails.data.id}`);
+                      }}
                       width={300}
                       height={500}
-                      alt="backdrop">
-                    </Image>
-                  }
+                      alt="backdrop"
+                    ></Image>
+                  )}
                 </div>
 
-                { makeTitle() }
-              </div>
+                <div className={styles["user-title-data"]}>
+                  <div className={styles["username-section"]}>
+                    <Link href={`/u/${router.query.username}/profile`}>
+                      <h2>
+                        {typeof router.query.username === "string" &&
+                          router.query.username}
+                      </h2>
+                    </Link>
 
-            </div>  {/* end title-section */}
-
-            <div className={`${styles["review-section"]} block`}>
-              { reviewDetails.status === "fulfilled" ?
-              <>
-                { reviewDetails.data &&
-                <>
-                  <p className={styles["date"]}>Watched on { makeDate(reviewDetails.data.review.created_at) }</p>
-                  <p>{ reviewDetails.data.review.review }</p>
-                </>
-                }
-              </>
-              :
-                <div className="spinner">
-                  <Spinner size='xl' />
-                </div>
-              }
-            </div>
-
-            <div className={styles["comments-section"]}>
-              <h2 className={styles["comments-title"]}>Comments</h2>
-              { reviewDetails.status === "fulfilled" ?
-                  reviewDetails.data && reviewDetails.data.comments.length > 0 ?
-                  <>{reviewDetails.data.comments.map((comment, idx) => makeComment(comment, idx)) }</>
-                  :
-                  <h2 className={styles["no-comments"]}>Be the first to comment</h2>
-                  // <>no Comments</>
-                :
-                  <div className="spinner">
-                    <Spinner size='xl' />
+                    <div className={styles["rating-heart"]}>
+                      {reviewDetails.data && (
+                        <Stars
+                          id="title-section"
+                          initialRating={reviewDetails.data.review.rating}
+                          setParentRating={() => {}}
+                          interactive={false}
+                          size={"xl"}
+                        />
+                      )}
+                      <span className={styles["heart"]}>
+                        {reviewDetails.data && reviewDetails.data.liked ? (
+                          <i className={`fa-solid fa-heart fa-2xl`}></i>
+                        ) : (
+                          <i className={`fa-regular fa-heart fa-2xl`}></i>
+                        )}
+                      </span>
+                    </div>
                   </div>
-              }
-            </div>
 
-            <div className={`${styles["comment-section"]} block`}>
-              { credentials.jwt_token ?
-              <>
-                Leave a comment
-                <Textarea
-                  value={commentText}
-                  onChange={e => setCommentText(e.target.value)}
-                  rows={5}
-                />
-                <div className={styles["submit-comment"]}>
-                  <Button
-                    className={styles["submit-comment-button"]}
-                    colorScheme="teal" variant="outline"
-                    mr={3}
-                    onClick={onClickAddComment}
-                    >
-                    Add Comment
-                  </Button>
+                  <div className={styles["user-title-movie-poster"]}>
+                    {movieDetails.data.poster_path && (
+                      <Image
+                        src={`${TMDB_IMAGE_URL}/w342${movieDetails.data.poster_path}`}
+                        className={styles["movie-poster"]}
+                        onClick={() => {
+                          router.push(`/details/movie/${movieDetails.data.id}`);
+                        }}
+                        width={300}
+                        height={500}
+                        alt="backdrop"
+                      ></Image>
+                    )}
+                  </div>
+
+                  {makeTitle()}
                 </div>
-              </>
-              :
-              <p>Login to leave a comment</p>
-              }
+              </div>{" "}
+              {/* end title-section */}
+              <div className={`${styles["review-section"]} block`}>
+                {reviewDetails.status === "fulfilled" ? (
+                  <>
+                    {reviewDetails.data && (
+                      <>
+                        <p className={styles["date"]}>
+                          Watched on{" "}
+                          {makeDate(reviewDetails.data.review.created_at)}
+                        </p>
+                        <p>{reviewDetails.data.review.review}</p>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <div className="spinner">
+                    <Spinner size="xl" />
+                  </div>
+                )}
+              </div>
+              <div className={styles["comments-section"]}>
+                <h2 className={styles["comments-title"]}>Comments</h2>
+                {reviewDetails.status === "fulfilled" ? (
+                  reviewDetails.data &&
+                  reviewDetails.data.comments.length > 0 ? (
+                    <>
+                      {reviewDetails.data.comments.map((comment, idx) =>
+                        makeComment(comment, idx)
+                      )}
+                    </>
+                  ) : (
+                    <h2 className={styles["no-comments"]}>
+                      Be the first to comment
+                    </h2>
+                  )
+                ) : (
+                  // <>no Comments</>
+                  <div className="spinner">
+                    <Spinner size="xl" />
+                  </div>
+                )}
+              </div>
+              <div className={`${styles["comment-section"]} block`}>
+                {credentials.jwt_token ? (
+                  <>
+                    Leave a comment
+                    <Textarea
+                      value={commentText}
+                      onChange={e => setCommentText(e.target.value)}
+                      rows={5}
+                    />
+                    <div className={styles["submit-comment"]}>
+                      <Button
+                        className={styles["submit-comment-button"]}
+                        colorScheme="teal"
+                        variant="outline"
+                        mr={3}
+                        onClick={onClickAddComment}
+                      >
+                        Add Comment
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <p>Login to leave a comment</p>
+                )}
+              </div>
             </div>
-          </div>  {/* end review-details */}
 
-          <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
-            <ModalOverlay />
-
-            { makeModal(modalType) }
-
-          </Modal>
-        </div>  // end review-content
-      :
-        <div className="spinner">
-          <Spinner size='xl' />
-        </div>
-      }
-
-    </div>  {/* end content */}
-    <Footer />
-  </div>
+            <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
+              <ModalOverlay />
+              {makeModal(modalType)}
+            </Modal>
+          </div> // end review-content
+        ) : (
+          <div className="spinner">
+            <Spinner size="xl" />
+          </div>
+        )}
+      </div>{" "}
+      {/* end content */}
+      <Footer />
+    </div>
+  );
 }

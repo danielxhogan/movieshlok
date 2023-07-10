@@ -10,7 +10,7 @@ const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeC
 // GET ALL LISTS FOR A USER
 // *************************
 export interface GetListsRequest {
-  username: string
+  username: string;
 }
 
 export interface List {
@@ -24,7 +24,7 @@ export interface List {
 interface GetListsPayload {
   success: boolean;
   message: string;
-  lists: List[] | null
+  lists: List[] | null;
 }
 
 // GET ALL LIST ITEMS FOR A LIST
@@ -85,7 +85,7 @@ export interface NewListItem {
   movie_id: string;
   movie_title: string;
   poster_path: string;
-  watchlist: boolean
+  watchlist: boolean;
 }
 
 interface CreateListItemPayload {
@@ -97,7 +97,7 @@ interface CreateListItemPayload {
 
 // DELETE A LIST
 // **************
-interface DeleteListRequest {
+export interface DeleteListRequest {
   jwt_token: string;
   list_id: string;
 }
@@ -111,7 +111,7 @@ interface DeleteListPayload {
 
 // DELETE AN ITEM FROM A LIST
 // ****************************
-interface DeleteListItemRequest {
+export interface DeleteListItemRequest {
   jwt_token: string;
   list_item_id: string;
 }
@@ -139,7 +139,11 @@ export const getLists = createAsyncThunk(
     const params = new URLSearchParams();
     params.append("username", getListsRequest.username);
 
-    const request = new Request(getListsUrl, { headers, body: params, method: "POST" });
+    const request = new Request(getListsUrl, {
+      headers,
+      body: params,
+      method: "POST"
+    });
     const response = await fetch(request);
 
     if (response.ok) {
@@ -148,22 +152,20 @@ export const getLists = createAsyncThunk(
         success: true,
         message: "ok",
         lists: data
-      }
-
+      };
     } else if (response.status >= 500) {
       return {
         success: false,
         message: "server error",
         lists: null
-      }
-
+      };
     } else {
       const data = await response.json();
       return {
         success: false,
         message: data.message,
         lists: null
-      }
+      };
     }
   }
 );
@@ -172,7 +174,9 @@ export const getLists = createAsyncThunk(
 // ******************************
 export const getListItems = createAsyncThunk(
   "lists/getListItems",
-  async (getListItemsRequest: GetListItemsRequest): Promise<GetListItemsPayload> => {
+  async (
+    getListItemsRequest: GetListItemsRequest
+  ): Promise<GetListItemsPayload> => {
     const limit = 10;
     const offset = limit * (getListItemsRequest.page - 1);
 
@@ -186,7 +190,12 @@ export const getListItems = createAsyncThunk(
     params.append("offset", offset.toString());
     params.append("limit", limit.toString());
 
-    const request = new Request(getListItemsUrl, { headers, body: params, method: "POST" });
+    const request = new Request(getListItemsUrl, {
+      headers,
+      body: params,
+      method: "POST"
+    });
+
     const response = await fetch(request);
 
     if (response.ok) {
@@ -195,22 +204,20 @@ export const getListItems = createAsyncThunk(
         success: true,
         message: "ok",
         list_items: data
-      }
-
+      };
     } else if (response.status >= 500) {
       return {
         success: false,
         message: "server error",
         list_items: null
-      }
-
+      };
     } else {
       const data = await response.json();
       return {
         success: false,
         message: data.message,
         list_items: null
-      }
+      };
     }
   }
 );
@@ -219,7 +226,9 @@ export const getListItems = createAsyncThunk(
 // ******************************
 export const getWatchlist = createAsyncThunk(
   "lists/getWatchlist",
-  async (getWatchlistsRequest: GetWatchlistRequest): Promise<GetWatchlistPayload> => {
+  async (
+    getWatchlistsRequest: GetWatchlistRequest
+  ): Promise<GetWatchlistPayload> => {
     const limit = 10;
     const offset = limit * (getWatchlistsRequest.page - 1);
 
@@ -233,7 +242,12 @@ export const getWatchlist = createAsyncThunk(
     params.append("offset", offset.toString());
     params.append("limit", limit.toString());
 
-    const request = new Request(getWatchlistsUrl, { headers, body: params, method: "POST" });
+    const request = new Request(getWatchlistsUrl, {
+      headers,
+      body: params,
+      method: "POST"
+    });
+
     const response = await fetch(request);
 
     if (response.ok) {
@@ -242,22 +256,20 @@ export const getWatchlist = createAsyncThunk(
         success: true,
         message: "ok",
         list_items: data
-      }
-
+      };
     } else if (response.status >= 500) {
       return {
         success: false,
         message: "server error",
         list_items: null
-      }
-
+      };
     } else {
       const data = await response.json();
       return {
         success: false,
         message: data.message,
         list_items: null
-      }
+      };
     }
   }
 );
@@ -276,7 +288,12 @@ export const createList = createAsyncThunk(
     params.append("jwt_token", newList.jwt_token);
     params.append("name", newList.name);
 
-    const request = new Request(createListsUrl, { headers, body: params, method: "POST" });
+    const request = new Request(createListsUrl, {
+      headers,
+      body: params,
+      method: "POST"
+    });
+
     const response = await fetch(request);
 
     if (response.ok) {
@@ -286,16 +303,14 @@ export const createList = createAsyncThunk(
         message: "ok",
         code: response.status,
         list: data
-      }
-
+      };
     } else if (response.status >= 500) {
       return {
         success: false,
         message: "server error",
         code: response.status,
         list: null
-      }
-
+      };
     } else {
       const data = await response.json();
       return {
@@ -303,7 +318,7 @@ export const createList = createAsyncThunk(
         message: data.message,
         code: response.status,
         list: null
-      }
+      };
     }
   }
 );
@@ -326,7 +341,12 @@ export const createListItem = createAsyncThunk(
     params.append("poster_path", newListItem.poster_path);
     params.append("watchlist", newListItem.watchlist.toString());
 
-    const request = new Request(createListitemsUrl, { headers, body: params, method: "POST" });
+    const request = new Request(createListitemsUrl, {
+      headers,
+      body: params,
+      method: "POST"
+    });
+
     const response = await fetch(request);
 
     if (response.ok) {
@@ -335,16 +355,14 @@ export const createListItem = createAsyncThunk(
         message: "ok",
         code: response.status,
         list_name: newListItem.list_name
-      }
-
+      };
     } else if (response.status >= 500) {
-      return{
+      return {
         success: false,
         message: "server error",
         code: response.status,
         list_name: newListItem.list_name
-      }
-
+      };
     } else {
       const data = await response.json();
       return {
@@ -352,7 +370,7 @@ export const createListItem = createAsyncThunk(
         message: data.message,
         code: response.status,
         list_name: newListItem.list_name
-      }
+      };
     }
   }
 );
@@ -371,7 +389,12 @@ export const deleteList = createAsyncThunk(
     params.append("jwt_token", deleteRequest.jwt_token);
     params.append("list_id", deleteRequest.list_id);
 
-    const request = new Request(deleteListUrl, { headers, body: params, method: "DELETE" });
+    const request = new Request(deleteListUrl, {
+      headers,
+      body: params,
+      method: "DELETE"
+    });
+
     const response = await fetch(request);
 
     if (response.ok) {
@@ -381,16 +404,14 @@ export const deleteList = createAsyncThunk(
         message: "ok",
         code: response.status,
         list: data
-      }
-
+      };
     } else if (response.status >= 500) {
-      return{
+      return {
         success: false,
         message: "server error",
         code: response.status,
         list: null
-      }
-
+      };
     } else {
       const data = await response.json();
       return {
@@ -398,7 +419,7 @@ export const deleteList = createAsyncThunk(
         message: data.message,
         code: response.status,
         list: null
-      }
+      };
     }
   }
 );
@@ -407,7 +428,9 @@ export const deleteList = createAsyncThunk(
 // ****************************
 export const deleteListItem = createAsyncThunk(
   "lists/deleteListItem",
-  async (deleteRequest: DeleteListItemRequest): Promise<DeleteListItemPayload> => {
+  async (
+    deleteRequest: DeleteListItemRequest
+  ): Promise<DeleteListItemPayload> => {
     const deleteListItemUrl = `${BACKEND_URL}/delete-list-item`;
 
     const headers = new Headers();
@@ -417,7 +440,12 @@ export const deleteListItem = createAsyncThunk(
     params.append("jwt_token", deleteRequest.jwt_token);
     params.append("list_item_id", deleteRequest.list_item_id);
 
-    const request = new Request(deleteListItemUrl, { headers, body: params, method: "DELETE" });
+    const request = new Request(deleteListItemUrl, {
+      headers,
+      body: params,
+      method: "DELETE"
+    });
+
     const response = await fetch(request);
 
     if (response.ok) {
@@ -427,16 +455,14 @@ export const deleteListItem = createAsyncThunk(
         message: "ok",
         code: response.status,
         list_item: data
-      }
-
+      };
     } else if (response.status >= 500) {
-      return{
+      return {
         success: false,
         message: "server error",
         code: response.status,
         list_item: null
-      }
-
+      };
     } else {
       const data = await response.json();
       return {
@@ -444,7 +470,7 @@ export const deleteListItem = createAsyncThunk(
         message: data.message,
         code: response.status,
         list_item: null
-      }
+      };
     }
   }
 );

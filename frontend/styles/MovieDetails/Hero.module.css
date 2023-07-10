@@ -46,7 +46,6 @@
   display: none;
 }
 
-
 @media screen and (max-width: 1000px) {
   .title-section {
     display: flex;
@@ -75,7 +74,7 @@
   }
 
   .score-number {
-    font-size: 2.0rem;
+    font-size: 2rem;
     font-weight: bold;
   }
 }

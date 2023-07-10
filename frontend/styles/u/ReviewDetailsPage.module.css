@@ -132,7 +132,7 @@
 }
 
 .comments-title {
-  font-family: 'Audiowide', cursive;
+  font-family: "Audiowide", cursive;
   font-size: 2rem;
   padding-bottom: 15px;
 }
@@ -156,7 +156,7 @@
 .no-comments {
   text-align: center;
   font-size: 1.5rem;
-  font-family: 'Audiowide', cursive;
+  font-family: "Audiowide", cursive;
 }
 
 @media screen and (max-width: 1500px) {
@@ -165,7 +165,7 @@
     align-items: flex-start;
     padding: 0 5px;
   }
-  
+
   .title {
     padding: 0;
   }
@@ -229,7 +229,7 @@
     align-items: center;
     flex-direction: row;
   }
-  
+
   .title-movie-poster {
     display: none;
   }

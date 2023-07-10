@@ -4,23 +4,21 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 import { FormEvent, useState } from "react";
-import { Input, Button } from '@chakra-ui/react';
-import Link from 'next/link';
+import { Input, Button } from "@chakra-ui/react";
+import Link from "next/link";
 import Image from "next/image";
 
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
 const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
 
-
 export default function RegisterPage() {
-  const [ email, setEmail ] = useState("");
-  const [ username, setUsername ] = useState("");
-  const [ password, setPassword ] = useState("");
-  const [ confirmPassword, setConfirmPassword ] = useState("");
-  const [ error, setError ] = useState(false);
-  const [ errorMessage, setErrorMessage ] = useState("default");
-
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("default");
 
   async function onSubmitRegisterForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -44,16 +42,18 @@ export default function RegisterPage() {
     params.append("password", password);
 
     // send request
-    const request = new Request(registerUrl, { headers, body: params, method: "POST" });
+    const request = new Request(registerUrl, {
+      headers,
+      body: params,
+      method: "POST"
+    });
     const response = await fetch(request);
 
     if (response.ok) {
       window.location.href = "/auth/login";
-
     } else if (response.status >= 500) {
       setError(true);
       setErrorMessage("Server Error");
-
     } else {
       const responseJson = await response.json();
       const errorMessage = responseJson.message;
@@ -62,56 +62,63 @@ export default function RegisterPage() {
     }
   }
 
+  return (
+    <div className={"wrapper"}>
+      <Navbar />
 
-  return <div className={"wrapper"}>
-    <Navbar />
+      <form className={styles["register-form"]} onSubmit={onSubmitRegisterForm}>
+        <Image src={logo} alt="logo" width={400} />
+        <h1>Register</h1>
 
-    <form className={styles["register-form"]} onSubmit={onSubmitRegisterForm}>
-      <Image src={logo} alt="logo" width={400} />
-      <h1>Register</h1>
+        <Input
+          type="text"
+          variant="filled"
+          placeholder="username"
+          value={username}
+          onChange={e => setUsername(e.target.value)}
+          required
+        />
+        <Input
+          type="email"
+          variant="filled"
+          placeholder="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          required
+        />
+        <Input
+          type="password"
+          variant="filled"
+          placeholder="password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          required
+        />
+        <Input
+          type="password"
+          variant="filled"
+          placeholder="confirm password"
+          value={confirmPassword}
+          onChange={e => setConfirmPassword(e.target.value)}
+          required
+        />
+        <Button type="submit" size="sm" variant="outline" colorScheme="blue">
+          Register
+        </Button>
 
-      <Input
-        type="text"
-        variant="filled"
-        placeholder="username"
-        value={username}
-        onChange={e => setUsername(e.target.value)}
-        required
-      />
-      <Input
-        type="email"
-        variant="filled"
-        placeholder="email"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-        required
-      />
-      <Input
-        type="password"
-        variant="filled"
-        placeholder="password"
-        value={password}
-        onChange={e => setPassword(e.target.value)}
-        required
-      />
-      <Input
-        type="password"
-        variant="filled"
-        placeholder="confirm password"
-        value={confirmPassword}
-        onChange={e => setConfirmPassword(e.target.value)}
-        required
-      />
-      <Button type="submit" size="sm" variant="outline" colorScheme='blue'>Register</Button>
+        <p className={error ? styles["show-error"] : styles["dont-show-error"]}>
+          {errorMessage}
+        </p>
 
-      <p className={error ? styles["show-error"] : styles["dont-show-error"]}>
-        {errorMessage}
-      </p>
+        <p>
+          Already have an account?{" "}
+          <Link href="/auth/login">
+            <span>Login</span>
+          </Link>
+        </p>
+      </form>
 
-      <p>Already have an account? <Link href="/auth/login"><span>Login</span></Link></p>
-
-    </form>
-
-    <Footer />
-  </div>
+      <Footer />
+    </div>
+  );
 }

@@ -23,17 +23,17 @@ export const authSlice = createSlice({
     unsetCredentials(state) {
       state.jwt_token = null;
       state.username = null;
-    },
+    }
   },
 
   extraReducers: {
     [HYDRATE]: (state, action) => {
       return {
         ...state,
-        ...action.payload.credentials,
+        ...action.payload.credentials
       };
-    },
-  },
+    }
+  }
 });
 
 export const { setCredentials, unsetCredentials } = authSlice.actions;

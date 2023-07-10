@@ -15,7 +15,7 @@
 .no-results {
   text-align: center;
   font-size: 1.5rem;
-  font-family: 'Audiowide', cursive;
+  font-family: "Audiowide", cursive;
 }
 
 .no-results-image {
@@ -80,7 +80,7 @@
 
 .filter {
   height: 220px;
-  font-family: 'Audiowide', cursive;
+  font-family: "Audiowide", cursive;
   background-color: white;
   border: 1px solid var(--light-grey);
   box-shadow: 5px 5px #888888;
@@ -114,7 +114,7 @@
     align-items: center;
     justify-content: space-around;
     gap: 5px;
-    font-family: 'Audiowide', cursive;
+    font-family: "Audiowide", cursive;
     margin-bottom: 40px;
   }
 

@@ -33,7 +33,7 @@ const nextConfig = {
         protocol: "https",
         hostname: "image.tmdb.org",
         pathname: "/t/p/w780/*"
-      },
+      }
     ]
   },
   publicRuntimeConfig: {
@@ -47,6 +47,6 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true
   }
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

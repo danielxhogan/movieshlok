@@ -3,14 +3,15 @@ import Navbar from "@/components/Navbar";
 // import { GetServerSideProps } from "next";
 
 export default function NotificationsPage() {
-  return <div className={styles["wrapper"]}>
-    <Navbar />
+  return (
+    <div className={styles["wrapper"]}>
+      <Navbar />
 
-    <div className={styles["notifications-page"]}>
-
-      <h1>Notifications Page</h1>
+      <div className={styles["notifications-page"]}>
+        <h1>Notifications Page</h1>
+      </div>
     </div>
-  </div>
+  );
 }
 
 // export const getServerSideProps: GetServerSideProps = async (context) => {

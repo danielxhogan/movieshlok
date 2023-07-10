@@ -11,7 +11,7 @@ import {
 } from "@/redux/actions/lists";
 
 import { createSlice } from "@reduxjs/toolkit";
-import { Status } from "@/redux/reducers/index"
+import { Status } from "@/redux/reducers/index";
 import { AppState } from "@/redux/store";
 
 // TYPES
@@ -32,7 +32,7 @@ const initialListsState: Lists = {
   success: null,
   message: "",
   lists: []
-}
+};
 
 // GET ALL LIST ITEMS FOR A LIST
 // ******************************
@@ -49,7 +49,7 @@ const initialListItemsState: ListItems = {
   success: null,
   message: "",
   list_items: null
-}
+};
 
 // GET WATCHLIST FOR A USER
 // ******************************
@@ -59,7 +59,7 @@ const initialWatchlistState: ListItems = {
   success: null,
   message: "",
   list_items: null
-}
+};
 
 // CREATE NEW LIST FOR A USER
 // ***************************
@@ -78,7 +78,7 @@ const initialNewListState: NewList = {
   message: "",
   code: null,
   list: null
-}
+};
 
 // ADD A MOVIE TO A LIST
 // ***************************
@@ -97,7 +97,7 @@ const initialNewListItemState: NewListItem = {
   message: "",
   code: null,
   list_name: null
-}
+};
 
 // DELETE A LIST
 // **************
@@ -105,7 +105,7 @@ const initialNewListItemState: NewListItem = {
 interface DeletedList {
   status: Status;
   success: boolean | null;
-  message: string,
+  message: string;
   code: number | null;
   list: List | null;
 }
@@ -116,7 +116,7 @@ const initialDeletedListState: DeletedList = {
   message: "",
   code: null,
   list: null
-}
+};
 
 // DELETE AN ITEM FROM A LIST
 // ****************************
@@ -135,7 +135,7 @@ const initialDeletedListItemState: DeletedListItem = {
   message: "",
   code: null,
   list_item: null
-}
+};
 
 // REDUCERS
 // *************************
@@ -149,26 +149,35 @@ export const listsSlice = createSlice({
   reducers: {
     addNewList(state, action) {
       state.lists?.push(action.payload.newList);
+    },
+    removeDeletedList(state, action) {
+      if (state.lists) {
+        const newList = state.lists.filter(
+          list => list.id !== action.payload.list_id
+        );
+        state.lists = newList;
+      }
     }
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
-      .addCase(getLists.pending, (state) => {
-        state.status = "loading",
-        state.success = null,
-        state.message = "",
-        state.lists = []
+      .addCase(getLists.pending, state => {
+        (state.status = "loading"),
+          (state.success = null),
+          (state.message = ""),
+          (state.lists = []);
       })
       .addCase(getLists.fulfilled, (state, action) => {
-        state.status = "fulfilled",
-        state.success = action.payload.success,
-        state.message = action.payload.message,
-        state.lists = action.payload.lists
-      })
+        (state.status = "fulfilled"),
+          (state.success = action.payload.success),
+          (state.message = action.payload.message),
+          (state.lists = action.payload.lists);
+      });
   }
 });
 
 export const { addNewList } = listsSlice.actions;
+export const { removeDeletedList } = listsSlice.actions;
 export const selectLists = (state: AppState) => state.lists;
 export const listsReducer = listsSlice.reducer;
 
@@ -178,24 +187,34 @@ export const listsReducer = listsSlice.reducer;
 export const listItemsSlice = createSlice({
   name: "listItems",
   initialState: initialListItemsState,
-  reducers: {},
-  extraReducers: (builder) => {
+  reducers: {
+    removeListItem(state, action) {
+      if (state.list_items) {
+        const newItems = state.list_items.filter(
+          list_item => list_item.id !== action.payload.list_item_id
+        );
+        state.list_items = newItems;
+      }
+    }
+  },
+  extraReducers: builder => {
     builder
-      .addCase(getListItems.pending, (state) => {
-        state.status = "loading",
-        state.success = null,
-        state.message = "",
-        state.list_items = null
+      .addCase(getListItems.pending, state => {
+        (state.status = "loading"),
+          (state.success = null),
+          (state.message = ""),
+          (state.list_items = null);
       })
       .addCase(getListItems.fulfilled, (state, action) => {
-        state.status = "fulfilled",
-        state.success = action.payload.success,
-        state.message = action.payload.message,
-        state.list_items = action.payload.list_items
-      })
+        (state.status = "fulfilled"),
+          (state.success = action.payload.success),
+          (state.message = action.payload.message),
+          (state.list_items = action.payload.list_items);
+      });
   }
-})
+});
 
+export const { removeListItem } = listItemsSlice.actions;
 export const selectListItems = (state: AppState) => state.listItems;
 export const listItemsReducer = listItemsSlice.reducer;
 
@@ -205,24 +224,34 @@ export const listItemsReducer = listItemsSlice.reducer;
 export const watchlistSlice = createSlice({
   name: "listItems",
   initialState: initialWatchlistState,
-  reducers: {},
-  extraReducers: (builder) => {
+  reducers: {
+    removeWatchlistItem(state, action) {
+      if (state.list_items) {
+        const newItems = state.list_items.filter(
+          list_item => list_item.id !== action.payload.list_item_id
+        );
+        state.list_items = newItems;
+      }
+    }
+  },
+  extraReducers: builder => {
     builder
-      .addCase(getWatchlist.pending, (state) => {
-        state.status = "loading",
-        state.success = null,
-        state.message = "",
-        state.list_items = null
+      .addCase(getWatchlist.pending, state => {
+        (state.status = "loading"),
+          (state.success = null),
+          (state.message = ""),
+          (state.list_items = null);
       })
       .addCase(getWatchlist.fulfilled, (state, action) => {
-        state.status = "fulfilled",
-        state.success = action.payload.success,
-        state.message = action.payload.message,
-        state.list_items = action.payload.list_items
-      })
+        (state.status = "fulfilled"),
+          (state.success = action.payload.success),
+          (state.message = action.payload.message),
+          (state.list_items = action.payload.list_items);
+      });
   }
 });
 
+export const { removeWatchlistItem } = watchlistSlice.actions;
 export const selectWatchlist = (state: AppState) => state.watchlist;
 export const watchlistReducer = watchlistSlice.reducer;
 
@@ -234,29 +263,29 @@ export const newListSlice = createSlice({
   initialState: initialNewListState,
   reducers: {
     resetNewList(state) {
-      state.status = "idle",
-      state.success = null,
-      state.message = "",
-      state.code = null,
-      state.list = null
+      (state.status = "idle"),
+        (state.success = null),
+        (state.message = ""),
+        (state.code = null),
+        (state.list = null);
     }
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
-      .addCase(createList.pending, (state) => {
-        state.status = "loading",
-        state.success = null,
-        state.message = "",
-        state.code = null,
-        state.list = null
+      .addCase(createList.pending, state => {
+        (state.status = "loading"),
+          (state.success = null),
+          (state.message = ""),
+          (state.code = null),
+          (state.list = null);
       })
       .addCase(createList.fulfilled, (state, action) => {
-        state.status = "fulfilled",
-        state.success = action.payload.success,
-        state.message = action.payload.message,
-        state.code = action.payload.code,
-        state.list = action.payload.list
-      })
+        (state.status = "fulfilled"),
+          (state.success = action.payload.success),
+          (state.message = action.payload.message),
+          (state.code = action.payload.code),
+          (state.list = action.payload.list);
+      });
   }
 });
 
@@ -272,29 +301,29 @@ export const newListItemSlice = createSlice({
   initialState: initialNewListItemState,
   reducers: {
     resetNewListItem(state) {
-      state.status = "idle",
-      state.success = null,
-      state.message = "",
-      state.code = null,
-      state.list_name = null
+      (state.status = "idle"),
+        (state.success = null),
+        (state.message = ""),
+        (state.code = null),
+        (state.list_name = null);
     }
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
-      .addCase(createListItem.pending, (state) => {
-        state.status = "loading",
-        state.success = null,
-        state.message = "",
-        state.code = null,
-        state.list_name = null
+      .addCase(createListItem.pending, state => {
+        (state.status = "loading"),
+          (state.success = null),
+          (state.message = ""),
+          (state.code = null),
+          (state.list_name = null);
       })
       .addCase(createListItem.fulfilled, (state, action) => {
-        state.status = "fulfilled",
-        state.success = action.payload.success,
-        state.message = action.payload.message,
-        state.code = action.payload.code,
-        state.list_name = action.payload.list_name
-      })
+        (state.status = "fulfilled"),
+          (state.success = action.payload.success),
+          (state.message = action.payload.message),
+          (state.code = action.payload.code),
+          (state.list_name = action.payload.list_name);
+      });
   }
 });
 
@@ -310,29 +339,29 @@ export const deletedListSlice = createSlice({
   initialState: initialDeletedListState,
   reducers: {
     resetDeletedList(state) {
-      state.status = "idle",
-      state.success = null,
-      state.message = "",
-      state.code = null,
-      state.list = null
+      (state.status = "idle"),
+        (state.success = null),
+        (state.message = ""),
+        (state.code = null),
+        (state.list = null);
     }
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
-      .addCase(deleteList.pending, (state) => {
-        state.status = "loading",
-        state.success = null,
-        state.message = "",
-        state.code = null,
-      state.list = null
+      .addCase(deleteList.pending, state => {
+        (state.status = "loading"),
+          (state.success = null),
+          (state.message = ""),
+          (state.code = null),
+          (state.list = null);
       })
       .addCase(deleteList.fulfilled, (state, action) => {
-        state.status = "fulfilled",
-        state.success = action.payload.success,
-        state.message = action.payload.message,
-        state.code = action.payload.code,
-        state.list = action.payload.list
-      })
+        (state.status = "fulfilled"),
+          (state.success = action.payload.success),
+          (state.message = action.payload.message),
+          (state.code = action.payload.code),
+          (state.list = action.payload.list);
+      });
   }
 });
 
@@ -348,29 +377,29 @@ export const deletedListItemSlice = createSlice({
   initialState: initialDeletedListItemState,
   reducers: {
     resetDeletedListItem(state) {
-      state.status = "idle",
-      state.success = null,
-      state.message = "",
-      state.code = null,
-      state.list_item = null
+      (state.status = "idle"),
+        (state.success = null),
+        (state.message = ""),
+        (state.code = null),
+        (state.list_item = null);
     }
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
-      .addCase(deleteListItem.pending, (state) => {
-        state.status = "loading",
-        state.success = null,
-        state.message = "",
-        state.code = null,
-      state.list_item = null
+      .addCase(deleteListItem.pending, state => {
+        (state.status = "loading"),
+          (state.success = null),
+          (state.message = ""),
+          (state.code = null),
+          (state.list_item = null);
       })
       .addCase(deleteListItem.fulfilled, (state, action) => {
-        state.status = "fulfilled",
-        state.success = action.payload.success,
-        state.message = action.payload.message,
-        state.code = action.payload.code,
-        state.list_item = action.payload.list_item
-      })
+        (state.status = "fulfilled"),
+          (state.success = action.payload.success),
+          (state.message = action.payload.message),
+          (state.code = action.payload.code),
+          (state.list_item = action.payload.list_item);
+      });
   }
 });
 

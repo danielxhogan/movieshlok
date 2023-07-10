@@ -5,13 +5,12 @@ import { useAppSelector } from "@/redux/hooks";
 import { selectSearchResults } from "@/redux/reducers/tmdb";
 
 import { useEffect, useState } from "react";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 import { InputGroup, InputLeftElement, Input } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
 
-
 interface SearchbarProps {
-  navbarProps: NavbarProps,
+  navbarProps: NavbarProps;
   size: string;
 }
 
@@ -27,15 +26,13 @@ export default function Searchbar(props: SearchbarProps) {
     defaultSearchQuery = "";
   }
 
-  const [ searchQuery, setSearchQuery ] = useState(defaultSearchQuery);
-
+  const [searchQuery, setSearchQuery] = useState(defaultSearchQuery);
 
   useEffect(() => {
     if (searchResults.status === "fulfilled") {
       setSearchQuery(searchResults.query);
     }
-  }, [searchResults])
-
+  }, [searchResults]);
 
   function onChangeSearchQuery(value: string) {
     setSearchQuery(value);
@@ -48,34 +45,39 @@ export default function Searchbar(props: SearchbarProps) {
     e.preventDefault();
 
     let defaultFilter: FilterResults;
-    if (props.navbarProps.filter !== undefined) { defaultFilter = props.navbarProps.filter; }
-    else { defaultFilter = FilterResults.ALL; }
+    if (props.navbarProps.filter !== undefined) {
+      defaultFilter = props.navbarProps.filter;
+    } else {
+      defaultFilter = FilterResults.ALL;
+    }
 
     if (searchQuery !== "") {
-      router.push(`/search?query=${searchQuery}&filter=${defaultFilter}&page=1`);
+      router.push(
+        `/search?query=${searchQuery}&filter=${defaultFilter}&page=1`
+      );
     }
   }
 
-  return <>
-    <form
-      onSubmit={onSubmitSearchForm}
-      className={`${styles["wrapper"]} ${styles[props.size]}`}
+  return (
+    <>
+      <form
+        onSubmit={onSubmitSearchForm}
+        className={`${styles["wrapper"]} ${styles[props.size]}`}
       >
-      {/* @ts-ignore */}
-      <InputGroup>
-        <InputLeftElement
-          pointerEvents='none'
-        >
-          <SearchIcon color="gray.500" />
-        </ InputLeftElement>
-        <Input
-          type="text"
-          variant="filled"
-          placeholder="search movies, or cast & crew"
-          value={searchQuery}
-          onChange={e => onChangeSearchQuery(e.target.value)}
-        />
-      </InputGroup>
-    </form>
-  </>;
+        {/* @ts-ignore */}
+        <InputGroup>
+          <InputLeftElement pointerEvents="none">
+            <SearchIcon color="gray.500" />
+          </InputLeftElement>
+          <Input
+            type="text"
+            variant="filled"
+            placeholder="search movies, or cast & crew"
+            value={searchQuery}
+            onChange={e => onChangeSearchQuery(e.target.value)}
+          />
+        </InputGroup>
+      </form>
+    </>
+  );
 }

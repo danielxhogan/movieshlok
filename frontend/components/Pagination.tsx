@@ -14,7 +14,7 @@ export enum UseCases {
 }
 
 interface SearchResultsData {
-  useCase: UseCases.SEARCH_RESULTS,
+  useCase: UseCases.SEARCH_RESULTS;
   currentPage: string;
   totalPages: string;
   searchQuery: string;
@@ -22,7 +22,7 @@ interface SearchResultsData {
 }
 
 interface ReviewsData {
-  useCase: UseCases.REVIEWS,
+  useCase: UseCases.REVIEWS;
   currentPage: number;
   totalPages: number;
   movieId: string;
@@ -36,43 +36,47 @@ export default function Pagination(props: Props) {
 
   function searchResultsOnClick(page: number) {
     if (props.useCase === UseCases.SEARCH_RESULTS) {
-      router.push(`/search?query=${props.searchQuery}&filter=${props.filter}&page=${page}`);
+      router.push(
+        `/search?query=${props.searchQuery}&filter=${props.filter}&page=${page}`
+      );
     }
   }
 
   function reviewsOnClick(page: number) {
     if (props.useCase === UseCases.REVIEWS) {
-    const getReviewsRequest: GetReviewsRequest = {
-      page,
-      movie_id: props.movieId
-    };
+      const getReviewsRequest: GetReviewsRequest = {
+        page,
+        movie_id: props.movieId
+      };
 
-    dispatch<any>(getReviews(getReviewsRequest));
+      dispatch<any>(getReviews(getReviewsRequest));
     }
   }
 
-  function makeLinksArray(startI: number, endI: number, currentPage: number, onClickFuncion: Function) {
+  function makeLinksArray(
+    startI: number,
+    endI: number,
+    currentPage: number,
+    onClickFuncion: Function
+  ) {
     const linksArray = [];
 
-    for (let i=startI; i<endI; i++) {
+    for (let i = startI; i < endI; i++) {
       const pageNumber = i + 1;
 
       linksArray.push(
-          <span
-            key={i}
-            onClick={ () => onClickFuncion(pageNumber) }
-            className={
-              (i+1) === currentPage
-              ?
-              `${styles["current-page"]} ${styles["page-button"]}`
-              :
-              `${styles["page-button"]}`}
-              >
-
-            { i + 1 }
-
-          </span>
-      )
+        <span
+          key={i}
+          onClick={() => onClickFuncion(pageNumber)}
+          className={
+            i + 1 === currentPage
+              ? `${styles["current-page"]} ${styles["page-button"]}`
+              : `${styles["page-button"]}`
+          }
+        >
+          {i + 1}
+        </span>
+      );
     }
 
     return linksArray;
@@ -100,15 +104,12 @@ export default function Pagination(props: Props) {
     if (totalPages <= 5) {
       startI = 0;
       endI = totalPages;
-
     } else if (currentPage <= 3) {
       startI = 0;
       endI = 5;
-
-    } else if ((totalPages - currentPage) <= 2) {
+    } else if (totalPages - currentPage <= 2) {
       startI = totalPages - 5;
       endI = totalPages;
-
     } else {
       startI = currentPage - 3;
       endI = currentPage + 2;
@@ -125,12 +126,18 @@ export default function Pagination(props: Props) {
   function makeLeftArrowIcons(page: number, onClickFunction: Function) {
     return (
       <span className={styles["left-buttons"]}>
-          <span className={styles["icon-span"]} onClick={ () => onClickFunction(1) }>
-            <i className="fa-solid fa-backward-step fa-lg"></i>
-          </span>
-          <span className={styles["icon-span"]} onClick={ () => onClickFunction(page) }>
-            <i className="fa-solid fa-play fa-rotate-180"></i>
-          </span>
+        <span
+          className={styles["icon-span"]}
+          onClick={() => onClickFunction(1)}
+        >
+          <i className="fa-solid fa-backward-step fa-lg"></i>
+        </span>
+        <span
+          className={styles["icon-span"]}
+          onClick={() => onClickFunction(page)}
+        >
+          <i className="fa-solid fa-play fa-rotate-180"></i>
+        </span>
       </span>
     );
   }
@@ -151,7 +158,7 @@ export default function Pagination(props: Props) {
       page = previousPage;
     }
 
-    switch(props.useCase) {
+    switch (props.useCase) {
       case UseCases.SEARCH_RESULTS:
         return makeLeftArrowIcons(page, searchResultsOnClick);
       case UseCases.REVIEWS:
@@ -170,15 +177,20 @@ export default function Pagination(props: Props) {
 
     return (
       <span className={styles["right-buttons"]}>
-          <span className={styles["icon-span"]} onClick={ () => onClickFuncion(page) }>
-            <i className="fa-solid fa-play"></i>
-          </span>
-          <span className={styles["icon-span"]} onClick={ () => onClickFuncion(totalPages) }>
-            <i className="fa-solid fa-forward-step fa-lg"></i>
-          </span>
+        <span
+          className={styles["icon-span"]}
+          onClick={() => onClickFuncion(page)}
+        >
+          <i className="fa-solid fa-play"></i>
+        </span>
+        <span
+          className={styles["icon-span"]}
+          onClick={() => onClickFuncion(totalPages)}
+        >
+          <i className="fa-solid fa-forward-step fa-lg"></i>
+        </span>
       </span>
     );
-
   }
 
   function makeRightArrows() {
@@ -204,7 +216,7 @@ export default function Pagination(props: Props) {
       page = nextPage;
     }
 
-    switch(props.useCase) {
+    switch (props.useCase) {
       case UseCases.SEARCH_RESULTS:
         return makeRightArrowIcons(page, searchResultsOnClick);
       case UseCases.REVIEWS:
@@ -212,9 +224,11 @@ export default function Pagination(props: Props) {
     }
   }
 
-  return <div className={styles["pagination"]}>
-    { makeLeftArrows() }
-    { makeLinks() }
-    { makeRightArrows() }
-  </div>
+  return (
+    <div className={styles["pagination"]}>
+      {makeLeftArrows()}
+      {makeLinks()}
+      {makeRightArrows()}
+    </div>
+  );
 }

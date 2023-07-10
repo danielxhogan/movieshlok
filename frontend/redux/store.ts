@@ -1,11 +1,11 @@
 import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
 import { createWrapper } from "next-redux-wrapper";
-import reducers from './reducers';
+import reducers from "./reducers";
 
 const makeStore = () =>
   configureStore({
     reducer: reducers,
-    devTools: true,
+    devTools: true
   });
 
 export type AppStore = ReturnType<typeof makeStore>;

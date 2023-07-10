@@ -1,8 +1,8 @@
 :root {
-  --background-primary: #F7F7F7;
-  --background-secondary: #FFF3E2;
+  --background-primary: #f7f7f7;
+  --background-secondary: #fff3e2;
   --light-grey: #c0c0c0;
-  --dark-grey: #282A3A;
+  --dark-grey: #282a3a;
   --hot-pink: #ff69b4;
 }
 
@@ -10,18 +10,18 @@
   background-color: var(--background-primary);
   min-height: 100vh;
   padding-top: 100px;
-  padding-bottom: 85px;   /* to account for the height of the footer */
+  padding-bottom: 85px; /* to account for the height of the footer */
 }
 
 @media only screen and (max-width: 900px) {
   .wrapper {
-    padding-top: 150px;   /* to account for the search bar in nav dropping down to its own row */
+    padding-top: 150px; /* to account for the search bar in nav dropping down to its own row */
   }
 }
 
 @media screen and (max-width: 650px) {
   .wrapper {
-    padding-bottom: 150px;    /* at 650px, the footer goes to a height of 150px */
+    padding-bottom: 150px; /* at 650px, the footer goes to a height of 150px */
   }
 }
 
@@ -65,7 +65,6 @@
 
 /* user profile page class: profile, ratings/ watchlist, lists, list */
 /* ***************************************************************** */
-
 
 .page-title {
   margin: 40px 0;
