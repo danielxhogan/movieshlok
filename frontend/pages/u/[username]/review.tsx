@@ -52,10 +52,8 @@ import {
   Spinner
 } from "@chakra-ui/react";
 
-import getConfig from "next/config";
-const { publicRuntimeConfig } = getConfig();
-const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
-const TMDB_IMAGE_URL = publicRuntimeConfig.TMDB_IMAGE_URL;
+const TMDB_IMAGE_URL = process.env.NEXT_PUBLIC_TMDB_IMAGE_URL;
+const BACKEND_URL = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}`;
 
 enum ModalType {
   DELETE_REVIEW,

@@ -1,6 +1,4 @@
-import getConfig from "next/config";
-const { publicRuntimeConfig } = getConfig();
-const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
+const BACKEND_URL = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}`;
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
@@ -42,6 +40,7 @@ export const getSearchResults = createAsyncThunk(
 
     // construct the request
     const searchUrl = `${BACKEND_URL}/tmdb/search`;
+    console.log(searchUrl);
 
     const headers = new Headers();
     headers.append("Content-Type", "application/x-www-form-urlencoded");

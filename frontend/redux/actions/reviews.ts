@@ -2,9 +2,7 @@ import { Rating } from "@/components/Stars";
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-import getConfig from "next/config";
-const { publicRuntimeConfig } = getConfig();
-const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
+const BACKEND_URL = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}`;
 
 // TYPES
 // *****************************

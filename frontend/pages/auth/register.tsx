@@ -8,9 +8,7 @@ import { Input, Button } from "@chakra-ui/react";
 import Link from "next/link";
 import Image from "next/image";
 
-import getConfig from "next/config";
-const { publicRuntimeConfig } = getConfig();
-const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
+const BACKEND_URL = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}`;
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -70,6 +68,7 @@ export default function RegisterPage() {
         <Image src={logo} alt="logo" width={400} />
         <h1>Register</h1>
 
+        {/* @ts-ignore */}
         <Input
           type="text"
           variant="filled"

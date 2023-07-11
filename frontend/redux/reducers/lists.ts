@@ -222,7 +222,7 @@ export const listItemsReducer = listItemsSlice.reducer;
 // ******************************
 // this reducer sets the value for watchlist in redux store
 export const watchlistSlice = createSlice({
-  name: "listItems",
+  name: "watchlistItems",
   initialState: initialWatchlistState,
   reducers: {
     removeWatchlistItem(state, action) {

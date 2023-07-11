@@ -1,6 +1,5 @@
 import styles from "@/styles/SearchPage.module.css";
 import Navbar from "@/components/Navbar";
-import Searchbar from "@/components/Searchbar";
 import Pagination, { UseCases } from "@/components/Pagination";
 import Footer from "@/components/Footer";
 
@@ -20,9 +19,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Divider, Button, Spinner } from "@chakra-ui/react";
 
-import getConfig from "next/config";
-const { publicRuntimeConfig } = getConfig();
-const TMDB_IMAGE_URL = publicRuntimeConfig.TMDB_IMAGE_URL;
+const TMDB_IMAGE_URL = process.env.NEXT_PUBLIC_TMDB_IMAGE_URL;
 
 export enum FilterResults {
   ALL,

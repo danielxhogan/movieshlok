@@ -36,11 +36,6 @@ const nextConfig = {
       }
     ]
   },
-  publicRuntimeConfig: {
-    BACKEND_HOST: process.env.BACKEND_HOST,
-    BACKEND_PORT: process.env.BACKEND_PORT,
-    TMDB_IMAGE_URL: process.env.TMDB_IMAGE_URL
-  },
   eslint: {
     ignoreDuringBuilds: true
   },

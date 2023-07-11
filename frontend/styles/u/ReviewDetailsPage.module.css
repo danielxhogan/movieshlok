@@ -172,16 +172,19 @@
 }
 
 @media screen and (max-width: 1000px) {
-  .title {
-    font-size: 2rem;
+  .review-details {
+    width: 100%;
   }
-
   .movie-poster-div {
     display: none;
   }
 
   .title-movie-poster {
     display: block;
+  }
+
+  .title {
+    font-size: 2rem;
   }
 
   .small-score {

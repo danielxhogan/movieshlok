@@ -39,9 +39,7 @@ import {
   ModalFooter
 } from "@chakra-ui/react";
 
-import getConfig from "next/config";
-const { publicRuntimeConfig } = getConfig();
-const BACKEND_URL = `http://${publicRuntimeConfig.BACKEND_HOST}:${publicRuntimeConfig.BACKEND_PORT}`;
+const BACKEND_URL = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}`;
 
 export default function Reviews() {
   const router = useRouter();

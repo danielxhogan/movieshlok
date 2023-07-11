@@ -1,6 +1,7 @@
 Dockerfile
+.next
 /node_modules
-.env
+
 dockerbuild.sh
 dockerrun.sh
-.next
+dockerexec.sh

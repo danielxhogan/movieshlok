@@ -17,10 +17,11 @@ services:
       - ${BACKEND_PORT}:3030
     environment:
       DATABASE_URL: ${DATABASE_URL}
-      TMDB_BASE_URL: ${TMDB_BASE_URL}
-      TMDB_API_KEY: ${TMDB_API_KEY}
+      JWT_SECRET: ${JWT_SECRET}
       BACKEND_HOST: ${BACKEND_HOST}
       BACKEND_PORT: ${BACKEND_PORT}
+      TMDB_BASE_URL: ${TMDB_BASE_URL}
+      TMDB_API_KEY: ${TMDB_API_KEY}
     network_mode: host
 
   frontend:
@@ -28,10 +29,6 @@ services:
     container_name: movieshlok-frontend
     ports:
       - ${FRONTEND_PORT}:3000
-    environment:
-      BACKEND_PORT: ${BACKEND_PORT}
-      BACKEND_HOST: ${BACKEND_HOST}
-      TMDB_IMAGE_URL: ${TMDB_IMAGE_URL}
 
 volumes:
   movieshlok-data:
