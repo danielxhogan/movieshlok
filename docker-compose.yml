@@ -13,8 +13,6 @@ services:
   backend:
     image: danielxhogan/movieshlok-backend
     container_name: movieshlok-backend
-    ports:
-      - ${BACKEND_PORT}:3030
     environment:
       DATABASE_URL: ${DATABASE_URL}
       JWT_SECRET: ${JWT_SECRET}
