@@ -219,13 +219,13 @@ export default function ListsPage() {
 
         {lists.status === "fulfilled" ? (
           <>
-            {lists.lists && lists.lists.length === 1 ? (
-              <div className={styles["no-lists"]}>Create you first list</div>
+            {lists.lists?.length === 1 ? (
+              <div className={styles["no-lists"]}>No lists yet</div>
             ) : (
               <i>View list</i>
             )}
 
-            {lists.lists && lists.lists.map(list => makeList(list))}
+            {lists.lists?.map(list => makeList(list))}
 
             <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
               <ModalOverlay />

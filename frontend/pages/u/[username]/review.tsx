@@ -20,6 +20,7 @@ import {
   DeleteReviewRequest,
   DeleteCommentRequest
 } from "@/redux/actions/review";
+
 import {
   selectReviewDetails,
   addNewComment,
@@ -100,7 +101,6 @@ export default function ReviewDetailsPage() {
   // ********************************************************************
   const onNewComment = useCallback(
     (newComment: string) => {
-      console.log("new Comment");
       let id: string | null = null;
       let username: string | null = null;
       let review_id: string | null = null;
@@ -113,22 +113,13 @@ export default function ReviewDetailsPage() {
         const key = commentFieldArray[0];
         const value = commentFieldArray[1];
 
+        // prettier-ignore
         switch (key) {
-          case "id":
-            id = value;
-            break;
-          case "username":
-            username = value;
-            break;
-          case "review_id":
-            review_id = value;
-            break;
-          case "comment":
-            comment = value;
-            break;
-          case "created_at":
-            created_at = parseInt(value);
-            break;
+          case "id": id = value; break;
+          case "username": username = value; break;
+          case "review_id": review_id = value; break;
+          case "comment": comment = value; break;
+          case "created_at": created_at = parseInt(value); break;
         }
       });
 
@@ -366,6 +357,7 @@ export default function ReviewDetailsPage() {
             </ModalContent>
           </>
         );
+
       case ModalType.DELETE_COMMENT:
         return (
           <>
@@ -568,6 +560,7 @@ export default function ReviewDetailsPage() {
 
           <div className={styles["comment-title-right"]}>
             <i>{makeDate(comment.created_at)}</i>
+
             {credentials.username === comment.username && (
               <Tooltip label={"delete comment"} placement="top">
                 <i
@@ -608,6 +601,7 @@ export default function ReviewDetailsPage() {
                     alt="backdrop"
                   ></Image>
                 )}
+
                 <span className={styles["score"]}>
                   <span className={styles["score-number"]}>{score}</span> / 5
                 </span>
@@ -643,10 +637,7 @@ export default function ReviewDetailsPage() {
                 <div className={styles["user-title-data"]}>
                   <div className={styles["username-section"]}>
                     <Link href={`/u/${router.query.username}/profile`}>
-                      <h2>
-                        {typeof router.query.username === "string" &&
-                          router.query.username}
-                      </h2>
+                      <h2>{router.query.username}</h2>
                     </Link>
 
                     <div className={styles["rating-heart"]}>
@@ -659,6 +650,7 @@ export default function ReviewDetailsPage() {
                           size={"xl"}
                         />
                       )}
+
                       <span className={styles["heart"]}>
                         {reviewDetails.data && reviewDetails.data.liked ? (
                           <i className={`fa-solid fa-heart fa-2xl`}></i>
@@ -686,8 +678,8 @@ export default function ReviewDetailsPage() {
 
                   {makeTitle()}
                 </div>
-              </div>{" "}
-              {/* end title-section */}
+              </div>
+
               <div className={`${styles["review-section"]} block`}>
                 {reviewDetails.status === "fulfilled" ? (
                   <>
@@ -707,8 +699,10 @@ export default function ReviewDetailsPage() {
                   </div>
                 )}
               </div>
+
               <div className={styles["comments-section"]}>
                 <h2 className={styles["comments-title"]}>Comments</h2>
+
                 {reviewDetails.status === "fulfilled" ? (
                   reviewDetails.data &&
                   reviewDetails.data.comments.length > 0 ? (
@@ -723,12 +717,12 @@ export default function ReviewDetailsPage() {
                     </h2>
                   )
                 ) : (
-                  // <>no Comments</>
                   <div className="spinner">
                     <Spinner size="xl" />
                   </div>
                 )}
               </div>
+
               <div className={`${styles["comment-section"]} block`}>
                 {credentials.jwt_token ? (
                   <>
@@ -760,14 +754,14 @@ export default function ReviewDetailsPage() {
               <ModalOverlay />
               {makeModal(modalType)}
             </Modal>
-          </div> // end review-content
+          </div>
         ) : (
           <div className="spinner">
             <Spinner size="xl" />
           </div>
         )}
-      </div>{" "}
-      {/* end content */}
+      </div>
+
       <Footer />
     </div>
   );

@@ -41,7 +41,7 @@ export default function MovieDetailsPage() {
     : movieDetails.data.vote_average;
 
   useEffect(() => {
-    if (router.query.movieId && typeof router.query.movieId === "string") {
+    if (typeof router.query.movieId === "string") {
       const getReviewsRequest: GetReviewsRequest = {
         movie_id: router.query.movieId,
         page: 1
@@ -56,7 +56,6 @@ export default function MovieDetailsPage() {
     if (
       credentials.jwt_token &&
       credentials.username &&
-      router.query.movieId &&
       typeof router.query.movieId === "string"
     ) {
       const userMovie: UserMovie = {

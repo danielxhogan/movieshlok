@@ -43,11 +43,11 @@ export default function ListPage() {
 
         {listItems.status === "fulfilled" ? (
           <div className="list-item-cards">
-            {listItems.list_items &&
-              listItems.list_items.map(listItem => {
-                return <ListItemCard listItem={listItem} key={listItem.id} />;
-              })}
-            {listItems.list_items && listItems.list_items.length === 0 && (
+            {listItems.list_items?.map(listItem => {
+              return <ListItemCard listItem={listItem} key={listItem.id} />;
+            })}
+
+            {listItems.list_items?.length === 0 && (
               <div className={styles["no-movies"]}>
                 No movies in this list yet
               </div>

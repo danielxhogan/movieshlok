@@ -112,13 +112,10 @@ export default function HomePage() {
   }
 
   const toggleQuotePicClass = useCallback(() => {
+    // prettier-ignore
     switch (quotePicClass) {
-      case SHOWN:
-        setQuotePicClass(HIDDEN);
-        break;
-      case HIDDEN:
-        setQuotePicClass(SHOWN);
-        break;
+      case SHOWN: setQuotePicClass(HIDDEN); break;
+      case HIDDEN: setQuotePicClass(SHOWN); break;
     }
   }, [quotePicClass]);
 
@@ -133,7 +130,6 @@ export default function HomePage() {
   useEffect(() => {
     window.addEventListener("scroll", () => {
       const distanceScrolled = window.pageYOffset;
-      // console.log(distanceScrolled);
       const searchImg = document.getElementById("searchImg");
       const movieDetailsImg = document.getElementById("movieDetailsImg");
       const reviewsImg = document.getElementById("reviewsImg");
@@ -159,46 +155,54 @@ export default function HomePage() {
           searchImg.style.opacity = "1";
           movieDetailsImg.style.opacity = "0";
           reviewsImg.style.opacity = "0";
+
+          // first fade out
         } else if (
           distanceScrolled > fadeOut1Start &&
           distanceScrolled <= fadeOut1End
         ) {
-          searchImg.style.opacity = (
-            1 -
-            (distanceScrolled - fadeOut1Start) / fadeScrollLength
-          ).toString();
+          const distanceIn = distanceScrolled - fadeOut1Start;
+          const percentIn = distanceIn / fadeScrollLength;
+          searchImg.style.opacity = (1 - percentIn).toString();
+
           movieDetailsImg.style.opacity = "0";
           reviewsImg.style.opacity = "0";
+
+          // first fade in
         } else if (
           distanceScrolled > fadeIn1Start &&
           distanceScrolled <= fadeIn1End
         ) {
+          const distanceIn = distanceScrolled - fadeIn1Start;
+          const percentIn = distanceIn / fadeScrollLength;
+          movieDetailsImg.style.opacity = percentIn.toString();
+
           searchImg.style.opacity = "0";
-          movieDetailsImg.style.opacity = (
-            (distanceScrolled - fadeIn1Start) /
-            fadeScrollLength
-          ).toString();
           reviewsImg.style.opacity = "0";
+
+          // second fade out
         } else if (
           distanceScrolled > fadeOut2Start &&
           distanceScrolled <= fadeOut2End
         ) {
+          const distanceIn = distanceScrolled - fadeOut2Start;
+          const percentIn = distanceIn / fadeScrollLength;
+          movieDetailsImg.style.opacity = (1 - percentIn).toString();
+
           searchImg.style.opacity = "0";
-          movieDetailsImg.style.opacity = (
-            1 -
-            (distanceScrolled - fadeOut2Start) / fadeScrollLength
-          ).toString();
           reviewsImg.style.opacity = "0";
+
+          // second fade in
         } else if (
           distanceScrolled > fadeIn2Start &&
           distanceScrolled <= fadeIn2End
         ) {
+          const distanceIn = distanceScrolled - fadeIn2Start;
+          const percentIn = distanceIn / fadeScrollLength;
+          reviewsImg.style.opacity = percentIn.toString();
+
           searchImg.style.opacity = "0";
           movieDetailsImg.style.opacity = "0";
-          reviewsImg.style.opacity = (
-            (distanceScrolled - fadeIn2Start) /
-            fadeScrollLength
-          ).toString();
         }
       }
     });

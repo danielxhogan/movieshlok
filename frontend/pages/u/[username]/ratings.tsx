@@ -337,8 +337,7 @@ export default function ReviewsPage() {
 
         {ratings.status === "fulfilled" ? (
           <>
-            {ratings.ratings &&
-              ratings.ratings.map((rating, idx) => makeRating(rating, idx))}
+            {ratings.ratings?.map((rating, idx) => makeRating(rating, idx))}
 
             {ratings.ratings && ratings.ratings[0] === null && (
               <div className={styles["no-ratings"]}>
