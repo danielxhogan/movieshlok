@@ -42,6 +42,7 @@ impl ListsDbManager {
         lists::watchlist,
         lists::created_at))
       .filter(users::username.eq(lists_request.username))
+      .order(lists::created_at.desc())
       .load::<List>(&mut self.connection)
       .map_err(|err| {
         AppError::from_diesel_err(err, "while gettings lists for a users")
@@ -59,6 +60,7 @@ impl ListsDbManager {
       .filter(list_items::list_id.eq(list_items_request.list_id))
       .offset(list_items_request.offset)
       .limit(list_items_request.limit)
+      .order(list_items::created_at.desc())
       .load::<ListItem>(&mut self.connection)
       .map_err(|err| {
         AppError::from_diesel_err(err, "while gettings list_items for a list")

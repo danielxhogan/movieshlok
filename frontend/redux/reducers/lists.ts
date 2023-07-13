@@ -37,7 +37,7 @@ const initialListsState: Lists = {
 // GET ALL LIST ITEMS FOR A LIST
 // ******************************
 // type for value of listItems in redux store
-interface ListItems {
+export interface ListItems {
   status: Status;
   success: boolean | null;
   message: string;
@@ -148,7 +148,7 @@ export const listsSlice = createSlice({
   initialState: initialListsState,
   reducers: {
     addNewList(state, action) {
-      state.lists?.push(action.payload.newList);
+      state.lists?.unshift(action.payload.newList);
     },
     removeDeletedList(state, action) {
       if (state.lists) {

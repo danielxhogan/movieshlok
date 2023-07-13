@@ -42,21 +42,6 @@ impl ReviewDbManager {
       review = reviews[0].clone();
     }
 
-    let count = comments::table
-      .filter(comments::review_id.eq(&get_review_request.review_id))
-      .count()
-      .get_result::<i64>(&mut self.connection)
-      .map_err(|err| {
-        AppError::from_diesel_err(err, "while getting count of comments")
-      });
-
-    match count {
-      Err(err) => return Err(err),
-      Ok(_) => ()
-    };
-
-    let count = count.unwrap();
-
     let comments = comments::table
       .inner_join(users::table)
       .select((comments::id,
@@ -66,8 +51,6 @@ impl ReviewDbManager {
         comments::created_at))
       .order(comments::created_at.asc())
       .filter(comments::review_id.eq(get_review_request.review_id))
-      .offset(get_review_request.offset)
-      .limit(get_review_request.limit)
       .load::<SelectingComment>(&mut self.connection)
       .map_err(|err| {
         AppError::from_diesel_err(err, "while getting comments")
@@ -95,7 +78,6 @@ impl ReviewDbManager {
     let response = GetReviewResponse {
       review,
       liked: like.liked,
-      total_results: count,
       comments: Box::new(comments)
     };
 

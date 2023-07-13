@@ -10,7 +10,6 @@ const BACKEND_URL = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.en
 // type passed in to getReview action
 export interface GetReviewRequest {
   review_id: string;
-  page: number;
 }
 
 export interface Comment {
@@ -38,8 +37,6 @@ export interface ReviewDetails {
 interface GetReviewPayload {
   success: boolean;
   message: string;
-  page: number;
-  total_pages: number | null;
   data: ReviewDetails | null;
 }
 
@@ -123,9 +120,6 @@ interface DeleteCommentPayload {
 export const getReviewDetails = createAsyncThunk(
   "review/getReview",
   async (getReviewRequest: GetReviewRequest): Promise<GetReviewPayload> => {
-    const limit = 10;
-    const offset = (getReviewRequest.page - 1) * limit;
-
     const getReviewsUrl = `${BACKEND_URL}/get-review`;
 
     const headers = new Headers();
@@ -133,8 +127,6 @@ export const getReviewDetails = createAsyncThunk(
 
     const params = new URLSearchParams();
     params.append("review_id", getReviewRequest.review_id);
-    params.append("offset", offset.toString());
-    params.append("limit", limit.toString());
 
     const request = new Request(getReviewsUrl, {
       headers,
@@ -146,22 +138,16 @@ export const getReviewDetails = createAsyncThunk(
 
     if (response.ok) {
       const data = await response.json();
-      const total_results = data.total_results;
-      const total_pages = Math.ceil(total_results / limit);
 
       return {
         success: true,
         message: "ok",
-        page: getReviewRequest.page,
-        total_pages,
         data
       };
     } else if (response.status >= 500) {
       return {
         success: false,
         message: "server error",
-        page: 0,
-        total_pages: null,
         data: null
       };
     } else {
@@ -169,8 +155,6 @@ export const getReviewDetails = createAsyncThunk(
       return {
         success: false,
         message: data.message,
-        page: 0,
-        total_pages: null,
         data: null
       };
     }

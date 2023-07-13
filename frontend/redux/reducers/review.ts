@@ -22,16 +22,12 @@ interface ReviewDetail {
   status: Status;
   success: boolean | null;
   message: string;
-  page: number;
-  total_pages: number | null;
   data: ReviewDetails | null;
 }
 const initialReviewDetailsState: ReviewDetail = {
   status: "idle",
   success: null,
   message: "",
-  page: 0,
-  total_pages: null,
   data: null
 };
 
@@ -121,16 +117,12 @@ export const reviewDetailsSlice = createSlice({
         (state.status = "loading"),
           (state.success = null),
           (state.message = ""),
-          (state.page = 0),
-          (state.total_pages = null),
           (state.data = null);
       })
       .addCase(getReviewDetails.fulfilled, (state, action) => {
         (state.status = "fulfilled"),
           (state.success = action.payload.success),
           (state.message = action.payload.message),
-          (state.page = action.payload.page),
-          (state.total_pages = action.payload.total_pages),
           (state.data = action.payload.data);
       });
   }

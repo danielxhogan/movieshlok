@@ -1,9 +1,65 @@
-import styles from "@/styles/u/ListItemCard.module.css";
-import { ListItem } from "@/redux/actions/lists";
+import listStyles from "@/styles/components/List.module.css";
+import listItemCardStyles from "@/styles/u/ListItemCard.module.css";
 
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/hooks";
+
+// LIST IMPORTS
+// ***********************************
+import { ListItems } from "@/redux/reducers/lists";
+import { selectWatchlist } from "@/redux/reducers/lists";
+import { selectListItems } from "@/redux/reducers/lists";
+
+import { Spinner } from "@chakra-ui/react";
+
+export enum ListType {
+  WATCHLIST,
+  OTHER_LIST
+}
+
+type ListProps = {
+  listType: ListType;
+};
+
+// LIST COMPONENT
+// ***********************************
+export default function List(props: ListProps) {
+  const list = useAppSelector(selectListItems);
+  const watchlist = useAppSelector(selectWatchlist);
+
+  function makeCards(listItems: ListItems) {
+    return listItems.status === "fulfilled" ? (
+      <span className="list-item-cards">
+        {listItems.list_items?.map(listItem => {
+          return <ListItemCard listItem={listItem} key={listItem.id} />;
+        })}
+
+        {listItems.list_items?.length === 0 && (
+          <div className={listStyles["no-movies"]}>
+            No movies in this watchlist yet
+          </div>
+        )}
+      </span>
+    ) : (
+      <div className="spinner">
+        {/* @ts-ignore */}
+        <Spinner size="xl" />
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {props.listType === ListType.WATCHLIST && makeCards(watchlist)}
+      {props.listType === ListType.OTHER_LIST && makeCards(list)}
+    </div>
+  );
+}
+
+// LIST ITEM CARD IMPORTS
+// ***********************************
 import { selectCredentials, unsetCredentials } from "@/redux/reducers/auth";
+import { ListItem } from "@/redux/actions/lists";
 import { deleteListItem, DeleteListItemRequest } from "@/redux/actions/lists";
 import {
   selectDeletedListItem,
@@ -21,11 +77,13 @@ import { Tooltip, useToast } from "@chakra-ui/react";
 
 const TMDB_IMAGE_URL = process.env.NEXT_PUBLIC_TMDB_IMAGE_URL;
 
-type Props = {
+type ListItemCardProps = {
   listItem: ListItem;
 };
 
-export default function ListItemCard(props: Props) {
+// LIST ITEM CARD COMPONENT
+// ***********************************
+export function ListItemCard(props: ListItemCardProps) {
   const router = useRouter();
   const dispatch = useDispatch();
   const credentials = useAppSelector(selectCredentials);
@@ -77,24 +135,26 @@ export default function ListItemCard(props: Props) {
   }, [deletedListItem, dispatch, toast]);
 
   return (
-    <div className={styles["wrapper"]}>
+    <div className={listItemCardStyles["wrapper"]}>
       <Link href={`/details/movie/${props.listItem.movie_id}`}>
-        <div className={styles["flex-container"]}>
+        <div className={listItemCardStyles["flex-container"]}>
           <Image
             src={`${TMDB_IMAGE_URL}/w342${props.listItem.poster_path}`}
-            className={styles["movie-poster"]}
+            className={listItemCardStyles["movie-poster"]}
             width={200}
             height={500}
             alt="backdrop"
           ></Image>
-          <p className={styles["movie-title"]}>{props.listItem.movie_title}</p>
+          <p className={listItemCardStyles["movie-title"]}>
+            {props.listItem.movie_title}
+          </p>
         </div>
       </Link>
       {credentials.username === router.query.username && (
         // @ts-ignore
         <Tooltip label={"delete movie"} placement="top">
           <i
-            className={`${styles["delete-item"]} fa-solid fa-trash fa-md`}
+            className={`${listItemCardStyles["delete-item"]} fa-solid fa-trash fa-md`}
             onClick={() => onClickDeleteListItem()}
           />
         </Tooltip>

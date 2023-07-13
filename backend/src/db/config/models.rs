@@ -307,8 +307,6 @@ pub struct Comment {
 #[derive(Deserialize)]
 pub struct GetReviewRequest {
   pub review_id: Uuid,
-  pub limit: i64,
-  pub offset: i64
 }
 
 #[derive(Queryable, Serialize)]
@@ -326,7 +324,6 @@ pub struct SelectingComment {
 pub struct GetReviewResponse {
   pub review: Review,
   pub liked: bool,
-  pub total_results: i64,
   pub comments: Box<Vec<SelectingComment>>
 }
 
