@@ -3,7 +3,7 @@ import {
   getSearchResults,
   getMovieDetails,
   getPersonDetails,
-  PersonCredits
+  PersonData
 } from "@/redux/actions/tmdb";
 import { Status } from "@/redux/reducers/index";
 import { AppState } from "@/redux/store";
@@ -201,14 +201,14 @@ interface PersonDetails {
   status: Status;
   success: boolean | null;
   message: string;
-  credits: PersonCredits | null;
+  details: PersonData | null;
 }
 
 const initialPersonDetailsState: PersonDetails = {
   status: "idle",
   success: null,
   message: "",
-  credits: null
+  details: null
 };
 
 export const searchResultsSlice = createSlice({
@@ -273,13 +273,13 @@ export const personDetailsSlice = createSlice({
         state.status = "loading";
         state.success = null;
         state.message = "";
-        state.credits = null;
+        state.details = null;
       })
       .addCase(getPersonDetails.fulfilled, (state, action) => {
         state.status = "fulfilled";
         state.success = action.payload.success;
         state.message = action.payload.message;
-        state.credits = action.payload.credits;
+        state.details = action.payload.details;
       });
   }
 });

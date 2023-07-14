@@ -32,7 +32,7 @@ export interface PersonCredit {
   original_language?: string;
   original_title?: string;
   overview?: string;
-  popularity?: number;
+  popularity: number;
   poster_path?: string;
   release_date?: string;
   title?: string;
@@ -50,15 +50,33 @@ export interface PersonCredit {
   job?: string;
 }
 
-export interface PersonCredits {
+interface PersonCredits {
   cast: PersonCredit[];
   crew: PersonCredit[];
+}
+
+export interface PersonData {
+  adult: boolean;
+  also_known_as: string[];
+  biography: string;
+  birthday: string;
+  deathday: string;
+  gender: number;
+  homepage: string;
+  id: number;
+  imdb_id: string;
+  known_for_department: string;
+  name: string;
+  place_of_birth: string;
+  popularity: number;
+  profile_path: string;
+  credits: PersonCredits;
 }
 
 interface PersonDetailsPayload {
   success: boolean;
   message: string;
-  credits: PersonCredits | null;
+  details: PersonData | null;
 }
 
 export const getSearchResults = createAsyncThunk(
@@ -195,13 +213,13 @@ export const getPersonDetails = createAsyncThunk(
       return {
         success: true,
         message: personId,
-        credits: data
+        details: data
       };
     } else if (response.status >= 500) {
       return {
         success: false,
         message: "server error",
-        credits: null
+        details: null
       };
     } else {
       const data = await response.json();
@@ -209,7 +227,7 @@ export const getPersonDetails = createAsyncThunk(
       return {
         success: false,
         message: data.message,
-        credits: null
+        details: null
       };
     }
   }

@@ -157,7 +157,7 @@ struct PersonDetailsParams {
 }
 
 #[derive(Serialize, Deserialize)]
-struct PersonCredits {
+struct PersonCredit {
   adult: Option<bool>,
   backdrop_path: Option<String>,
   genre_ids: Option<Box<[i32]>>,
@@ -183,11 +183,30 @@ struct PersonCredits {
   job: Option<String>
 }
 
+#[derive(Serialize, Deserialize)]
+struct PersonCredits {
+  cast: Option<Box<[PersonCredit]>>,
+  crew: Option<Box<[PersonCredit]>>
+}
+
 // MAIN RESPONSE
 #[derive(Serialize, Deserialize)]
 struct PersonDetails {
-  cast: Option<Box<[PersonCredits]>>,
-  crew: Option<Box<[PersonCredits]>>
+  adult: Option<bool>,
+  also_known_as: Option<Box<[String]>>,
+  biography: Option<String>,
+  birthday: Option<String>,
+  deathday: Option<String>,
+  gender: Option<i32>,
+  homepage: Option<String>,
+  id: Option<i32>,
+  imdb_id: Option<String>,
+  known_for_department: Option<String>,
+  name: Option<String>,
+  place_of_birth: Option<String>,
+  popularity: Option<f32>,
+  profile_path: Option<String>,
+  credits: Option<PersonCredits>
 }
 
 // SEARCH
@@ -343,11 +362,11 @@ async fn person_details(person_details_params: PersonDetailsParams)
   let tmdb_base_url = env::var("TMDB_BASE_URL").unwrap();
   let tmdb_api_key = env::var("TMDB_API_KEY").unwrap();
 
-  let person_details_url = format!("{}/person/{}/movie_credits?api_key={}",
+  let person_details_url = format!("{}/person/{}?api_key={}&append_to_response=credits&language=en-US",
     &tmdb_base_url,
     &person_details_params.person_id,
     &tmdb_api_key);
-  
+
   let response = reqwest::get(&person_details_url).await.unwrap()
     .json::<PersonDetails>().await
     .map_err(|err| {

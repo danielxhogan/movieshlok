@@ -88,37 +88,41 @@ export default function List(props: ListProps) {
   return (
     <div>
       {props.listType === ListType.WATCHLIST && makeListItemCards(watchlist)}
-      <br />
-      <br />
       {props.listType === ListType.WATCHLIST &&
         watchlist.total_pages &&
         watchlist.total_pages > 1 &&
         typeof router.query.username === "string" && (
-          <Pagination
-            useCase={UseCases.WATCHLIST}
-            currentPage={watchlist.page}
-            totalPages={watchlist.total_pages}
-            username={router.query.username}
-          />
+          <>
+            <br />
+            <br />
+            <Pagination
+              useCase={UseCases.WATCHLIST}
+              currentPage={watchlist.page}
+              totalPages={watchlist.total_pages}
+              username={router.query.username}
+            />
+          </>
         )}
 
       {props.listType === ListType.OTHER_LIST && makeListItemCards(list)}
-      <br />
-      <br />
       {props.listType === ListType.OTHER_LIST &&
         list.total_pages &&
         list.total_pages > 1 &&
         typeof router.query.username === "string" &&
         typeof router.query.listId === "string" &&
         typeof router.query.name === "string" && (
-          <Pagination
-            useCase={UseCases.OTHER_LIST}
-            currentPage={list.page}
-            totalPages={list.total_pages}
-            username={router.query.username}
-            listId={router.query.listId}
-            listName={router.query.name}
-          />
+          <>
+            <br />
+            <br />
+            <Pagination
+              useCase={UseCases.OTHER_LIST}
+              currentPage={list.page}
+              totalPages={list.total_pages}
+              username={router.query.username}
+              listId={router.query.listId}
+              listName={router.query.name}
+            />
+          </>
         )}
 
       {props.personCredits && makeCreditCards()}
@@ -198,7 +202,6 @@ export function ListItemCard(props: ListItemCardProps) {
       poster_path = props.credit.poster_path;
       break;
   }
-  console.log(poster_path);
 
   function onClickDeleteListItem() {
     if (props.cardType === CardType.LIST && credentials.jwt_token) {

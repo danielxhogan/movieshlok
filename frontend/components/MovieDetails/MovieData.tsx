@@ -2,6 +2,7 @@ import styles from "@/styles/MovieDetails/MovieData.module.css";
 import { useAppSelector } from "@/redux/hooks";
 import { selectMovieDetails, CastCrewMember } from "@/redux/reducers/tmdb";
 
+import Link from "next/link";
 import {
   Divider,
   Tabs,
@@ -51,7 +52,7 @@ export default function MovieContent() {
     : movieDetails.data.release_date;
 
   function makeCastCrew(
-    castCrewMembers: [CastCrewMember],
+    castCrewMembers: CastCrewMember[],
     castCrewType: CastCrewType
   ) {
     let buttons = [];
@@ -88,14 +89,19 @@ export default function MovieContent() {
       <span key={castCrewMember.credit_id}>
         {/* @ts-ignore */}
         <Tooltip label={role} placement="top">
-          <Button
-            colorScheme="teal"
-            variant="outline"
-            className={styles["cast-crew-button"]}
-            // onClick={onOpen}
+          <Link
+            href={`/details/person/${castCrewMember.id}?kf=${castCrewMember.known_for_department}`}
           >
-            {castCrewMember && castCrewMember.name}
-          </Button>
+            {/* @ts-ignore */}
+            <Button
+              colorScheme="teal"
+              variant="outline"
+              className={styles["cast-crew-button"]}
+              // onClick={onOpen}
+            >
+              {castCrewMember && castCrewMember.name}
+            </Button>
+          </Link>
         </Tooltip>
       </span>
     );
