@@ -184,7 +184,9 @@ export default function SearchPage() {
   function makePersonResult(result: SearchResult) {
     return (
       <div key={result.id} className="block block-btn">
-        <Link href={`/details/person/${result.id}`}>
+        <Link
+          href={`/details/person/${result.id}?kf=${result.known_for_department}`}
+        >
           <span className={styles["result-title"]}>{result.name}</span>
           <br />
 

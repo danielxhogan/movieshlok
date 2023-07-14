@@ -89,8 +89,7 @@ export default function ReviewDetailsPage() {
     }
     if (typeof router.query.id === "string") {
       const getReviewRequest: GetReviewRequest = {
-        review_id: router.query.id,
-        page: 1
+        review_id: router.query.id
       };
 
       dispatch<any>(getReviewDetails(getReviewRequest));

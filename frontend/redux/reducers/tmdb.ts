@@ -1,5 +1,10 @@
 import { FilterResults } from "@/pages/search";
-import { getSearchResults, getMovieDetails } from "@/redux/actions/tmdb";
+import {
+  getSearchResults,
+  getMovieDetails,
+  getPersonDetails,
+  PersonCredits
+} from "@/redux/actions/tmdb";
 import { Status } from "@/redux/reducers/index";
 import { AppState } from "@/redux/store";
 import { createSlice } from "@reduxjs/toolkit";
@@ -163,6 +168,7 @@ export interface SearchResult {
   name?: string; // only person
   profile_path?: string; // only person
   known_for?: KnownFor[]; // only person
+  known_for_department?: string;
 }
 
 // MAIN RESPONSE
@@ -187,6 +193,22 @@ const initialSearchResultsState: SearchResults = {
   query: "",
   filter: null,
   data: {}
+};
+
+// PERSON DETAILS
+// ****************************
+interface PersonDetails {
+  status: Status;
+  success: boolean | null;
+  message: string;
+  credits: PersonCredits | null;
+}
+
+const initialPersonDetailsState: PersonDetails = {
+  status: "idle",
+  success: null,
+  message: "",
+  credits: null
 };
 
 export const searchResultsSlice = createSlice({
@@ -240,3 +262,27 @@ export const movieDetailsSlice = createSlice({
 
 export const selectMovieDetails = (state: AppState) => state.movieDetails;
 export const movieDetailsReducer = movieDetailsSlice.reducer;
+
+export const personDetailsSlice = createSlice({
+  name: "personDetails",
+  initialState: initialPersonDetailsState,
+  reducers: {},
+  extraReducers: builder => {
+    builder
+      .addCase(getPersonDetails.pending, state => {
+        state.status = "loading";
+        state.success = null;
+        state.message = "";
+        state.credits = null;
+      })
+      .addCase(getPersonDetails.fulfilled, (state, action) => {
+        state.status = "fulfilled";
+        state.success = action.payload.success;
+        state.message = action.payload.message;
+        state.credits = action.payload.credits;
+      });
+  }
+});
+
+export const selectPersonDetails = (state: AppState) => state.personDetails;
+export const personDetailsReducer = personDetailsSlice.reducer;

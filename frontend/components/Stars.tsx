@@ -88,43 +88,43 @@ export default function Stars(props: Props) {
       }
     });
 
-    starOneRef.current?.addEventListener("mouseover", event => {
+    starOneRef.current?.addEventListener("mouseover", () => {
       insideStarOne = true;
     });
 
-    starOneRef.current?.addEventListener("mouseout", event => {
+    starOneRef.current?.addEventListener("mouseout", () => {
       insideStarOne = false;
     });
 
-    starTwoRef.current?.addEventListener("mouseover", event => {
+    starTwoRef.current?.addEventListener("mouseover", () => {
       insideStarTwo = true;
     });
 
-    starTwoRef.current?.addEventListener("mouseout", event => {
+    starTwoRef.current?.addEventListener("mouseout", () => {
       insideStarTwo = false;
     });
 
-    starThreeRef.current?.addEventListener("mouseover", event => {
+    starThreeRef.current?.addEventListener("mouseover", () => {
       insideStarThree = true;
     });
 
-    starThreeRef.current?.addEventListener("mouseout", event => {
+    starThreeRef.current?.addEventListener("mouseout", () => {
       insideStarThree = false;
     });
 
-    starFourRef.current?.addEventListener("mouseover", event => {
+    starFourRef.current?.addEventListener("mouseover", () => {
       insideStarFour = true;
     });
 
-    starFourRef.current?.addEventListener("mouseout", event => {
+    starFourRef.current?.addEventListener("mouseout", () => {
       insideStarFour = false;
     });
 
-    starFiveRef.current?.addEventListener("mouseover", event => {
+    starFiveRef.current?.addEventListener("mouseover", () => {
       insideStarFive = true;
     });
 
-    starFiveRef.current?.addEventListener("mouseout", event => {
+    starFiveRef.current?.addEventListener("mouseout", () => {
       insideStarFive = false;
     });
   }, [props.id, props.interactive]);
@@ -135,93 +135,113 @@ export default function Stars(props: Props) {
       case Rating.ZERO:
         return (
           <>
-            <i ref={starOneRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-            <i ref={starTwoRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-            <i ref={starThreeRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-            <i ref={starFourRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-            <i ref={starFiveRef} className={`fa-regular fa-star fa-${props.size}`}></i>
+            <i ref={starOneRef} className={`fa-regular fa-star fa-${props.size}`} />
+            <i ref={starTwoRef} className={`fa-regular fa-star fa-${props.size}`} />
+            <i ref={starThreeRef} className={`fa-regular fa-star fa-${props.size}`} />
+            <i ref={starFourRef} className={`fa-regular fa-star fa-${props.size}`} />
+            <i ref={starFiveRef} className={`fa-regular fa-star fa-${props.size}`} />
           </>
         );
       case Rating.POINT_FIVE:
-        return <>
-          <i ref={starOneRef} className={`${ styles[`hs-${props.size}`]} fa-regular fa-star-half-stroke fa-${props.size}`}></i>
-          <i ref={starTwoRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-          <i ref={starThreeRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-          <i ref={starFourRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-          <i ref={starFiveRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-        </>;
+        return (
+          <>
+            <i ref={starOneRef} className={`${   styles[`hs-${props.size}`] } fa-regular fa-star-half-stroke fa-${props.size}`} />
+            <i ref={starTwoRef} className={`fa-regular fa-star fa-${props.size}`} />
+            <i ref={starThreeRef} className={`fa-regular fa-star fa-${props.size}`} />
+            <i ref={starFourRef} className={`fa-regular fa-star fa-${props.size}`} />
+            <i ref={starFiveRef} className={`fa-regular fa-star fa-${props.size}`} />
+          </>
+        );
       case Rating.ONE:
-        return <>
-          <i ref={starOneRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starTwoRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-          <i ref={starThreeRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-          <i ref={starFourRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-          <i ref={starFiveRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-        </>;
+        return (
+          <>
+            <i ref={starOneRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starTwoRef} className={`fa-regular fa-star fa-${props.size}`} />
+            <i ref={starThreeRef} className={`fa-regular fa-star fa-${props.size}`} />
+            <i ref={starFourRef} className={`fa-regular fa-star fa-${props.size}`} />
+            <i ref={starFiveRef} className={`fa-regular fa-star fa-${props.size}`} />
+          </>
+        );
       case Rating.ONE_POINT_FIVE:
-        return <>
-          <i ref={starOneRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starTwoRef} className={`${ styles[`hs-${props.size}`]} fa-solid fa-star-half-stroke fa-${props.size}`}></i>
-          <i ref={starThreeRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-          <i ref={starFourRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-          <i ref={starFiveRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-        </>;
+        return (
+          <>
+            <i ref={starOneRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starTwoRef} className={`${   styles[`hs-${props.size}`] } fa-solid fa-star-half-stroke fa-${props.size}`} />
+            <i ref={starThreeRef} className={`fa-regular fa-star fa-${props.size}`} />
+            <i ref={starFourRef} className={`fa-regular fa-star fa-${props.size}`} />
+            <i ref={starFiveRef} className={`fa-regular fa-star fa-${props.size}`} />
+          </>
+        );
       case Rating.TWO:
-        return <>
-          <i ref={starOneRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starTwoRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starThreeRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-          <i ref={starFourRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-          <i ref={starFiveRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-        </>;
+        return (
+          <>
+            <i ref={starOneRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starTwoRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starThreeRef} className={`fa-regular fa-star fa-${props.size}`} />
+            <i ref={starFourRef} className={`fa-regular fa-star fa-${props.size}`} />
+            <i ref={starFiveRef} className={`fa-regular fa-star fa-${props.size}`} />
+          </>
+        );
       case Rating.TWO_POINT_FIVE:
-        return <>
-          <i ref={starOneRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starTwoRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starThreeRef} className={`${ styles[`hs-${props.size}`]} fa-regular fa-star-half-stroke fa-${props.size}`}></i>
-          <i ref={starFourRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-          <i ref={starFiveRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-        </>;
+        return (
+          <>
+            <i ref={starOneRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starTwoRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starThreeRef} className={`${   styles[`hs-${props.size}`] } fa-regular fa-star-half-stroke fa-${props.size}`} />
+            <i ref={starFourRef} className={`fa-regular fa-star fa-${props.size}`} />
+            <i ref={starFiveRef} className={`fa-regular fa-star fa-${props.size}`} />
+          </>
+        );
       case Rating.THREE:
-        return <>
-          <i ref={starOneRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starTwoRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starThreeRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starFourRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-          <i ref={starFiveRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-        </>;
+        return (
+          <>
+            <i ref={starOneRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starTwoRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starThreeRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starFourRef} className={`fa-regular fa-star fa-${props.size}`} />
+            <i ref={starFiveRef} className={`fa-regular fa-star fa-${props.size}`} />
+          </>
+        );
       case Rating.THREE_POINT_FIVE:
-        return <>
-          <i ref={starOneRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starTwoRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starThreeRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starFourRef} className={`${ styles[`hs-${props.size}`]} fa-solid fa-star-half-stroke fa-${props.size}`}></i>
-          <i ref={starFiveRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-        </>;
+        return (
+          <>
+            <i ref={starOneRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starTwoRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starThreeRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starFourRef} className={`${   styles[`hs-${props.size}`] } fa-solid fa-star-half-stroke fa-${props.size}`} />
+            <i ref={starFiveRef} className={`fa-regular fa-star fa-${props.size}`} />
+          </>
+        );
       case Rating.FOUR:
-        return <>
-          <i ref={starOneRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starTwoRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starThreeRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starFourRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starFiveRef} className={`fa-regular fa-star fa-${props.size}`}></i>
-        </>;
+        return (
+          <>
+            <i ref={starOneRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starTwoRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starThreeRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starFourRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starFiveRef} className={`fa-regular fa-star fa-${props.size}`} />
+          </>
+        );
       case Rating.FOUR_POINT_FIVE:
-        return <>
-          <i ref={starOneRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starTwoRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starThreeRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starFourRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starFiveRef} className={`${ styles[`hs-${props.size}`]} fa-solid fa-star-half-stroke fa-${props.size}`}></i>
-        </>;
+        return (
+          <>
+            <i ref={starOneRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starTwoRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starThreeRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starFourRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starFiveRef} className={`${   styles[`hs-${props.size}`] } fa-solid fa-star-half-stroke fa-${props.size}`} />
+          </>
+        );
       case Rating.FIVE:
-        return <>
-          <i ref={starOneRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starTwoRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starThreeRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starFourRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-          <i ref={starFiveRef} className={`fa-solid fa-star fa-${props.size}`}></i>
-        </>;
+        return (
+          <>
+            <i ref={starOneRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starTwoRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starThreeRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starFourRef} className={`fa-solid fa-star fa-${props.size}`} />
+            <i ref={starFiveRef} className={`fa-solid fa-star fa-${props.size}`} />
+          </>
+        );
     }
   }
 

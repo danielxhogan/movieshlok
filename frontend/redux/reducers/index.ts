@@ -1,7 +1,8 @@
 import { authSliceReducer } from "@/redux/reducers/auth";
 import {
   searchResultsReducer,
-  movieDetailsReducer
+  movieDetailsReducer,
+  personDetailsReducer
 } from "@/redux/reducers/tmdb";
 import {
   reviewsReducer,
@@ -58,7 +59,10 @@ const reducers = combineReducers({
   listItems: listItemsReducer,
   watchlist: watchlistReducer,
   deletedList: deletedListReducer,
-  deletedListItem: deletedListItemReducer
+  deletedListItem: deletedListItemReducer,
+
+  // person details page
+  personDetails: personDetailsReducer
 });
 
 export default reducers;

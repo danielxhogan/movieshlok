@@ -24,6 +24,43 @@ export interface MovieDetailsPayload {
   data: {};
 }
 
+export interface PersonCredit {
+  adult?: boolean;
+  backdrop_path?: string;
+  genre_ids?: number[];
+  id?: number;
+  original_language?: string;
+  original_title?: string;
+  overview?: string;
+  popularity?: number;
+  poster_path?: string;
+  release_date?: string;
+  title?: string;
+  video?: boolean;
+  vote_average?: number;
+  vote_count?: number;
+  credit_id?: string;
+
+  // cast
+  character?: string;
+  order?: number;
+
+  // crew
+  department?: string;
+  job?: string;
+}
+
+export interface PersonCredits {
+  cast: PersonCredit[];
+  crew: PersonCredit[];
+}
+
+interface PersonDetailsPayload {
+  success: boolean;
+  message: string;
+  credits: PersonCredits | null;
+}
+
 export const getSearchResults = createAsyncThunk(
   "searchResults/fetchResults",
   async (searchParams: SearchParams): Promise<SearchResultsPayload> => {
@@ -104,16 +141,76 @@ export const getMovieDetails = createAsyncThunk(
       body: params,
       method: "POST"
     });
+
     const response = await fetch(request);
 
     if (response.ok) {
       const data = await response.json();
-      return { success: true, message: movieId, data };
+
+      return {
+        success: true,
+        message: movieId,
+        data
+      };
     } else if (response.status >= 500) {
-      return { success: false, message: "server error", data: {} };
+      return {
+        success: false,
+        message: "server error",
+        data: {}
+      };
     } else {
       const data = await response.json();
-      return { success: false, message: data.message, data: {} };
+
+      return {
+        success: false,
+        message: data.message,
+        data: {}
+      };
+    }
+  }
+);
+
+export const getPersonDetails = createAsyncThunk(
+  "personDetails/fetchDetails",
+  async (personId: string): Promise<PersonDetailsPayload> => {
+    const movieDetailsUrl = `${BACKEND_URL}/tmdb/person`;
+
+    const headers = new Headers();
+    headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+    const params = new URLSearchParams();
+    params.append("person_id", personId);
+
+    const request = new Request(movieDetailsUrl, {
+      headers,
+      body: params,
+      method: "POST"
+    });
+
+    const response = await fetch(request);
+
+    if (response.ok) {
+      const data = await response.json();
+
+      return {
+        success: true,
+        message: personId,
+        credits: data
+      };
+    } else if (response.status >= 500) {
+      return {
+        success: false,
+        message: "server error",
+        credits: null
+      };
+    } else {
+      const data = await response.json();
+
+      return {
+        success: false,
+        message: data.message,
+        credits: null
+      };
     }
   }
 );

@@ -148,6 +148,47 @@ struct MovieDetails {
   credits: Option<Credits>
 }
 
+// PERSON DETAILS
+// **************************************************
+// REQUEST PARAMS
+#[derive(Deserialize)]
+struct PersonDetailsParams {
+  person_id: String
+}
+
+#[derive(Serialize, Deserialize)]
+struct PersonCredits {
+  adult: Option<bool>,
+  backdrop_path: Option<String>,
+  genre_ids: Option<Box<[i32]>>,
+  id: Option<i32>,
+  original_language: Option<String>,
+  original_title: Option<String>,
+  overview: Option<String>,
+  popularity: Option<f32>,
+  poster_path: Option<String>,
+  release_date: Option<String>,
+  title: Option<String>,
+  video: Option<bool>,
+  vote_average: Option<f32>,
+  vote_count: Option<i32>,
+  credit_id: Option<String>,
+
+  // cast
+  character: Option<String>,
+  order: Option<i32>,
+
+  // crew
+  department: Option<String>,
+  job: Option<String>
+}
+
+// MAIN RESPONSE
+#[derive(Serialize, Deserialize)]
+struct PersonDetails {
+  cast: Option<Box<[PersonCredits]>>,
+  crew: Option<Box<[PersonCredits]>>
+}
 
 // SEARCH
 // **************************************************
@@ -172,7 +213,7 @@ struct KnownFor {
   overview: Option<String>,
   poster_path: Option<String>,
   media_type: Option<String>,
-  genre_ides: Option<Box<[i32]>>,
+  genre_ids: Option<Box<[i32]>>,
   popularity: Option<f32>,
   release_date: Option<String>,
   video: Option<bool>,
@@ -224,6 +265,38 @@ pub fn tmdb_filters()
 {
   search_filters()
   .or(movie_details_filters())
+  .or(person_details_filters())
+}
+
+pub fn search_filters()
+-> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
+{
+  warp::path!("tmdb" / "search")
+    .and(warp::post())
+    .and(with_form_body::<QueryParams>())
+    .and_then(search)
+}
+
+async fn search(query_params: QueryParams)
+-> Result<impl warp::Reply, warp::Rejection>
+{
+  let tmdb_base_url = env::var("TMDB_BASE_URL").unwrap();
+  let tmdb_api_key = env::var("TMDB_API_KEY").unwrap();
+
+  let search_url = format!("{}/search/{}?api_key={}&query={}&page={}",
+    &tmdb_base_url,
+    &query_params.endpoint,
+    &tmdb_api_key,
+    &query_params.query,
+    &query_params.page);
+
+  let response = reqwest::get(&search_url).await.unwrap()
+    .json::<SearchResults>().await
+    .map_err(|err| {
+      AppError::new(&err.to_string(), ErrorType::FailedToSearch)
+    });
+
+  respond(response, warp::http::StatusCode::OK)
 }
 
 pub fn movie_details_filters()
@@ -255,33 +328,31 @@ async fn movie_details(movie_details_params: MovieDetailsParams)
   respond(response, warp::http::StatusCode::OK)
 }
 
-pub fn search_filters()
+fn person_details_filters()
 -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
-  warp::path!("tmdb" / "search")
+  warp::path!("tmdb" / "person")
     .and(warp::post())
-    .and(with_form_body::<QueryParams>())
-    .and_then(search)
+    .and(with_form_body::<PersonDetailsParams>())
+    .and_then(person_details)
 }
 
-async fn search(query_params: QueryParams)
+async fn person_details(person_details_params: PersonDetailsParams)
 -> Result<impl warp::Reply, warp::Rejection>
 {
   let tmdb_base_url = env::var("TMDB_BASE_URL").unwrap();
   let tmdb_api_key = env::var("TMDB_API_KEY").unwrap();
 
-  let search_url = format!("{}/search/{}?api_key={}&query={}&page={}",
+  let person_details_url = format!("{}/person/{}/movie_credits?api_key={}",
     &tmdb_base_url,
-    &query_params.endpoint,
-    &tmdb_api_key,
-    &query_params.query,
-    &query_params.page);
-
-  let response = reqwest::get(&search_url).await.unwrap()
-    .json::<SearchResults>().await
+    &person_details_params.person_id,
+    &tmdb_api_key);
+  
+  let response = reqwest::get(&person_details_url).await.unwrap()
+    .json::<PersonDetails>().await
     .map_err(|err| {
-      AppError::new(&err.to_string(), ErrorType::FailedToSearch)
+      AppError::new(&err.to_string(), ErrorType::FailedToGetPersonDetails)
     });
-
+  
   respond(response, warp::http::StatusCode::OK)
 }
