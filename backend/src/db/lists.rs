@@ -3,6 +3,7 @@ use crate::db::config::schema::{lists, list_items, users};
 use crate::db::config::models::{List,
   GetListsRequest,
   GetListItemsRequest,
+  GetListItemsResponse,
   InsertingNewList,
   UserList,
   InsertingNewListItem,
@@ -54,9 +55,24 @@ impl ListsDbManager {
   // GET ALL LIST ITEMS FOR A LIST
   // ******************************
   pub fn get_list_items(&mut self, list_items_request: GetListItemsRequest)
-  -> Result<Box<Vec<ListItem>>, AppError>
+  -> Result<GetListItemsResponse, AppError>
   {
-    let users_list_items = list_items::table
+    let count = list_items::table
+      .filter(list_items::list_id.eq(&list_items_request.list_id))
+      .count()
+      .get_result::<i64>(&mut self.connection)
+      .map_err(|err| {
+        AppError::from_diesel_err(err, "while getting count of list_items")
+      });
+
+    match count {
+      Err(err) => return Err(err),
+      Ok(_) => ()
+    };
+
+    let count = count.unwrap();
+
+    let results = list_items::table
       .filter(list_items::list_id.eq(list_items_request.list_id))
       .offset(list_items_request.offset)
       .limit(list_items_request.limit)
@@ -65,8 +81,19 @@ impl ListsDbManager {
       .map_err(|err| {
         AppError::from_diesel_err(err, "while gettings list_items for a list")
       });
-    
-    Ok(Box::new(users_list_items.unwrap()))
+
+    match results {
+      Err(err) => return Err(err),
+
+      Ok(results) => {
+        let response = GetListItemsResponse {
+          total_results: count,
+          list_items: Box::new(results)
+        };
+
+        Ok(response)
+      }
+    }
   }
 
   // GET WATCHLIST ID FOR A USER

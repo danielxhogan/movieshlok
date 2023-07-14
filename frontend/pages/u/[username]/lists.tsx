@@ -164,7 +164,7 @@ export default function ListsPage() {
     return (
       <div className={styles["list"]}>
         <Link
-          href={`/u/${router.query.username}/list/${list.id}?name=${list.name}`}
+          href={`/u/${router.query.username}/list/${list.id}?name=${list.name}&page=1`}
           className={styles["list-name"]}
         >
           <div className={styles["list-name-text"]}>{list.name}</div>

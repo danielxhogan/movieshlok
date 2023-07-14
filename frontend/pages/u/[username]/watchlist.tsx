@@ -14,15 +14,18 @@ export default function WatchlistPage() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (typeof router.query.username === "string") {
+    if (
+      typeof router.query.username === "string" &&
+      typeof router.query.page === "string"
+    ) {
       const watchlistRequest: GetWatchlistRequest = {
         username: router.query.username,
-        page: 1
+        page: parseInt(router.query.page)
       };
 
       dispatch<any>(getWatchlist(watchlistRequest));
     }
-  }, [dispatch, router.query.username]);
+  }, [dispatch, router.query]);
 
   return (
     <div className="wrapper">

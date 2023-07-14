@@ -77,6 +77,14 @@ pub struct GetListItemsRequest {
   pub limit: i64
 }
 
+// results from db query for all list_items for a list
+// sent to client in response to get-list-items endpoint
+#[derive(Serialize)]
+pub struct GetListItemsResponse {
+  pub total_results: i64,
+  pub list_items: Box<Vec<ListItem>>
+}
+
 // sent from client when requesting all list_items for the watchlist of a user
 #[derive(Deserialize)]
 pub struct GetWatchlistRequest {

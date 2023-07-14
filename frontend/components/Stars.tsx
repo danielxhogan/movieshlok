@@ -131,7 +131,7 @@ export default function Stars(props: Props) {
         insideStarFive = false;
       });
     }, 100); // end interval
-  });
+  }, [props.id, props.interactive]);
 
   function makeStars(rating: Rating) {
     // prettier-ignore

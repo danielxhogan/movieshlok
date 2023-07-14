@@ -10,7 +10,9 @@ import { getReviews, GetReviewsRequest } from "@/redux/actions/reviews";
 
 export enum UseCases {
   SEARCH_RESULTS,
-  REVIEWS
+  REVIEWS,
+  WATCHLIST,
+  OTHER_LIST
 }
 
 interface SearchResultsData {
@@ -28,7 +30,23 @@ interface ReviewsData {
   movieId: string;
 }
 
-type Props = SearchResultsData | ReviewsData;
+interface WatchlistData {
+  useCase: UseCases.WATCHLIST;
+  currentPage: number;
+  totalPages: number;
+  username: string;
+}
+
+interface OtherListData {
+  useCase: UseCases.OTHER_LIST;
+  currentPage: number;
+  totalPages: number;
+  username: string;
+  listId: string;
+  listName: string;
+}
+
+type Props = SearchResultsData | ReviewsData | WatchlistData | OtherListData;
 
 export default function Pagination(props: Props) {
   const router = useRouter();
@@ -50,6 +68,20 @@ export default function Pagination(props: Props) {
       };
 
       dispatch<any>(getReviews(getReviewsRequest));
+    }
+  }
+
+  function watchlistOnClick(page: number) {
+    if (props.useCase === UseCases.WATCHLIST) {
+      router.push(`/u/${props.username}/watchlist?page=${page}`);
+    }
+  }
+
+  function listOnClick(page: number) {
+    if (props.useCase === UseCases.OTHER_LIST) {
+      router.push(
+        `/u/${props.username}/list/${props.listId}?name=${props.listName}&page=${page}`
+      );
     }
   }
 
@@ -120,6 +152,10 @@ export default function Pagination(props: Props) {
         return makeLinksArray(startI, endI, currentPage, searchResultsOnClick);
       case UseCases.REVIEWS:
         return makeLinksArray(startI, endI, currentPage, reviewsOnClick);
+      case UseCases.WATCHLIST:
+        return makeLinksArray(startI, endI, currentPage, watchlistOnClick);
+      case UseCases.OTHER_LIST:
+        return makeLinksArray(startI, endI, currentPage, listOnClick);
     }
   }
 
@@ -163,6 +199,10 @@ export default function Pagination(props: Props) {
         return makeLeftArrowIcons(page, searchResultsOnClick);
       case UseCases.REVIEWS:
         return makeLeftArrowIcons(page, reviewsOnClick);
+      case UseCases.WATCHLIST:
+        return makeLeftArrowIcons(page, watchlistOnClick);
+      case UseCases.OTHER_LIST:
+        return makeLeftArrowIcons(page, listOnClick);
     }
   }
 
@@ -221,6 +261,10 @@ export default function Pagination(props: Props) {
         return makeRightArrowIcons(page, searchResultsOnClick);
       case UseCases.REVIEWS:
         return makeRightArrowIcons(page, reviewsOnClick);
+      case UseCases.WATCHLIST:
+        return makeRightArrowIcons(page, watchlistOnClick);
+      case UseCases.OTHER_LIST:
+        return makeRightArrowIcons(page, listOnClick);
     }
   }
 

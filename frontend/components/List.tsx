@@ -1,8 +1,10 @@
 import listStyles from "@/styles/components/List.module.css";
 import listItemCardStyles from "@/styles/u/ListItemCard.module.css";
+import Pagination, { UseCases } from "./Pagination";
 
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/hooks";
+import { useRouter } from "next/router";
 
 // LIST IMPORTS
 // ***********************************
@@ -24,6 +26,7 @@ type ListProps = {
 // LIST COMPONENT
 // ***********************************
 export default function List(props: ListProps) {
+  const router = useRouter();
   const list = useAppSelector(selectListItems);
   const watchlist = useAppSelector(selectWatchlist);
 
@@ -51,7 +54,38 @@ export default function List(props: ListProps) {
   return (
     <div>
       {props.listType === ListType.WATCHLIST && makeCards(watchlist)}
+      <br />
+      <br />
+      {props.listType === ListType.WATCHLIST &&
+        watchlist.total_pages &&
+        watchlist.total_pages > 1 &&
+        typeof router.query.username === "string" && (
+          <Pagination
+            useCase={UseCases.WATCHLIST}
+            currentPage={watchlist.page}
+            totalPages={watchlist.total_pages}
+            username={router.query.username}
+          />
+        )}
+
       {props.listType === ListType.OTHER_LIST && makeCards(list)}
+      <br />
+      <br />
+      {props.listType === ListType.OTHER_LIST &&
+        list.total_pages &&
+        list.total_pages > 1 &&
+        typeof router.query.username === "string" &&
+        typeof router.query.listId === "string" &&
+        typeof router.query.name === "string" && (
+          <Pagination
+            useCase={UseCases.OTHER_LIST}
+            currentPage={list.page}
+            totalPages={list.total_pages}
+            username={router.query.username}
+            listId={router.query.listId}
+            listName={router.query.name}
+          />
+        )}
     </div>
   );
 }
@@ -59,8 +93,12 @@ export default function List(props: ListProps) {
 // LIST ITEM CARD IMPORTS
 // ***********************************
 import { selectCredentials, unsetCredentials } from "@/redux/reducers/auth";
-import { ListItem } from "@/redux/actions/lists";
-import { deleteListItem, DeleteListItemRequest } from "@/redux/actions/lists";
+import {
+  deleteListItem,
+  ListItem,
+  DeleteListItemRequest
+} from "@/redux/actions/lists";
+
 import {
   selectDeletedListItem,
   removeListItem,
@@ -69,7 +107,6 @@ import {
 } from "@/redux/reducers/lists";
 
 import { useEffect } from "react";
-import { useRouter } from "next/router";
 import Image from "next/image";
 import Link from "next/link";
 

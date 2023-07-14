@@ -14,15 +14,18 @@ export default function ListPage() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (typeof router.query.listId === "string") {
+    if (
+      typeof router.query.listId === "string" &&
+      typeof router.query.page === "string"
+    ) {
       const listItemsRequest: GetListItemsRequest = {
         list_id: router.query.listId,
-        page: 1
+        page: parseInt(router.query.page)
       };
 
       dispatch<any>(getListItems(listItemsRequest));
     }
-  }, [dispatch, router.query.listId]);
+  }, [dispatch, router.query]);
 
   return (
     <div className="wrapper">

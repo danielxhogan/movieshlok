@@ -41,6 +41,8 @@ export interface ListItems {
   status: Status;
   success: boolean | null;
   message: string;
+  page: number;
+  total_pages: number | null;
   list_items: ListItem[] | null;
 }
 
@@ -48,6 +50,8 @@ const initialListItemsState: ListItems = {
   status: "idle",
   success: null,
   message: "",
+  page: 0,
+  total_pages: null,
   list_items: null
 };
 
@@ -58,6 +62,8 @@ const initialWatchlistState: ListItems = {
   status: "idle",
   success: null,
   message: "",
+  page: 0,
+  total_pages: null,
   list_items: null
 };
 
@@ -203,12 +209,16 @@ export const listItemsSlice = createSlice({
         (state.status = "loading"),
           (state.success = null),
           (state.message = ""),
+          (state.page = 0),
+          (state.total_pages = null),
           (state.list_items = null);
       })
       .addCase(getListItems.fulfilled, (state, action) => {
         (state.status = "fulfilled"),
           (state.success = action.payload.success),
           (state.message = action.payload.message),
+          (state.page = action.payload.page),
+          (state.total_pages = action.payload.total_pages),
           (state.list_items = action.payload.list_items);
       });
   }
@@ -240,12 +250,16 @@ export const watchlistSlice = createSlice({
         (state.status = "loading"),
           (state.success = null),
           (state.message = ""),
+          (state.page = 0),
+          (state.total_pages = null),
           (state.list_items = null);
       })
       .addCase(getWatchlist.fulfilled, (state, action) => {
         (state.status = "fulfilled"),
           (state.success = action.payload.success),
           (state.message = action.payload.message),
+          (state.page = action.payload.page),
+          (state.total_pages = action.payload.total_pages),
           (state.list_items = action.payload.list_items);
       });
   }

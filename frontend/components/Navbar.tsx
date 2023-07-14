@@ -101,7 +101,7 @@ export default function Navbar(props: NavbarProps) {
                     {" "}
                     Ratings{" "}
                   </Link>
-                  <Link href={`/u/${credentials.username}/watchlist`}>
+                  <Link href={`/u/${credentials.username}/watchlist?page=1`}>
                     {" "}
                     Watchlist{" "}
                   </Link>
@@ -142,7 +142,9 @@ export default function Navbar(props: NavbarProps) {
                         <MenuItem command="Ratings"></MenuItem>
                       </Link>
 
-                      <Link href={`/u/${credentials.username}/watchlist`}>
+                      <Link
+                        href={`/u/${credentials.username}/watchlist?page=1`}
+                      >
                         <MenuItem command="Watchlist"></MenuItem>
                       </Link>
 

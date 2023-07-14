@@ -44,6 +44,8 @@ export interface GetListItemsRequest {
 interface GetListItemsPayload {
   success: boolean;
   message: string;
+  page: number;
+  total_pages: number | null;
   list_items: ListItem[] | null;
 }
 
@@ -57,6 +59,8 @@ export interface GetWatchlistRequest {
 interface GetWatchlistPayload {
   success: boolean;
   message: string;
+  page: number;
+  total_pages: number | null;
   list_items: ListItem[] | null;
 }
 
@@ -198,22 +202,31 @@ export const getListItems = createAsyncThunk(
 
     if (response.ok) {
       const data = await response.json();
+      const total_pages = Math.ceil(data.total_results / limit);
+
       return {
         success: true,
         message: "ok",
-        list_items: data
+        page: getListItemsRequest.page,
+        total_pages,
+        list_items: data.list_items
       };
     } else if (response.status >= 500) {
       return {
         success: false,
         message: "server error",
+        page: getListItemsRequest.page,
+        total_pages: null,
         list_items: null
       };
     } else {
       const data = await response.json();
+
       return {
         success: false,
         message: data.message,
+        page: getListItemsRequest.page,
+        total_pages: null,
         list_items: null
       };
     }
@@ -225,10 +238,10 @@ export const getListItems = createAsyncThunk(
 export const getWatchlist = createAsyncThunk(
   "lists/getWatchlist",
   async (
-    getWatchlistsRequest: GetWatchlistRequest
+    getWatchlistRequest: GetWatchlistRequest
   ): Promise<GetWatchlistPayload> => {
     const limit = 10;
-    const offset = limit * (getWatchlistsRequest.page - 1);
+    const offset = limit * (getWatchlistRequest.page - 1);
 
     const getWatchlistsUrl = `${BACKEND_URL}/get-watchlist`;
 
@@ -236,7 +249,7 @@ export const getWatchlist = createAsyncThunk(
     headers.append("Content-Type", "application/x-www-form-urlencoded");
 
     const params = new URLSearchParams();
-    params.append("username", getWatchlistsRequest.username);
+    params.append("username", getWatchlistRequest.username);
     params.append("offset", offset.toString());
     params.append("limit", limit.toString());
 
@@ -250,15 +263,20 @@ export const getWatchlist = createAsyncThunk(
 
     if (response.ok) {
       const data = await response.json();
+      const total_pages = Math.ceil(data.total_results / limit);
       return {
         success: true,
         message: "ok",
-        list_items: data
+        page: getWatchlistRequest.page,
+        total_pages,
+        list_items: data.list_items
       };
     } else if (response.status >= 500) {
       return {
         success: false,
         message: "server error",
+        page: getWatchlistRequest.page,
+        total_pages: null,
         list_items: null
       };
     } else {
@@ -266,6 +284,8 @@ export const getWatchlist = createAsyncThunk(
       return {
         success: false,
         message: data.message,
+        page: getWatchlistRequest.page,
+        total_pages: null,
         list_items: null
       };
     }
