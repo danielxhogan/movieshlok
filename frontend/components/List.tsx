@@ -76,9 +76,7 @@ export default function List(props: ListProps) {
           })}
 
           {props.personCredits.length === 0 && (
-            <div className={listStyles["no-movies"]}>
-              No movies in this watchlist yet
-            </div>
+            <div className={listStyles["no-movies"]}>No movies found</div>
           )}
         </span>
       );

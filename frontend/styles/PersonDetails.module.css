@@ -1,9 +1,97 @@
+.person-details {
+  display: flex;
+  gap: 20px;
+}
+
+.profile-pic {
+  border-radius: 10px;
+  position: sticky;
+  top: 100px;
+}
+
+.person-data {
+  width: 80%;
+}
+
+.title-section {
+  margin-bottom: 20px;
+}
+
+.title-profile-pic {
+  display: none;
+}
+
+.name {
+  font-size: 3rem;
+  font-weight: bold;
+}
+
+.date {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
 .filter-form {
   display: flex;
+  justify-content: flex-end;
+  gap: 20px;
   max-width: 300px;
-  margin: 30px 0;
+  margin-bottom: 30px;
 }
 
 .update-filter {
   width: 170px;
+}
+
+@media only screen and (max-width: 1100px) {
+  .profile-pic {
+    top: 150px; /* to account for the search bar in nav dropping down to its own row */
+    display: none;
+  }
+
+  .person-data {
+    width: 100%;
+  }
+
+  .title-section {
+    display: flex;
+    gap: 20px;
+  }
+
+  .title-profile-pic {
+    display: block;
+    border-radius: 10px;
+    position: sticky;
+    top: 100px;
+  }
+
+  .title-right {
+    width: 80%;
+  }
+}
+
+@media only screen and (max-width: 900px) {
+  .title-profile-pic {
+    top: 150px;
+  }
+}
+
+@media only screen and (max-width: 800px) {
+  .title-section {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .title-profile-pic {
+    height: 300px;
+    width: auto;
+  }
+
+  .name {
+    text-align: center;
+  }
+
+  .date {
+    text-align: center;
+  }
 }

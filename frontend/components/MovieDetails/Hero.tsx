@@ -1,6 +1,10 @@
 import styles from "@/styles/MovieDetails/Hero.module.css";
 import { useAppSelector } from "@/redux/hooks";
-import { selectMovieDetails, MovieImage } from "@/redux/reducers/tmdb";
+import {
+  selectMovieDetails,
+  MovieImage,
+  CastCrewMember
+} from "@/redux/reducers/tmdb";
 
 import Image from "next/image";
 import {
@@ -12,6 +16,7 @@ import {
   ModalBody,
   ModalCloseButton
 } from "@chakra-ui/react";
+import Link from "next/link";
 
 const TMDB_IMAGE_URL = process.env.NEXT_PUBLIC_TMDB_IMAGE_URL;
 
@@ -41,8 +46,8 @@ export default function Hero() {
 
   function makeTitle() {
     let year: string = "";
-    let directors: string[] = [];
-    let director: string = "";
+    let directors: CastCrewMember[] = [];
+    let director: CastCrewMember | null = null;
     const score = movieDetails.data.vote_average
       ? (movieDetails.data.vote_average / 2).toFixed(1)
       : movieDetails.data.vote_average;
@@ -53,7 +58,7 @@ export default function Hero() {
 
     movieDetails.data.credits?.crew?.forEach(crewMember => {
       if (crewMember.job === "Director") {
-        crewMember.name && directors.push(crewMember.name);
+        crewMember.name && directors.push(crewMember);
       }
     });
 
@@ -67,10 +72,18 @@ export default function Hero() {
           <span className={styles["title"]}>{movieDetails.data.title},</span>
           <span className={styles["year"]}>{year}</span>
         </h1>
-        <h2>
-          directed by
-          <span className={styles["director"]}> {director}</span>
-        </h2>
+
+        {director && (
+          <Link
+            href={`/details/person/${director.id}?kf=${director.known_for_department}`}
+          >
+            <h2>
+              directed by
+              <span className={styles["director"]}> {director.name}</span>
+            </h2>
+          </Link>
+        )}
+
         <span className={styles["score"]}>
           <span className={styles["score-number"]}>{score}</span> / 5
         </span>

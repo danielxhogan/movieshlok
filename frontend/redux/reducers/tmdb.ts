@@ -97,8 +97,8 @@ export interface CastCrewMember {
 
 interface Credits {
   id?: number;
-  cast?: [CastCrewMember];
-  crew?: [CastCrewMember];
+  cast?: CastCrewMember[];
+  crew?: CastCrewMember[];
 }
 
 // MAIN RESPONSE

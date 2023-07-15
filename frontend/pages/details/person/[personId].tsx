@@ -10,7 +10,11 @@ import { selectPersonDetails } from "@/redux/reducers/tmdb";
 
 import { useState, useRef, useEffect, FormEvent } from "react";
 import { useRouter } from "next/router";
+import Image from "next/image";
 import { Button, Select, Spinner } from "@chakra-ui/react";
+import { reformatDate } from "@/utils/date";
+
+const TMDB_IMAGE_URL = process.env.NEXT_PUBLIC_TMDB_IMAGE_URL;
 
 export default function PersonDetailsPage() {
   const router = useRouter();
@@ -55,7 +59,6 @@ export default function PersonDetailsPage() {
 
   function submitFilter(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    console.log(filter.current?.value);
     setDepartment(filter.current?.value);
   }
 
@@ -74,8 +77,6 @@ export default function PersonDetailsPage() {
           }
         });
     }
-
-    console.log(movieList);
 
     movieList.sort(
       (movie1: { popularity: number }, movie2: { popularity: number }) => {
@@ -113,9 +114,59 @@ export default function PersonDetailsPage() {
       <div className="content">
         {personDetails.status === "fulfilled" ? (
           <div className={styles["person-details"]}>
-            <div className={styles["person-image"]}></div>
+            <div className={styles["person-image"]}>
+              {personDetails.details?.profile_path && (
+                <Image
+                  src={`${TMDB_IMAGE_URL}/w342${personDetails.details.profile_path}`}
+                  className={styles["profile-pic"]}
+                  width={300}
+                  height={500}
+                  alt="backdrop"
+                ></Image>
+              )}
+            </div>
 
             <div className={styles["person-data"]}>
+              <div className={styles["title-section"]}>
+                <div className={styles["title-left"]}>
+                  {personDetails.details &&
+                    personDetails.details.profile_path && (
+                      <Image
+                        src={`${TMDB_IMAGE_URL}/w342${personDetails.details.profile_path}`}
+                        className={styles["title-profile-pic"]}
+                        width={300}
+                        height={500}
+                        alt="backdrop"
+                      ></Image>
+                    )}
+                </div>
+
+                <div className={styles["title-right"]}>
+                  <h1 className={styles["name"]}>
+                    {personDetails.details?.name}
+                  </h1>
+
+                  <div className={styles["date"]}>
+                    {personDetails.details &&
+                      personDetails.details.birthday && (
+                        <span>
+                          {reformatDate(personDetails.details.birthday)} -{" "}
+                        </span>
+                      )}
+                    {personDetails.details &&
+                      personDetails.details.deathday && (
+                        <span>
+                          {reformatDate(personDetails.details.deathday)}
+                        </span>
+                      )}
+                  </div>
+
+                  <p className={styles["biography"]}>
+                    {personDetails.details?.biography}
+                  </p>
+                </div>
+              </div>
+
               <form
                 onSubmit={e => submitFilter(e)}
                 className={styles["filter-form"]}
@@ -127,11 +178,12 @@ export default function PersonDetailsPage() {
                   variant="outline"
                   type="submit"
                 >
-                  Update filter:
+                  Update filter
                 </Button>
+
                 <Select
                   name="filter-select"
-                  placeholder={department}
+                  defaultValue={department}
                   ref={filter}
                 >
                   {makeOptions()}
