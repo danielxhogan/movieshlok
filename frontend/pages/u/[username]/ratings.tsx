@@ -1,7 +1,7 @@
 import styles from "@/styles/u/RatingsPage.module.css";
 import Navbar from "@/components/Navbar";
 import ProfileNav from "@/components/ProfileNav";
-import Stars from "@/components/Stars";
+import Rating from "@/components/Rating";
 import Footer from "@/components/Footer";
 
 import { useDispatch } from "react-redux";
@@ -30,11 +30,8 @@ import {
 } from "@/redux/reducers/review";
 
 import { useRouter } from "next/router";
-import Link from "next/link";
-import Image from "next/image";
 import { useState, useEffect } from "react";
 import {
-  Tooltip,
   useToast,
   useDisclosure,
   Modal,
@@ -47,8 +44,6 @@ import {
   ModalFooter,
   Spinner
 } from "@chakra-ui/react";
-
-const TMDB_IMAGE_URL = process.env.NEXT_PUBLIC_TMDB_IMAGE_URL;
 
 export default function ReviewsPage() {
   const router = useRouter();
@@ -163,10 +158,6 @@ export default function ReviewsPage() {
   let currentMonth = 13;
 
   function makeRating(rating: RatingReview, idx: number) {
-    if (!rating) {
-      return;
-    }
-
     const date = new Date(rating.timestamp * 1000);
     const month = date.getMonth();
     let monthText: string = "";
@@ -201,115 +192,20 @@ export default function ReviewsPage() {
       monthHeading = null;
     }
 
+    let canDelete = false;
+    if (credentials.username === router.query.username) {
+      canDelete = true;
+    }
+
     const ratingElement = (
-      <div key={idx} className={`${styles["rating"]} block`}>
-        {credentials.username === router.query.username && (
-          // @ts-ignore
-          <Tooltip label={"delete rating"} placement="top">
-            <i
-              className={`${styles["delete-rating"]} fa-solid fa-trash fa-md`}
-              onClick={() => onClickDeleteRating(rating)}
-            />
-          </Tooltip>
-        )}
-
-        <span className={styles["rating-left"]}>
-          <span className={styles["day"]}>{date.getDate()}</span>
-
-          <span className={styles["poster-section"]}>
-            <Image
-              src={`${TMDB_IMAGE_URL}/w342${rating.poster_path}`}
-              className={styles["movie-poster"]}
-              onClick={() => {
-                router.push(`/details/movie/${rating.movie_id}`);
-              }}
-              width={75}
-              height={0}
-              alt="backdrop"
-            ></Image>
-
-            <span className={styles["title-section"]}>
-              <span
-                className={styles["movie-title"]}
-                onClick={() => {
-                  router.push(`/details/movie/${rating.movie_id}`);
-                }}
-              >
-                {rating.movie_title}
-              </span>
-
-              <span className={styles["icons"]}>
-                <span className={styles["rating-like"]}>
-                  <Stars
-                    id={idx.toString()}
-                    size={"sm"}
-                    interactive={false}
-                    initialRating={rating.rating}
-                    setParentRating={() => {}}
-                  />
-
-                  {rating.liked ? (
-                    <i
-                      className={`fa-solid fa-heart fa-sm ${styles["heart"]}`}
-                    ></i>
-                  ) : (
-                    <i
-                      className={`fa-regular fa-heart fa-sm ${styles["heart"]}`}
-                    ></i>
-                  )}
-                </span>
-
-                {rating.review_id ? (
-                  <span className={styles["review"]}>
-                    <Link
-                      href={`/u/${router.query.username}/review?id=${rating.review_id}&movieId=${rating.movie_id}`}
-                    >
-                      <i className="fa-solid fa-bars-staggered fa-sm"></i>
-                    </Link>
-                  </span>
-                ) : (
-                  <span className={styles["review"]}>
-                    <i></i>
-                  </span>
-                )}
-              </span>
-            </span>
-          </span>
-        </span>
-
-        <span className={styles["rating-right"]}>
-          <span className={styles["rating-like"]}>
-            <Stars
-              id={idx.toString()}
-              size={"lg"}
-              interactive={false}
-              initialRating={rating.rating}
-              setParentRating={() => {}}
-            />
-
-            {rating.liked ? (
-              <i className={`fa-solid fa-heart fa-lg ${styles["heart"]}`}></i>
-            ) : (
-              <i className={`fa-regular fa-heart fa-lg ${styles["heart"]}`}></i>
-            )}
-          </span>
-
-          {rating.review_id ? (
-            <span className={styles["review"]}>
-              <Link
-                href={`/u/${router.query.username}/review?id=${rating.review_id}&movieId=${rating.movie_id}`}
-              >
-                <i className="fa-solid fa-bars-staggered"></i>
-              </Link>
-            </span>
-          ) : (
-            <span className={styles["review"]}>
-              <i></i>
-            </span>
-          )}
-        </span>
-      </div>
-    ); // end rating
+      <Rating
+        key={idx}
+        id={idx}
+        rating={rating}
+        date={date.getDate()}
+        onClickDeleteRating={canDelete ? onClickDeleteRating : null}
+      />
+    );
 
     if (monthHeading) {
       return (
@@ -337,7 +233,10 @@ export default function ReviewsPage() {
 
         {ratings.status === "fulfilled" ? (
           <>
-            {ratings.ratings?.map((rating, idx) => makeRating(rating, idx))}
+            {/* {ratings.ratings?.map((rating, idx) => makeRating(rating, idx))} */}
+            {ratings.ratings?.map((rating, idx) => {
+              return <>{rating && <>{makeRating(rating, idx)}</>}</>;
+            })}
 
             {ratings.ratings && ratings.ratings[0] === null && (
               <div className={styles["no-ratings"]}>
