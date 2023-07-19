@@ -60,8 +60,9 @@ export default function ReviewsPage() {
 
   useEffect(() => {
     const username = router.query.username;
+    const page = router.query.page;
 
-    if (typeof username === "string") {
+    if (typeof username === "string" && typeof page === "string") {
       const getRatingsRequest: GetRatingsRequest = {
         username,
         page: 1
@@ -69,7 +70,7 @@ export default function ReviewsPage() {
 
       dispatch<any>(getRatings(getRatingsRequest));
     }
-  }, [dispatch, router.query.username]);
+  }, [dispatch, router.query]);
 
   function onClickDeleteRating(rating: RatingReview) {
     setDeletingRating(rating);
@@ -233,7 +234,6 @@ export default function ReviewsPage() {
 
         {ratings.status === "fulfilled" ? (
           <>
-            {/* {ratings.ratings?.map((rating, idx) => makeRating(rating, idx))} */}
             {ratings.ratings?.map((rating, idx) => {
               return <>{rating && <>{makeRating(rating, idx)}</>}</>;
             })}

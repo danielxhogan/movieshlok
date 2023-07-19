@@ -152,7 +152,7 @@ import { Tooltip, useToast } from "@chakra-ui/react";
 
 const TMDB_IMAGE_URL = process.env.NEXT_PUBLIC_TMDB_IMAGE_URL;
 
-enum CardType {
+export enum CardType {
   LIST,
   CREDIT
 }

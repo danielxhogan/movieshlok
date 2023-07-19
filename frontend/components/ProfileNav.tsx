@@ -11,7 +11,7 @@ export default function ProfileNav() {
       <Link href={`/u/${router.query.username}/profile`}>
         <div>Profile</div>
       </Link>
-      <Link href={`/u/${router.query.username}/ratings`}>
+      <Link href={`/u/${router.query.username}/ratings?page=1`}>
         <div>Ratings</div>
       </Link>
       <Link href={`/u/${router.query.username}/watchlist?page=1`}>

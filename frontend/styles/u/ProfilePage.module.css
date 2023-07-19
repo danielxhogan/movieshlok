@@ -1,0 +1,28 @@
+.list {
+  margin-bottom: 10px;
+  background-color: var(--background-primary);
+  border: 1px solid var(--light-grey);
+  border-radius: 5px;
+  transition: 0.3s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* position: relative; */
+}
+
+.list:hover {
+  cursor: pointer;
+  border: 1px solid var(--dark-grey);
+  transition: 0.3s ease;
+}
+
+.list-name {
+  width: 95%;
+  height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.list-name-text {
+  transform: translateX(10px);
+}
