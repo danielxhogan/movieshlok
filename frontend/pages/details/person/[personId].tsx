@@ -12,7 +12,7 @@ import { useState, useRef, useEffect, FormEvent } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { Button, Select, Spinner } from "@chakra-ui/react";
-import { reformatDate } from "@/utils/date";
+import { reformatTMDBDate } from "@/utils/date";
 
 const TMDB_IMAGE_URL = process.env.NEXT_PUBLIC_TMDB_IMAGE_URL;
 
@@ -57,8 +57,7 @@ export default function PersonDetailsPage() {
     }
   }, [personDetails]);
 
-  function submitFilter(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  function filterResults() {
     setDepartment(filter.current?.value);
   }
 
@@ -96,14 +95,23 @@ export default function PersonDetailsPage() {
   function makeOptions() {
     if (departments) {
       const departmentOptions: JSX.Element[] = [];
+      const dpmtIter = departments.values();
+      let dpmt: string;
 
-      departments.forEach(department => {
+      for (let i = 0; i < departments.size; i++) {
+        dpmt = dpmtIter.next().value;
+
         departmentOptions.push(
-          <option key={department} value={department}>
-            {department}
+          <option
+            key={dpmt}
+            value={dpmt}
+            selected={dpmt === department ? true : false}
+          >
+            {dpmt}
           </option>
         );
-      });
+      }
+
       return departmentOptions;
     }
   }
@@ -111,6 +119,7 @@ export default function PersonDetailsPage() {
   return (
     <div className="wrapper">
       <Navbar />
+
       <div className="content">
         {personDetails.status === "fulfilled" ? (
           <div className={styles["person-details"]}>
@@ -150,13 +159,14 @@ export default function PersonDetailsPage() {
                     {personDetails.details &&
                       personDetails.details.birthday && (
                         <span>
-                          {reformatDate(personDetails.details.birthday)} -{" "}
+                          {reformatTMDBDate(personDetails.details.birthday)} -{" "}
                         </span>
                       )}
+
                     {personDetails.details &&
                       personDetails.details.deathday && (
                         <span>
-                          {reformatDate(personDetails.details.deathday)}
+                          {reformatTMDBDate(personDetails.details.deathday)}
                         </span>
                       )}
                   </div>
@@ -167,28 +177,13 @@ export default function PersonDetailsPage() {
                 </div>
               </div>
 
-              <form
-                onSubmit={e => submitFilter(e)}
-                className={styles["filter-form"]}
-              >
-                {/* @ts-ignore */}
-                <Button
-                  className={styles["update-filter"]}
-                  colorScheme="teal"
-                  variant="outline"
-                  type="submit"
-                >
-                  Update filter
-                </Button>
-
-                <Select
-                  name="filter-select"
-                  defaultValue={department}
-                  ref={filter}
-                >
-                  {makeOptions()}
-                </Select>
-              </form>
+              {department && (
+                <div className={styles["filter-select"]}>
+                  <Select ref={filter} onChange={filterResults}>
+                    {makeOptions()}
+                  </Select>
+                </div>
+              )}
 
               {department && makeList(department)}
             </div>

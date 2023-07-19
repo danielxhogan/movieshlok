@@ -2,7 +2,7 @@ import styles from "@/styles/SearchPage.module.css";
 import Navbar from "@/components/Navbar";
 import Pagination, { UseCases } from "@/components/Pagination";
 import Footer from "@/components/Footer";
-import { reformatDate } from "@/utils/date";
+import { reformatTMDBDate } from "@/utils/date";
 
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/hooks";
@@ -83,7 +83,7 @@ export default function SearchPage() {
 
   function makeMovieResult(result: SearchResult) {
     const date = result.release_date
-      ? reformatDate(result.release_date)
+      ? reformatTMDBDate(result.release_date)
       : result.release_date;
 
     const score = result.vote_average
@@ -346,15 +346,11 @@ export default function SearchPage() {
                 CAST & CREW
               </Button>
             </div>
-            {/* end filter-buttons */}
           </div>
-          {/* end filter */}
         </div>
-        {/* end search-data */}
       </div>
-      {/* end content */}
 
       <Footer />
     </div>
-  ); /* end wrapper */
+  );
 }

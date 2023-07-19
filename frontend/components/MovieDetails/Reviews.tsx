@@ -1,6 +1,7 @@
 import styles from "@/styles/MovieDetails/Reviews.module.css";
 import Stars from "@/components/Stars";
 import Pagination, { UseCases } from "../Pagination";
+import { reformatTimestampDate } from "@/utils/date";
 
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/hooks";
@@ -322,25 +323,7 @@ export default function Reviews() {
   }, [deletedReview, dispatch, toast]);
 
   function makeReview(review: Review) {
-    const date = new Date(review.created_at * 1000);
-    const month = date.getMonth();
-    let monthText: string = "";
-
-    // prettier-ignore
-    switch (month) {
-      case 0: monthText = "January"; break;
-      case 1: monthText = "February"; break;
-      case 2: monthText = "March"; break;
-      case 3: monthText = "April"; break;
-      case 4: monthText = "May"; break;
-      case 5: monthText = "June"; break;
-      case 6: monthText = "July"; break;
-      case 7: monthText = "August"; break;
-      case 8: monthText = "September"; break;
-      case 9: monthText = "October"; break;
-      case 10: monthText = "November"; break;
-      case 11: monthText = "December"; break;
-    }
+    const date = reformatTimestampDate(review.created_at);
 
     return (
       <div className="block block-btn" key={review.id}>
@@ -359,7 +342,7 @@ export default function Reviews() {
           </div>
 
           <div className={styles["review-title-right"]}>
-            <i>{`${monthText} ${date.getDate()}, ${date.getFullYear()}`}</i>
+            <i>{date}</i>
             {credentials.username === review.username && (
               <Tooltip label={"delete review"} placement="top">
                 <i

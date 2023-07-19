@@ -1,5 +1,5 @@
 import styles from "@/styles/MovieDetails/MovieData.module.css";
-import { reformatDate } from "@/utils/date";
+import { reformatTMDBDate } from "@/utils/date";
 
 import { useAppSelector } from "@/redux/hooks";
 import { selectMovieDetails, CastCrewMember } from "@/redux/reducers/tmdb";
@@ -25,7 +25,7 @@ export default function MovieContent() {
   const movieDetails = useAppSelector(selectMovieDetails);
 
   const date = movieDetails.data.release_date
-    ? reformatDate(movieDetails.data.release_date)
+    ? reformatTMDBDate(movieDetails.data.release_date)
     : movieDetails.data.release_date;
 
   function makeCastCrew(

@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import ProfileNav from "@/components/ProfileNav";
 import Stars from "@/components/Stars";
 import Footer from "@/components/Footer";
+import { reformatTimestampDate } from "@/utils/date";
 
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/hooks";
@@ -83,6 +84,8 @@ export default function ReviewDetailsPage() {
     ? (movieDetails.data.vote_average / 2).toFixed(1)
     : movieDetails.data.vote_average;
 
+  // DATA FETCHING
+  // *********************************************
   useEffect(() => {
     if (typeof router.query.movieId === "string") {
       dispatch<any>(getMovieDetails(router.query.movieId));
@@ -97,7 +100,7 @@ export default function ReviewDetailsPage() {
   }, [dispatch, router.query]);
 
   // WEBSOCKET ON MESSAGE
-  // ********************************************************************
+  // *********************************************
   const onNewComment = useCallback(
     (newComment: string) => {
       let id: string | null = null;
@@ -138,7 +141,7 @@ export default function ReviewDetailsPage() {
   );
 
   // WEBSOCKET SETUP
-  // *************************************************************
+  // *********************************************
   useEffect(() => {
     async function wsSetup() {
       const registerWsUrl = `${BACKEND_URL}/register-comments-ws`;
@@ -226,7 +229,7 @@ export default function ReviewDetailsPage() {
   }, [credentials.jwt_token, onNewComment, router.query.id]);
 
   // MAKE NEW COMMENT
-  // **********************************
+  // *********************************************
   function onClickAddComment() {
     if (commentText !== "" && credentials.jwt_token && reviewDetails.data) {
       const newComment: NewComment = {
@@ -316,7 +319,7 @@ export default function ReviewDetailsPage() {
     onOpen();
   }
 
-  function onCickDeleteReview() {
+  function onClickDeleteReview() {
     setModalType(ModalType.DELETE_REVIEW);
     onOpen();
   }
@@ -389,7 +392,7 @@ export default function ReviewDetailsPage() {
   }
 
   // DELETE REVIEW
-  // *********************************
+  // *********************************************
   function dispatchDeleteReview() {
     if (
       credentials.jwt_token &&
@@ -436,7 +439,7 @@ export default function ReviewDetailsPage() {
   }, [deletedReview, dispatch, router, toast]);
 
   // DELETE COMMENT
-  // *********************************
+  // *********************************************
   function dispatchDeleteComment() {
     onClose();
 
@@ -480,7 +483,7 @@ export default function ReviewDetailsPage() {
   }, [deletedComment, deletingCommentId, dispatch, toast]);
 
   // RENDERING FUNCTIONS
-  // *********************************************************
+  // *********************************************
   function makeTitle() {
     let year: string = "";
     let directors: string[] = [];
@@ -519,34 +522,6 @@ export default function ReviewDetailsPage() {
     );
   }
 
-  function makeDate(timestamp: number) {
-    if (reviewDetails.data) {
-      const date = new Date(timestamp * 1000);
-      const month = date.getMonth();
-      let monthText: string = "";
-
-      // prettier-ignore
-      switch (month) {
-        case 0:monthText = "January"; break;
-        case 1:monthText = "February"; break;
-        case 2:monthText = "March"; break;
-        case 3:monthText = "April"; break;
-        case 4:monthText = "May"; break;
-        case 5:monthText = "June"; break;
-        case 6:monthText = "July"; break;
-        case 7:monthText = "August"; break;
-        case 8:monthText = "September"; break;
-        case 9:monthText = "October"; break;
-        case 10:monthText = "November"; break;
-        case 11:monthText = "December"; break;
-      }
-
-      return (
-        <span>{`${monthText} ${date.getDate()}, ${date.getFullYear()}`}</span>
-      );
-    }
-  }
-
   function makeComment(comment: Comment, idx: number) {
     return (
       <div className="block" key={comment.id} id={comment.id}>
@@ -558,7 +533,7 @@ export default function ReviewDetailsPage() {
           </Link>
 
           <div className={styles["comment-title-right"]}>
-            <i>{makeDate(comment.created_at)}</i>
+            <i>{reformatTimestampDate(comment.created_at)}</i>
 
             {credentials.username === comment.username && (
               <Tooltip label={"delete comment"} placement="top">
@@ -577,7 +552,7 @@ export default function ReviewDetailsPage() {
   }
 
   // JSX
-  // *************************************************************************
+  // *********************************************
   return (
     <div className="wrapper">
       <Navbar />
@@ -613,7 +588,7 @@ export default function ReviewDetailsPage() {
                   <Tooltip label={"delete review"} placement="top">
                     <i
                       className={`${styles["delete-review"]} fa-solid fa-trash fa-md`}
-                      onClick={onCickDeleteReview}
+                      onClick={onClickDeleteReview}
                     />
                   </Tooltip>
                 )}
@@ -686,7 +661,9 @@ export default function ReviewDetailsPage() {
                       <>
                         <p className={styles["date"]}>
                           Watched on{" "}
-                          {makeDate(reviewDetails.data.review.created_at)}
+                          {reformatTimestampDate(
+                            reviewDetails.data.review.created_at
+                          )}
                         </p>
                         <p>{reviewDetails.data.review.review}</p>
                       </>
