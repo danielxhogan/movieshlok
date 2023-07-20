@@ -2,6 +2,7 @@ import styles from "@/styles/u/RatingsPage.module.css";
 import Navbar from "@/components/Navbar";
 import ProfileNav from "@/components/ProfileNav";
 import Rating from "@/components/Rating";
+import Pagination, { UseCases } from "@/components/Pagination";
 import Footer from "@/components/Footer";
 
 import { useDispatch } from "react-redux";
@@ -243,6 +244,18 @@ export default function ReviewsPage() {
                 No ratings from {router.query.username} yet
               </div>
             )}
+
+            {ratings.ratings &&
+              ratings.total_pages &&
+              ratings.total_pages > 1 &&
+              typeof router.query.username === "string" && (
+                <Pagination
+                  useCase={UseCases.RATINGS}
+                  currentPage={ratings.page}
+                  totalPages={ratings.total_pages}
+                  username={router.query.username}
+                />
+              )}
 
             <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
               <ModalOverlay />

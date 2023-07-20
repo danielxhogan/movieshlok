@@ -35,13 +35,13 @@ const nextConfig = {
         pathname: "/t/p/w780/*"
       }
     ]
-  },
-  eslint: {
-    ignoreDuringBuilds: true
-  },
-  typescript: {
-    ignoreBuildErrors: true
   }
+  // eslint: {
+  //   ignoreDuringBuilds: true
+  // },
+  // typescript: {
+  //   ignoreBuildErrors: true
+  // }
 };
 
 module.exports = nextConfig;

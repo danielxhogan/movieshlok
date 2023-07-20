@@ -35,7 +35,7 @@ export interface NavbarProps {
 export default function Navbar(props: NavbarProps) {
   const router = useRouter();
   const dispatch = useDispatch();
-  const credentials = useAppSelector(selectCredentials);
+  const credentials: Credentials = useAppSelector(selectCredentials);
 
   const [authenticated, setAuthenticated] = useState(false);
 
@@ -97,7 +97,7 @@ export default function Navbar(props: NavbarProps) {
                     {" "}
                     Profile{" "}
                   </Link>
-                  <Link href={`/u/${credentials.username}/ratings`}>
+                  <Link href={`/u/${credentials.username}/ratings?page=1`}>
                     {" "}
                     Ratings{" "}
                   </Link>
@@ -138,7 +138,7 @@ export default function Navbar(props: NavbarProps) {
                         <MenuItem command="Profile"></MenuItem>
                       </Link>
 
-                      <Link href={`/u/${credentials.username}/ratings`}>
+                      <Link href={`/u/${credentials.username}/ratings?page=1`}>
                         <MenuItem command="Ratings"></MenuItem>
                       </Link>
 
