@@ -86,11 +86,5 @@ diesel::joinable!(ratings -> users (user_id));
 diesel::joinable!(reviews -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
-    comments,
-    likes,
-    list_items,
-    lists,
-    ratings,
-    reviews,
-    users,
+    comments, likes, list_items, lists, ratings, reviews, users,
 );
