@@ -1,6 +1,4 @@
-use crate::db::config::models::{
-    InsertingNewList, List, LoginCreds, NewUser, User,
-};
+use crate::db::config::models::{InsertingNewList, List, LoginCreds, NewUser, User};
 use crate::db::config::schema::{lists, users};
 use crate::db::PooledPg;
 use crate::utils::error_handling::{AppError, ErrorType};

@@ -1,29 +1,32 @@
 use crate::db::config::models::{
-    DeleteRatingRequest,
-    // get all ratings for a user
-    GetRatingsRequest,
-    GetRatingsResponse,
     // get all reviews for a movie
     GetReviewsRequest,
     GetReviewsResponse,
-
-    InsertingNewLike,
-
-    InsertingNewRating,
-    // insert new review, rating, or like
-    InsertingNewReview,
-    Like,
-    Rating,
-    RatingLike,
-
-    RatingReview,
-
-    RatingsRating,
-    RatingsReview,
-    Review,
     SelectingReview,
+
     // get rating and like for a user for movie
     UserMovie,
+    RatingLike,
+
+    // create review
+    InsertingNewReview,
+    Review,
+
+    // create new rating or like
+    InsertingNewLike,
+    InsertingNewRating,
+    Like,
+    Rating,
+
+    // delete rating
+    DeleteRatingRequest,
+
+    // get all ratings for a user
+    GetRatingsRequest,
+    GetRatingsResponse,
+    RatingReview,
+    RatingsRating,
+    RatingsReview,
 };
 use crate::db::config::schema::{likes, ratings, reviews, users};
 use crate::db::PooledPg;

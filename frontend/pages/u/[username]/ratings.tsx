@@ -66,7 +66,7 @@ export default function ReviewsPage() {
     if (typeof username === "string" && typeof page === "string") {
       const getRatingsRequest: GetRatingsRequest = {
         username,
-        page: 1
+        page: parseInt(page)
       };
 
       dispatch<any>(getRatings(getRatingsRequest));
