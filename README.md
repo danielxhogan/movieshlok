@@ -1,7 +1,5 @@
 # Movieshlok
 
-# mvplaylist
-
 [![IMAGE_ALT](frontend/public/homepage.png)](https://www.youtube.com/watch?v=5nCuNbf1WWw)
 
 Movieshlok is a website dedicated to cinema of all kinds, from kino to schlock, and everything \
