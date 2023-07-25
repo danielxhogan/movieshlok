@@ -1,0 +1,1 @@
+docker exec -it movieshlok-cache redis-cli -h localhost
