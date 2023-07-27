@@ -1,1 +1,0 @@
-docker run --name movieshlok-cache -d redis

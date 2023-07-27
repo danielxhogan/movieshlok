@@ -1,0 +1,1 @@
+docker exec -it movieshlok-database psql -U postgres

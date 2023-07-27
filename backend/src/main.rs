@@ -1,5 +1,6 @@
-pub mod db;
 pub mod routes;
+pub mod db;
+pub mod cache;
 pub mod utils;
 
 use db::config::db_connect::establish_connection;
@@ -11,11 +12,19 @@ use routes::tmdb::tmdb_filters;
 use utils::error_handling::handle_rejection;
 use utils::websockets::make_client_list;
 
+use cache::review::fetch_int;
+
 use dotenvy::dotenv;
 use warp::{http::Method, Filter};
 
 #[tokio::main]
 async fn main() {
+    let suh_res = fetch_int().await;
+    match suh_res {
+        Ok(suh) => println!("{}", suh),
+        Err(_) => ()
+    }
+
     dotenv().ok();
     let pg_pool = establish_connection();
 

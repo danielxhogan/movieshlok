@@ -2,7 +2,6 @@
 
 dockerbuild.sh
 dockerrun.sh
-dockerlogs.sh
 .env
 
 # dependencies

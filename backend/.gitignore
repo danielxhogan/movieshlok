@@ -4,4 +4,3 @@
 
 dockerbuild.sh
 dockerrun.sh
-dockerlogs.sh

@@ -75,7 +75,7 @@ fn with_review_db_manager(
 }
 
 // ENDPOINTS
-// *******************************
+// ********************************************************
 pub fn review_filters(
     pool: PgPool,
     ws_client_list: ClientList,
@@ -110,7 +110,8 @@ fn get_review_filters(
 async fn get_review(
     mut review_db_manager: ReviewDbManager,
     get_review_request: GetReviewRequest,
-) -> Result<impl warp::Reply, warp::Rejection> {
+) -> Result<impl warp::Reply, warp::Rejection>
+{
     respond(
         review_db_manager.get_review(get_review_request),
         warp::http::StatusCode::OK,
@@ -175,7 +176,8 @@ fn delete_review_filters(
 async fn delete_review(
     mut review_db_manager: ReviewDbManager,
     delete_request: IncomingDeleteReviewRequest,
-) -> Result<impl warp::Reply, warp::Rejection> {
+) -> Result<impl warp::Reply, warp::Rejection>
+{
     let payload = auth_check(delete_request.jwt_token);
 
     match payload {
@@ -214,7 +216,8 @@ fn delete_comment_filters(
 async fn delete_comment(
     mut review_db_manager: ReviewDbManager,
     delete_request: IncomingDeleteCommentRequest,
-) -> Result<impl warp::Reply, warp::Rejection> {
+) -> Result<impl warp::Reply, warp::Rejection>
+{
     let payload = auth_check(delete_request.jwt_token);
 
     match payload {
@@ -253,7 +256,8 @@ fn register_comments_ws_client_filters(
 async fn register_comments_ws_client(
     req: WsRegisterRequest,
     client_list: ClientList,
-) -> Result<impl warp::Reply, warp::Rejection> {
+) -> Result<impl warp::Reply, warp::Rejection>
+{
     let response = register_ws_client(req, client_list, "comments-ws").await;
     respond(response, warp::http::StatusCode::OK)
 }
@@ -272,7 +276,8 @@ fn unregister_comments_ws_client_filters(
 async fn unregister_comments_ws_client(
     req: WsUnregisterRequest,
     client_list: ClientList,
-) -> Result<impl warp::Reply, warp::Rejection> {
+) -> Result<impl warp::Reply, warp::Rejection>
+{
     client_list.write().await.remove(&req.uuid);
     respond(saul_good_man(), warp::http::StatusCode::OK)
 }
@@ -292,7 +297,8 @@ async fn make_comments_ws_connection(
     ws: warp::ws::Ws,
     query_params: WsConnectionRequest,
     client_list: ClientList,
-) -> Result<impl warp::Reply, warp::Rejection> {
+) -> Result<impl warp::Reply, warp::Rejection>
+{
     make_ws_connection(ws, query_params, client_list).await
 }
 
@@ -309,7 +315,8 @@ fn emit_comment_filters(
 async fn emit_comment(
     req: WsEmitRequest,
     client_list: ClientList,
-) -> Result<impl warp::Reply, warp::Rejection> {
+) -> Result<impl warp::Reply, warp::Rejection>
+{
     let payload = auth_check(req.jwt_token);
 
     match payload {
