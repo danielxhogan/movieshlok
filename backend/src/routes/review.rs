@@ -4,12 +4,13 @@ use crate::db::config::models::{
     InsertingNewComment,
 };
 use crate::db::review::ReviewDbManager;
+use crate::cache;
 use crate::routes::{auth_check, respond, with_form_body};
-use crate::utils::error_handling::{AppError, ErrorType};
 use crate::utils::websockets::{
     make_ws_connection, register_ws_client, saul_good_man, with_clients,
     ClientList, WsConnectionRequest, WsRegisterRequest, WsUnregisterRequest,
 };
+use crate::utils::error_handling::{AppError, ErrorType};
 
 use chrono::Utc;
 use serde::Deserialize;
@@ -111,10 +112,26 @@ async fn get_review(
     mut review_db_manager: ReviewDbManager,
     get_review_request: GetReviewRequest,
 ) -> Result<impl warp::Reply, warp::Rejection> {
-    respond(
-        review_db_manager.get_review(get_review_request),
-        warp::http::StatusCode::OK,
-    )
+    let cached_response = cache::review::get_review(&get_review_request).await;
+
+    match cached_response {
+        Ok(response) => {
+            println!("returning cached response");
+            respond(Ok(response), warp::http::StatusCode::OK)
+        }
+        Err(_) => {
+            println!("returning db response");
+            let response = review_db_manager.get_review(get_review_request);
+
+            match response {
+                Ok(response) => {
+                    let _ = cache::review::set_review(&response).await;
+                    respond(Ok(response), warp::http::StatusCode::OK)
+                }
+                Err(err) => respond(Err(err), warp::http::StatusCode::OK),
+            }
+        }
+    }
 }
 
 // ENDPOINTS FOR INSERTING INTO/UPDATING/DELETING DATABASE

@@ -124,7 +124,7 @@ pub struct DeleteListItemRequest {
 
 // REVIEWS
 // ***********************************************
-#[derive(Queryable, Serialize, Clone)]
+#[derive(Queryable, Serialize, Deserialize, Clone)]
 pub struct Review {
     pub id: Uuid,
     pub user_id: Uuid,
@@ -318,7 +318,7 @@ pub struct GetReviewRequest {
     pub review_id: Uuid,
 }
 
-#[derive(Queryable, Serialize)]
+#[derive(Queryable, Serialize, Deserialize)]
 pub struct SelectingComment {
     pub id: Uuid,
     pub username: String,
@@ -328,7 +328,7 @@ pub struct SelectingComment {
     pub created_at: i64,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct GetReviewResponse {
     pub review: Review,
     pub liked: bool,
