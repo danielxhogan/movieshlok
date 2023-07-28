@@ -22,7 +22,7 @@ async fn main() {
     let suh_res = fetch_int().await;
     match suh_res {
         Ok(suh) => println!("{}", suh),
-        Err(_) => ()
+        Err(_) => (),
     }
 
     dotenv().ok();

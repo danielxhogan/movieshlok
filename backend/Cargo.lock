@@ -712,6 +712,7 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_derive",
+ "serde_json",
  "tokio",
  "tokio-stream",
  "uuid",

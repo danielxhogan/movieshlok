@@ -21,3 +21,4 @@ serde = "1.0.163"
 serde_derive = "1.0"
 log = "0.4"
 redis = { version = "0.23.0", features = ["tokio-comp"] }
+serde_json = "1.0"
