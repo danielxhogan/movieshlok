@@ -49,7 +49,7 @@ impl ReviewsDbManager {
     // ****************************
     pub fn get_reviews(
         &mut self,
-        get_reviews_request: GetReviewsRequest,
+        get_reviews_request: &GetReviewsRequest,
     ) -> Result<GetReviewsResponse, AppError> {
         let count = reviews::table
             .filter(reviews::movie_id.eq(&get_reviews_request.movie_id))

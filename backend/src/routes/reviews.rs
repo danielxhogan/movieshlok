@@ -5,6 +5,7 @@ use crate::db::config::models::{
 };
 
 use crate::db::reviews::ReviewsDbManager;
+use crate::cache::reviews::ReviewsCache;
 use crate::routes::{auth_check, respond, with_form_body};
 
 use crate::utils::error_handling::{AppError, ErrorType};
@@ -13,10 +14,11 @@ use crate::utils::websockets::{
     ClientList, WsConnectionRequest, WsRegisterRequest, WsUnregisterRequest,
 };
 
-use chrono::Utc;
+use warp::{reject, ws::Message, Filter};
+use std::convert::Infallible;
 use serde::Deserialize;
 use uuid::Uuid;
-use warp::{reject, ws::Message, Filter};
+use chrono::Utc;
 
 // STRUCTS FOR QUERYING DATABASE
 // **************************************************
@@ -100,14 +102,21 @@ fn with_reviews_db_manager(
         })
 }
 
+fn with_reviews_cache(
+    reviews_cache: ReviewsCache,
+) -> impl Filter<Extract = (ReviewsCache,), Error = Infallible> + Clone {
+    warp::any().map(move || reviews_cache.clone())
+}
+
 // ENDPOINTS
 // *******************************
 pub fn reviews_filters(
     pool: PgPool,
+    reviews_cache: ReviewsCache,
     ws_client_list: ClientList,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
-    get_reviews_filters(pool.clone())
+    get_reviews_filters(pool.clone(), reviews_cache)
         .or(get_rating_like_filters(pool.clone()))
         .or(get_ratings_filters(pool.clone()))
         .or(post_review_filters(pool.clone()))
@@ -127,22 +136,40 @@ pub fn reviews_filters(
 // ****************************
 fn get_reviews_filters(
     pool: PgPool,
+    cache: ReviewsCache,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
     warp::path!("get-reviews")
         .and(warp::post())
         .and(with_reviews_db_manager(pool))
+        .and(with_reviews_cache(cache))
         .and(with_form_body::<GetReviewsRequest>())
         .and_then(get_reviews)
 }
 
 async fn get_reviews(
     mut reviews_db_manager: ReviewsDbManager,
+    cache: ReviewsCache,
     get_reviews_request: GetReviewsRequest,
 ) -> Result<impl warp::Reply, warp::Rejection> {
-    let response = reviews_db_manager.get_reviews(get_reviews_request);
+    let response = reviews_db_manager.get_reviews(&get_reviews_request);
 
-    respond(response, warp::http::StatusCode::OK)
+    match response {
+        Ok(response) => {
+            let serialized_reviews = serde_json::to_string(&response).unwrap();
+            cache
+                .store_reviews(
+                    get_reviews_request.movie_id,
+                    get_reviews_request.offset,
+                    serialized_reviews,
+                )
+                .await;
+            respond(Ok(response), warp::http::StatusCode::OK)
+        }
+        Err(err) => respond(Err(err), warp::http::StatusCode::OK),
+    }
+
+    // respond(response, warp::http::StatusCode::OK)
 }
 
 // GET RATING AND LIKE FOR A MOVIE
@@ -420,7 +447,7 @@ fn register_reviews_ws_client_filters(
     warp::path!("register-reviews-ws")
         .and(warp::post())
         .and(with_form_body::<WsRegisterRequest>())
-        .and(with_clients(client_list.clone()))
+        .and(with_clients(client_list))
         .and_then(register_reviews_ws_client)
 }
 
@@ -439,7 +466,7 @@ fn unregister_reviews_ws_client_filters(
     warp::path!("unregister-reviews-ws")
         .and(warp::post())
         .and(with_form_body::<WsUnregisterRequest>())
-        .and(with_clients(client_list.clone()))
+        .and(with_clients(client_list))
         .and_then(unregister_reviews_ws_client)
 }
 
@@ -458,7 +485,7 @@ fn make_reviews_ws_connection_filters(
     warp::path!("reviews-ws")
         .and(warp::ws())
         .and(warp::query::<WsConnectionRequest>())
-        .and(with_clients(client_list.clone()))
+        .and(with_clients(client_list))
         .and_then(make_reviews_ws_connection)
 }
 
@@ -478,7 +505,7 @@ fn emit_review_filters(
 {
     warp::path!("emit-review")
         .and(with_form_body::<WsEmitRequest>())
-        .and(with_clients(client_list.clone()))
+        .and(with_clients(client_list))
         .and_then(emit_review)
 }
 

@@ -80,15 +80,6 @@ pub fn with_clients(
     warp::any().map(move || client_list.clone())
 }
 
-// before a client establishes a websocket connection, a request is made to a register endpoint
-// to indicate to the server that the client intends to connect. This is a
-// normal post request the client sends a request to with the user's user_id
-// if the user is logged in, and the topic they want to subscribe to. This
-// function creates a new entry for them in the list of clients. The sender
-// property is initially None, but once they make the websocket connection
-// the sender property is bound to sender part of the websocket channel
-// established with this client.
-
 pub async fn register_ws_client(
     req: WsRegisterRequest,
     client_list: ClientList,
@@ -97,6 +88,7 @@ pub async fn register_ws_client(
     match req.uuid {
         Some(uuid) => {
             let client = client_list.read().await.get(&uuid).cloned();
+
             match client {
                 Some(_) => {
                     return Err(AppError::new(
@@ -111,13 +103,6 @@ pub async fn register_ws_client(
     }
 
     let mut user_id: Option<Uuid> = None;
-
-    // authentication is not required to register, it is only required to emit
-    // messages of new reviews because a user must be logged in to leave a review.
-    // However, they can still connect to websocket to recieve new posts in real
-    // time if other users leave reviews. In the case the user provides a jwt
-    // token but it's determined to be invalid, an error response is sent to the
-    // client and the function returns immediately so this issue can be dealt with.
 
     match req.jwt_token {
         Some(token) => {
@@ -180,11 +165,6 @@ pub async fn make_ws_connection(
     }
 }
 
-// splits the websocket into a sender and reciever, then creates
-// a new unbounded channel. The sender part of this stream is stored
-// as the sender field the in this clients entry in the client_list
-// and is used to send them messages. The reciever part of the channel
-// is bound to the sends part of the websocket channel.
 async fn client_connection(
     ws: WebSocket,
     uuid: String,

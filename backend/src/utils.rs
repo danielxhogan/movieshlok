@@ -1,2 +1,2 @@
-pub mod error_handling;
 pub mod websockets;
+pub mod error_handling;

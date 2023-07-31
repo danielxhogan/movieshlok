@@ -177,7 +177,7 @@ async fn post_comment(
 }
 
 // DELETE REVIEW
-// **************
+// ********************************************************
 fn delete_review_filters(
     pool: PgPool,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
@@ -216,7 +216,7 @@ async fn delete_review(
 }
 
 // DELETE COMMENT
-// **************
+// ********************************************************
 fn delete_comment_filters(
     pool: PgPool,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
@@ -263,7 +263,7 @@ fn register_comments_ws_client_filters(
     warp::path!("register-comments-ws")
         .and(warp::post())
         .and(with_form_body::<WsRegisterRequest>())
-        .and(with_clients(client_list.clone()))
+        .and(with_clients(client_list))
         .and_then(register_comments_ws_client)
 }
 
@@ -282,7 +282,7 @@ fn unregister_comments_ws_client_filters(
     warp::path!("unregister-comments-ws")
         .and(warp::post())
         .and(with_form_body::<WsUnregisterRequest>())
-        .and(with_clients(client_list.clone()))
+        .and(with_clients(client_list))
         .and_then(unregister_comments_ws_client)
 }
 
@@ -301,7 +301,7 @@ fn make_comments_ws_connection_filters(
     warp::path!("comments-ws")
         .and(warp::ws())
         .and(warp::query::<WsConnectionRequest>())
-        .and(with_clients(client_list.clone()))
+        .and(with_clients(client_list))
         .and_then(make_comments_ws_connection)
 }
 
@@ -319,7 +319,7 @@ fn emit_comment_filters(
 {
     warp::path!("emit-comment")
         .and(with_form_body::<WsEmitRequest>())
-        .and(with_clients(client_list.clone()))
+        .and(with_clients(client_list))
         .and_then(emit_comment)
 }
 
