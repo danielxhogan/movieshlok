@@ -148,13 +148,13 @@ pub struct GetReviewsRequest {
 
 // results from db query for all reviews for a movie
 // sent to client in response to get_reviews endpoint
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct GetReviewsResponse {
     pub total_results: i64,
     pub reviews: Box<Vec<SelectingReview>>,
 }
 
-#[derive(Queryable, Serialize)]
+#[derive(Queryable, Serialize, Deserialize)]
 pub struct SelectingReview {
     pub id: Uuid,
     pub user_id: Uuid,

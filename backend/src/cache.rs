@@ -30,6 +30,8 @@ async fn establish_connection() -> RedisResult<redis::aio::Connection> {
 
 struct Cache {
     key: String,
+    set_key: String,
+    hash_key: String,
     time_stamp: u64,
     capacity: i32,
 }
@@ -37,8 +39,10 @@ struct Cache {
 impl Cache {
     fn new(key: String) -> Arc<RwLock<Cache>> {
         Arc::new(RwLock::new(Cache {
-            key,
-            time_stamp: 5,
+            key: key.clone(),
+            set_key: format!("{}_set", &key),
+            hash_key: format!("{}_hash", key),
+            time_stamp: 14,
             capacity: 5,
         }))
     }
@@ -71,36 +75,63 @@ impl Cache {
                     }
                 };
 
-                let set_key = format!("{}_set", &self.key);
-                let hash_key = format!("{}_hash", &self.key);
-
                 self.time_stamp += 1;
 
                 let _: redis::RedisResult<i32> =
-                    con.zadd(&set_key, &name, self.time_stamp).await;
+                    con.zadd(&self.set_key, &name, self.time_stamp).await;
 
                 let _: redis::RedisResult<i32> =
-                    con.hset(&hash_key, name, value).await;
+                    con.hset(&self.hash_key, name, value).await;
 
-                let count: i32 =
-                    con.zcard(&set_key).await.expect("to get count of members");
+                let count: i32 = con
+                    .zcard(&self.set_key)
+                    .await
+                    .expect("to get count of members");
 
                 if count > self.capacity {
                     println!("count is: {}", &count);
                     let least_recent: Vec<String> = con
-                        .zpopmin(set_key, 1)
+                        .zpopmin(&self.set_key, 1)
                         .await
                         .expect("to get the least recently used");
 
                     println!("{}, {}", &least_recent[0], &least_recent[1]);
 
-                    // if page != none
-                    // split least_recent[0] on _
-                    // get the page number
-                    // lrem key=uuid, count=1, element=page number
+                    let least_recent_name = &least_recent[0];
 
                     let _: redis::RedisResult<i32> =
-                        con.hdel(hash_key, &least_recent[0]).await;
+                        con.hdel(&self.hash_key, &least_recent_name).await;
+
+                    // if page != none
+                    match page {
+                        Some(_) => {
+                            let mut least_recent_split =
+                                least_recent_name.split("_");
+
+                            let least_recent_uuid = least_recent_split.next()
+                                .expect("set member name of popped item has an underscore");
+                            let least_recent_page = least_recent_split.next()
+                                .expect("set member name of popped item has an underscore");
+
+                            println!(
+                                "least_recent_uuid: {}",
+                                &least_recent_uuid
+                            );
+                            println!(
+                                "least_recent_page: {}",
+                                &least_recent_page
+                            );
+
+                            let pages: Vec<String> = con.lrange(least_recent_uuid, 0, -1).await
+                                .expect("there is a list with name of least_recent_uuid");
+
+                            println!("pages: {}", &pages[0]);
+
+                            let _: i32 = con.lrem(least_recent_uuid, 1, least_recent_page).await
+                                .expect("will be able to remove the page deleted from pages array");
+                        }
+                        None => (),
+                    }
                 }
 
                 Ok(())
@@ -110,5 +141,42 @@ impl Cache {
     }
 
     // retrieve value
+    async fn retrieve(
+        &self,
+        uuid: &String,
+        page: Option<&i64>,
+    ) -> Result<String, String> {
+        match CACHE_METHOD {
+            CacheMethod::REDIS => {
+                let con_res = establish_connection().await;
+                let mut con: redis::aio::Connection;
+
+                match con_res {
+                    Ok(c) => con = c,
+                    Err(err) => return Err(err.to_string()),
+                };
+
+                let response: Result<String, String>;
+
+                match page {
+                    Some(p) => {
+                        response = con
+                            .hget(&self.hash_key, format!("{}_{}", uuid, p))
+                            .await
+                            .map_err(|err| err.to_string());
+                    }
+                    None => {
+                        response = con
+                            .hget(&self.hash_key, uuid)
+                            .await
+                            .map_err(|err| err.to_string());
+                    }
+                }
+
+                response
+            }
+            CacheMethod::LRU => Ok("".to_string()),
+        }
+    }
     // delete value
 }

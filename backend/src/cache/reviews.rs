@@ -28,6 +28,18 @@ impl ReviewsCache {
             .await;
     }
 
+    pub async fn retrieve_review(
+        &self,
+        movie_id: &String,
+        page: &i64,
+    ) -> Result<String, String> {
+        self.reviews
+            .read()
+            .await
+            .retrieve(movie_id, Some(page))
+            .await
+    }
+
     // retrieve review
     // delete review
 }

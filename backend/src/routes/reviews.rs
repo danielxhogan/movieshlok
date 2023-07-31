@@ -1,7 +1,8 @@
 use crate::db::config::db_connect::PgPool;
 use crate::db::config::models::{
     DeleteRatingRequest, GetRatingsRequest, GetReviewsRequest,
-    InsertingNewLike, InsertingNewRating, InsertingNewReview, UserMovie,
+    GetReviewsResponse, InsertingNewLike, InsertingNewRating,
+    InsertingNewReview, UserMovie,
 };
 
 use crate::db::reviews::ReviewsDbManager;
@@ -109,7 +110,7 @@ fn with_reviews_cache(
 }
 
 // ENDPOINTS
-// *******************************
+// **************************************************
 pub fn reviews_filters(
     pool: PgPool,
     reviews_cache: ReviewsCache,
@@ -133,7 +134,7 @@ pub fn reviews_filters(
 // *************************************************************************************************
 
 // GET ALL REVIEWS FOR A MOVIE
-// ****************************
+// **************************************************
 fn get_reviews_filters(
     pool: PgPool,
     cache: ReviewsCache,
@@ -152,11 +153,33 @@ async fn get_reviews(
     cache: ReviewsCache,
     get_reviews_request: GetReviewsRequest,
 ) -> Result<impl warp::Reply, warp::Rejection> {
+    let retrieved_value = cache
+        .retrieve_review(
+            &get_reviews_request.movie_id,
+            &get_reviews_request.offset,
+        )
+        .await;
+
+    match retrieved_value {
+        Ok(value) => {
+            println!("got the value: {}", value);
+            let response: Result<GetReviewsResponse, serde_json::Error> =
+                serde_json::from_str(&value[..]);
+
+            match response {
+                Ok(r) => return respond(Ok(r), warp::http::StatusCode::OK),
+                Err(err) => println!("couldn't deserialize the value: {}", err),
+            }
+        }
+        Err(err) => println!("Didn't get the value: {}", err),
+    }
+
     let response = reviews_db_manager.get_reviews(&get_reviews_request);
 
     match response {
         Ok(response) => {
             let serialized_reviews = serde_json::to_string(&response).unwrap();
+
             cache
                 .store_reviews(
                     get_reviews_request.movie_id,
@@ -173,7 +196,7 @@ async fn get_reviews(
 }
 
 // GET RATING AND LIKE FOR A MOVIE
-// ********************************
+// **************************************************
 fn get_rating_like_filters(
     pool: PgPool,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
@@ -211,7 +234,7 @@ async fn get_rating_like(
 }
 
 // GET ALL RATINGS FOR A USER
-// ***************************
+// **************************************************
 fn get_ratings_filters(
     pool: PgPool,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
@@ -235,7 +258,7 @@ async fn get_ratings(
 // *************************************************************************************************
 
 // CREATE A NEW REVIEW IN THE DATABASE
-// ************************************
+// **************************************************
 fn post_review_filters(
     pool: PgPool,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
@@ -318,7 +341,7 @@ async fn post_review(
 }
 
 // CREATE/UPDATE RATING FOR A USER
-// ********************************
+// **************************************************
 fn post_rating_filters(
     pool: PgPool,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
@@ -361,7 +384,7 @@ async fn post_rating(
 }
 
 // CREATE/UPDATE LIKE FOR A USER
-// ********************************
+// **************************************************
 fn post_like_filters(
     pool: PgPool,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
@@ -400,7 +423,7 @@ async fn post_like(
 }
 
 // DELETE RATING
-// **************
+// **************************************************
 fn delete_rating_filters(
     pool: PgPool,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
