@@ -51,7 +51,11 @@ async fn main() {
             reviews_cache.clone(),
             reviews_ws_client_list,
         ))
-        .or(review_filters(pg_pool, comments_ws_client_list))
+        .or(review_filters(
+            pg_pool,
+            reviews_cache,
+            comments_ws_client_list,
+        ))
         .or(tmdb_filters())
         .recover(handle_rejection)
         .map(|reply| {

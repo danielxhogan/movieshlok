@@ -19,7 +19,7 @@ impl ReviewDbManager {
 
     pub fn get_review(
         &mut self,
-        get_review_request: GetReviewRequest,
+        get_review_request: &GetReviewRequest,
     ) -> Result<GetReviewResponse, AppError> {
         let reviews = reviews::table
             .filter(reviews::id.eq(&get_review_request.review_id))

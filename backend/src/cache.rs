@@ -117,6 +117,7 @@ impl Cache {
                                 "least_recent_uuid: {}",
                                 &least_recent_uuid
                             );
+
                             println!(
                                 "least_recent_page: {}",
                                 &least_recent_page
@@ -204,11 +205,19 @@ impl Cache {
 
                         let _: redis::RedisResult<Vec<String>> =
                             con.zrem(&self.set_key, &name).await;
+
                         let _: redis::RedisResult<i32> =
                             con.hdel(&self.hash_key, &name).await;
+
                         let _: redis::RedisResult<i32> =
                             con.lrem(&uuid, 1, page).await;
                     }
+                } else {
+                    let _: redis::RedisResult<Vec<String>> =
+                        con.zrem(&self.set_key, &uuid).await;
+
+                    let _: redis::RedisResult<i32> =
+                        con.hdel(&self.hash_key, &uuid).await;
                 }
 
                 Ok(())

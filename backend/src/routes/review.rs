@@ -1,10 +1,11 @@
 use crate::db::config::db_connect::PgPool;
 use crate::db::config::models::{
     DeleteCommentRequest, DeleteReviewRequest, GetReviewRequest,
-    InsertingNewComment,
+    GetReviewResponse, InsertingNewComment,
 };
 use crate::db::review::ReviewDbManager;
 use crate::cache;
+use crate::cache::reviews::{ReviewsCache, with_reviews_cache};
 use crate::routes::{auth_check, respond, with_form_body};
 use crate::utils::websockets::{
     make_ws_connection, register_ws_client, saul_good_man, with_clients,
@@ -79,13 +80,14 @@ fn with_review_db_manager(
 // ********************************************************
 pub fn review_filters(
     pool: PgPool,
+    reviews_cache: ReviewsCache,
     ws_client_list: ClientList,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
-    get_review_filters(pool.clone())
-        .or(post_comment_filters(pool.clone()))
-        .or(delete_review_filters(pool.clone()))
-        .or(delete_comment_filters(pool.clone()))
+    get_review_filters(pool.clone(), reviews_cache.clone())
+        .or(post_comment_filters(pool.clone(), reviews_cache.clone()))
+        .or(delete_review_filters(pool.clone(), reviews_cache.clone()))
+        .or(delete_comment_filters(pool.clone(), reviews_cache.clone()))
         .or(register_comments_ws_client_filters(ws_client_list.clone()))
         .or(unregister_comments_ws_client_filters(
             ws_client_list.clone(),
@@ -99,38 +101,56 @@ pub fn review_filters(
 
 fn get_review_filters(
     pool: PgPool,
+    cache: ReviewsCache,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
     warp::path!("get-review")
         .and(warp::post())
         .and(with_review_db_manager(pool))
+        .and(with_reviews_cache(cache))
         .and(with_form_body::<GetReviewRequest>())
         .and_then(get_review)
 }
 
 async fn get_review(
     mut review_db_manager: ReviewDbManager,
+    cache: ReviewsCache,
     get_review_request: GetReviewRequest,
 ) -> Result<impl warp::Reply, warp::Rejection> {
-    let cached_response = cache::review::get_review(&get_review_request).await;
+    let cached_value = cache
+        .retrieve_review_details(get_review_request.review_id.to_string())
+        .await;
 
-    match cached_response {
-        Ok(response) => {
-            println!("returning cached response");
-            respond(Ok(response), warp::http::StatusCode::OK)
-        }
-        Err(_) => {
-            println!("returning db response");
-            let response = review_db_manager.get_review(get_review_request);
+    match cached_value {
+        Ok(value) => {
+            println!("got the value: {}", value);
+            let response: Result<GetReviewResponse, serde_json::Error> =
+                serde_json::from_str(&value[..]);
 
             match response {
-                Ok(response) => {
-                    let _ = cache::review::set_review(&response).await;
-                    respond(Ok(response), warp::http::StatusCode::OK)
-                }
-                Err(err) => respond(Err(err), warp::http::StatusCode::OK),
+                Ok(r) => return respond(Ok(r), warp::http::StatusCode::OK),
+                Err(err) => println!("couldn't deserialize the value: {}", err),
             }
         }
+        Err(err) => println!("Didn't get the value: {}", err),
+    }
+
+    let response = review_db_manager.get_review(&get_review_request);
+
+    match response {
+        Ok(response) => {
+            let serialized_reviews = serde_json::to_string(&response).unwrap();
+
+            cache
+                .store_review_details(
+                    get_review_request.review_id.to_string(),
+                    serialized_reviews,
+                )
+                .await;
+
+            respond(Ok(response), warp::http::StatusCode::OK)
+        }
+        Err(err) => respond(Err(err), warp::http::StatusCode::OK),
     }
 }
 
@@ -139,17 +159,20 @@ async fn get_review(
 
 fn post_comment_filters(
     pool: PgPool,
+    cache: ReviewsCache,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
     warp::path!("post-comment")
         .and(warp::post())
         .and(with_review_db_manager(pool))
+        .and(with_reviews_cache(cache))
         .and(with_form_body::<IncomingNewComment>())
         .and_then(post_comment)
 }
 
 async fn post_comment(
     mut review_db_manager: ReviewDbManager,
+    cache: ReviewsCache,
     new_comment: IncomingNewComment,
 ) -> Result<impl warp::Reply, warp::Rejection> {
     let payload = auth_check(new_comment.jwt_token);
@@ -160,6 +183,10 @@ async fn post_comment(
         }
         Ok(_) => (),
     }
+
+    let _ = cache
+        .delete_review_details(&new_comment.review_id.to_string())
+        .await;
 
     let payload = payload.unwrap();
     let user_id = payload.claims.user_id;
@@ -180,17 +207,20 @@ async fn post_comment(
 // ********************************************************
 fn delete_review_filters(
     pool: PgPool,
+    cache: ReviewsCache,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
     warp::path!("delete-review")
         .and(warp::delete())
         .and(with_review_db_manager(pool))
+        .and(with_reviews_cache(cache))
         .and(with_form_body::<IncomingDeleteReviewRequest>())
         .and_then(delete_review)
 }
 
 async fn delete_review(
     mut review_db_manager: ReviewDbManager,
+    cache: ReviewsCache,
     delete_request: IncomingDeleteReviewRequest,
 ) -> Result<impl warp::Reply, warp::Rejection> {
     let payload = auth_check(delete_request.jwt_token);
@@ -201,6 +231,8 @@ async fn delete_review(
         }
         Ok(_) => (),
     }
+
+    let _ = cache.delete_reviews(&delete_request.movie_id).await;
 
     let payload = payload.unwrap();
     let user_id = payload.claims.user_id;
@@ -219,17 +251,20 @@ async fn delete_review(
 // ********************************************************
 fn delete_comment_filters(
     pool: PgPool,
+    cache: ReviewsCache,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
     warp::path!("delete-comment")
         .and(warp::delete())
         .and(with_review_db_manager(pool))
+        .and(with_reviews_cache(cache))
         .and(with_form_body::<IncomingDeleteCommentRequest>())
         .and_then(delete_comment)
 }
 
 async fn delete_comment(
     mut review_db_manager: ReviewDbManager,
+    cache: ReviewsCache,
     delete_request: IncomingDeleteCommentRequest,
 ) -> Result<impl warp::Reply, warp::Rejection> {
     let payload = auth_check(delete_request.jwt_token);
@@ -250,7 +285,14 @@ async fn delete_comment(
     };
 
     let response = review_db_manager.delete_comment(delete_comment_request);
-    respond(response, warp::http::StatusCode::OK)
+
+    match response {
+        Ok(r) => {
+            let _ = cache.delete_review_details(&r.review_id.to_string()).await;
+            respond(Ok(r), warp::http::StatusCode::OK)
+        }
+        Err(err) => respond(Err(err), warp::http::StatusCode::OK),
+    }
 }
 
 // ENPOINTS FOR MANAGING WEBSOCKETS

@@ -6,7 +6,7 @@ use crate::db::config::models::{
 };
 
 use crate::db::reviews::ReviewsDbManager;
-use crate::cache::reviews::ReviewsCache;
+use crate::cache::reviews::{ReviewsCache, with_reviews_cache};
 use crate::routes::{auth_check, respond, with_form_body};
 
 use crate::utils::error_handling::{AppError, ErrorType};
@@ -16,7 +16,6 @@ use crate::utils::websockets::{
 };
 
 use warp::{reject, ws::Message, Filter};
-use std::convert::Infallible;
 use serde::Deserialize;
 use uuid::Uuid;
 use chrono::Utc;
@@ -103,12 +102,6 @@ fn with_reviews_db_manager(
         })
 }
 
-fn with_reviews_cache(
-    reviews_cache: ReviewsCache,
-) -> impl Filter<Extract = (ReviewsCache,), Error = Infallible> + Clone {
-    warp::any().map(move || reviews_cache.clone())
-}
-
 // ENDPOINTS
 // **************************************************
 pub fn reviews_filters(
@@ -120,7 +113,7 @@ pub fn reviews_filters(
     get_reviews_filters(pool.clone(), reviews_cache.clone())
         .or(get_rating_like_filters(pool.clone()))
         .or(get_ratings_filters(pool.clone()))
-        .or(post_review_filters(pool.clone(), reviews_cache))
+        .or(post_review_filters(pool.clone(), reviews_cache.clone()))
         .or(post_rating_filters(pool.clone()))
         .or(post_like_filters(pool.clone()))
         .or(delete_rating_filters(pool.clone()))
@@ -153,14 +146,14 @@ async fn get_reviews(
     cache: ReviewsCache,
     get_reviews_request: GetReviewsRequest,
 ) -> Result<impl warp::Reply, warp::Rejection> {
-    let retrieved_value = cache
-        .retrieve_review(
+    let cached_value = cache
+        .retrieve_reviews(
             &get_reviews_request.movie_id,
             &get_reviews_request.offset,
         )
         .await;
 
-    match retrieved_value {
+    match cached_value {
         Ok(value) => {
             println!("got the value: {}", value);
             let response: Result<GetReviewsResponse, serde_json::Error> =
@@ -284,7 +277,7 @@ async fn post_review(
         Ok(_) => (),
     }
 
-    let _ = cache.delete_review(&new_review.movie_id).await;
+    let _ = cache.delete_reviews(&new_review.movie_id).await;
 
     let payload = payload.unwrap();
     let user_id = payload.claims.user_id;
