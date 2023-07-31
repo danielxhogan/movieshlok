@@ -42,7 +42,7 @@ impl Cache {
             key: key.clone(),
             set_key: format!("{}_set", &key),
             hash_key: format!("{}_hash", key),
-            time_stamp: 14,
+            time_stamp: 15,
             capacity: 5,
         }))
     }
@@ -178,5 +178,42 @@ impl Cache {
             CacheMethod::LRU => Ok("".to_string()),
         }
     }
+
     // delete value
+    async fn delete(&self, uuid: &String, paged: bool) -> Result<(), String> {
+        match CACHE_METHOD {
+            CacheMethod::REDIS => {
+                let con_res = establish_connection().await;
+                let mut con: redis::aio::Connection;
+
+                match con_res {
+                    Ok(c) => con = c,
+                    Err(err) => return Err(err.to_string()),
+                };
+
+                if paged {
+                    let pages: Vec<String> = con
+                        .lrange(&uuid, 0, -1)
+                        .await
+                        .expect("there is a list with pages for this uuid");
+
+                    let mut name: String;
+
+                    for page in pages.iter() {
+                        name = format!("{}_{}", uuid, page);
+
+                        let _: redis::RedisResult<Vec<String>> =
+                            con.zrem(&self.set_key, &name).await;
+                        let _: redis::RedisResult<i32> =
+                            con.hdel(&self.hash_key, &name).await;
+                        let _: redis::RedisResult<i32> =
+                            con.lrem(&uuid, 1, page).await;
+                    }
+                }
+
+                Ok(())
+            }
+            CacheMethod::LRU => Ok(()),
+        }
+    }
 }

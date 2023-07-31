@@ -117,10 +117,10 @@ pub fn reviews_filters(
     ws_client_list: ClientList,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
-    get_reviews_filters(pool.clone(), reviews_cache)
+    get_reviews_filters(pool.clone(), reviews_cache.clone())
         .or(get_rating_like_filters(pool.clone()))
         .or(get_ratings_filters(pool.clone()))
-        .or(post_review_filters(pool.clone()))
+        .or(post_review_filters(pool.clone(), reviews_cache))
         .or(post_rating_filters(pool.clone()))
         .or(post_like_filters(pool.clone()))
         .or(delete_rating_filters(pool.clone()))
@@ -191,8 +191,6 @@ async fn get_reviews(
         }
         Err(err) => respond(Err(err), warp::http::StatusCode::OK),
     }
-
-    // respond(response, warp::http::StatusCode::OK)
 }
 
 // GET RATING AND LIKE FOR A MOVIE
@@ -261,17 +259,20 @@ async fn get_ratings(
 // **************************************************
 fn post_review_filters(
     pool: PgPool,
+    cache: ReviewsCache,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
     warp::path!("post-review")
         .and(warp::post())
         .and(with_reviews_db_manager(pool))
+        .and(with_reviews_cache(cache))
         .and(with_form_body::<IncomingNewReview>())
         .and_then(post_review)
 }
 
 async fn post_review(
     mut reviews_db_manager: ReviewsDbManager,
+    cache: ReviewsCache,
     new_review: IncomingNewReview,
 ) -> Result<impl warp::Reply, warp::Rejection> {
     let payload = auth_check(new_review.jwt_token);
@@ -282,6 +283,8 @@ async fn post_review(
         }
         Ok(_) => (),
     }
+
+    let _ = cache.delete_review(&new_review.movie_id).await;
 
     let payload = payload.unwrap();
     let user_id = payload.claims.user_id;

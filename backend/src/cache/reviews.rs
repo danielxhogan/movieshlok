@@ -40,6 +40,8 @@ impl ReviewsCache {
             .await
     }
 
-    // retrieve review
     // delete review
+    pub async fn delete_review(&self, movie_id: &String) -> Result<(), String> {
+        self.reviews.write().await.delete(movie_id, true).await
+    }
 }
