@@ -45,7 +45,7 @@ impl ReviewsCache {
         page: &i64,
     ) -> Result<String, String> {
         self.reviews
-            .read()
+            .write()
             .await
             .retrieve(movie_id, Some(page))
             .await
@@ -81,7 +81,7 @@ impl ReviewsCache {
         review_id: String,
     ) -> Result<String, String> {
         self.review_details
-            .read()
+            .write()
             .await
             .retrieve(&review_id, None)
             .await

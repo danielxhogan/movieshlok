@@ -42,7 +42,7 @@ impl Cache {
             key: key.clone(),
             set_key: format!("{}_set", &key),
             hash_key: format!("{}_hash", key),
-            time_stamp: 15,
+            time_stamp: 27,
             capacity: 5,
         }))
     }
@@ -141,9 +141,8 @@ impl Cache {
         }
     }
 
-    // retrieve value
     async fn retrieve(
-        &self,
+        &mut self,
         uuid: &String,
         page: Option<&i64>,
     ) -> Result<String, String> {
@@ -157,30 +156,40 @@ impl Cache {
                     Err(err) => return Err(err.to_string()),
                 };
 
-                let response: Result<String, String>;
+                let name: String;
 
                 match page {
-                    Some(p) => {
-                        response = con
-                            .hget(&self.hash_key, format!("{}_{}", uuid, p))
-                            .await
-                            .map_err(|err| err.to_string());
-                    }
-                    None => {
-                        response = con
-                            .hget(&self.hash_key, uuid)
-                            .await
-                            .map_err(|err| err.to_string());
-                    }
+                    Some(p) => name = format!("{}_{}", uuid, p),
+                    None => name = uuid.clone()
                 }
 
-                response
+                println!("name: {}", name);
+
+                let member: i32 = con
+                    .zrem(&self.set_key, &name)
+                    .await
+                    .expect("to get number of removed items");
+
+                if member == 1 {
+                    println!("popped the retrieved value");
+                    self.time_stamp += 1;
+
+                    let _: redis::RedisResult<i32> =
+                        con.zadd(&self.set_key, &name, self.time_stamp).await;
+                    println!("added popped value in front");
+
+                    con
+                        .hget(&self.hash_key, name)
+                        .await
+                        .map_err(|err| err.to_string())
+                } else {
+                    Err("could not retrieve".to_string())
+                }
             }
             CacheMethod::LRU => Ok("".to_string()),
         }
     }
 
-    // delete value
     async fn delete(&self, uuid: &String, paged: bool) -> Result<(), String> {
         match CACHE_METHOD {
             CacheMethod::REDIS => {
@@ -203,7 +212,7 @@ impl Cache {
                     for page in pages.iter() {
                         name = format!("{}_{}", uuid, page);
 
-                        let _: redis::RedisResult<Vec<String>> =
+                        let _: redis::RedisResult<i32> =
                             con.zrem(&self.set_key, &name).await;
 
                         let _: redis::RedisResult<i32> =
@@ -213,7 +222,7 @@ impl Cache {
                             con.lrem(&uuid, 1, page).await;
                     }
                 } else {
-                    let _: redis::RedisResult<Vec<String>> =
+                    let _: redis::RedisResult<i32> =
                         con.zrem(&self.set_key, &uuid).await;
 
                     let _: redis::RedisResult<i32> =
