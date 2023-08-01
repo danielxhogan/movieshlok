@@ -1,6 +1,6 @@
-pub mod lists;
-pub mod review;
+pub mod tmdb;
 pub mod reviews;
+pub mod lists;
 
 extern crate redis;
 use redis::{AsyncCommands, RedisResult};
@@ -40,7 +40,7 @@ impl Cache {
         Arc::new(RwLock::new(Cache {
             set_key: format!("{}_set", &key),
             hash_key: format!("{}_hash", key),
-            time_stamp: 64,
+            time_stamp: 122,
             capacity: 5,
             paged,
         }))
@@ -51,8 +51,7 @@ impl Cache {
         uuid: String,
         page: Option<i64>,
         value: String,
-    ) -> Result<(), String>
-    {
+    ) -> Result<(), String> {
         match CACHE_METHOD {
             CacheMethod::REDIS => {
                 match page {
@@ -83,8 +82,11 @@ impl Cache {
                     Some(p) => {
                         name = format!("{}_{}", uuid, p);
 
-                        let _: redis::RedisResult<i32> =
-                            con.rpush(uuid, page).await;
+                        // let _: redis::RedisResult<i32> =
+                        let _: i32 = con
+                            .rpush(uuid, page)
+                            .await
+                            .expect("to make a new list");
                     }
                 };
 
@@ -157,8 +159,7 @@ impl Cache {
         &mut self,
         uuid: &String,
         page: Option<&i64>,
-    ) -> Result<String, String>
-    {
+    ) -> Result<String, String> {
         match CACHE_METHOD {
             CacheMethod::REDIS => {
                 match page {
@@ -173,6 +174,7 @@ impl Cache {
                         }
                     }
                 }
+
                 let con_res = establish_connection().await;
                 let mut con: redis::aio::Connection;
 

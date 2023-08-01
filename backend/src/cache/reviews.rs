@@ -91,10 +91,6 @@ impl ReviewsCache {
         &self,
         review_id: &String,
     ) -> Result<(), String> {
-        self.review_details
-            .write()
-            .await
-            .delete(review_id)
-            .await
+        self.review_details.write().await.delete(review_id).await
     }
 }

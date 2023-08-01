@@ -1,4 +1,5 @@
 use crate::routes::{respond, with_form_body};
+use crate::cache::tmdb::{TmdbCache, with_tmdb_cache};
 use crate::utils::error_handling::{AppError, ErrorType};
 
 use serde::{Deserialize, Serialize};
@@ -277,25 +278,51 @@ struct SearchResults {
 // ENDPOINTS
 // *******************************
 pub fn tmdb_filters(
+    tmdb_cache: TmdbCache,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
-    search_filters()
-        .or(movie_details_filters())
-        .or(person_details_filters())
+    search_filters(tmdb_cache.clone())
+        .or(movie_details_filters(tmdb_cache.clone()))
+        .or(person_details_filters(tmdb_cache))
 }
 
 pub fn search_filters(
+    cache: TmdbCache,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
     warp::path!("tmdb" / "search")
         .and(warp::post())
+        .and(with_tmdb_cache(cache))
         .and(with_form_body::<QueryParams>())
         .and_then(search)
 }
 
 async fn search(
+    cache: TmdbCache,
     query_params: QueryParams,
 ) -> Result<impl warp::Reply, warp::Rejection> {
+    let cached_value = cache
+        .retrieve_search_results(
+            &query_params.query,
+            &query_params.page,
+            &query_params.endpoint,
+        )
+        .await;
+
+    match cached_value {
+        Ok(value) => {
+            println!("got the seach results");
+            let response: Result<SearchResults, serde_json::Error> =
+                serde_json::from_str(&value[..]);
+
+            match response {
+                Ok(r) => return respond(Ok(r), warp::http::StatusCode::OK),
+                Err(err) => println!("couldn't deserialize the value: {}", err),
+            }
+        }
+        Err(err) => println!("Didn't get the value: {}", err),
+    }
+
     let tmdb_base_url = env::var("TMDB_BASE_URL").unwrap();
     let tmdb_api_key = env::var("TMDB_API_KEY").unwrap();
 
@@ -317,21 +344,58 @@ async fn search(
             AppError::new(&err.to_string(), ErrorType::FailedToSearch)
         });
 
-    respond(response, warp::http::StatusCode::OK)
+    match response {
+        Ok(response) => {
+            let serialized_reviews = serde_json::to_string(&response).unwrap();
+
+            cache
+                .store_search_results(
+                    query_params.query,
+                    query_params.page,
+                    query_params.endpoint,
+                    serialized_reviews,
+                )
+                .await;
+
+            respond(Ok(response), warp::http::StatusCode::OK)
+        }
+        Err(err) => respond(Err(err), warp::http::StatusCode::OK),
+    }
 }
 
 pub fn movie_details_filters(
+    cache: TmdbCache,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
     warp::path!("tmdb" / "movie")
         .and(warp::post())
+        .and(with_tmdb_cache(cache))
         .and(with_form_body::<MovieDetailsParams>())
         .and_then(movie_details)
 }
 
 async fn movie_details(
+    cache: TmdbCache,
     movie_details_params: MovieDetailsParams,
 ) -> Result<impl warp::Reply, warp::Rejection> {
+    let cached_value = cache
+        .retrieve_movie_details(&movie_details_params.movie_id)
+        .await;
+
+    match cached_value {
+        Ok(value) => {
+            println!("got the movie details");
+            let response: Result<MovieDetails, serde_json::Error> =
+                serde_json::from_str(&value[..]);
+
+            match response {
+                Ok(r) => return respond(Ok(r), warp::http::StatusCode::OK),
+                Err(err) => println!("couldn't deserialize the value: {}", err),
+            }
+        }
+        Err(err) => println!("Didn't get the value: {}", err),
+    }
+
     let tmdb_base_url = env::var("TMDB_BASE_URL").unwrap();
     let tmdb_api_key = env::var("TMDB_API_KEY").unwrap();
 
@@ -349,21 +413,56 @@ async fn movie_details(
             AppError::new(&err.to_string(), ErrorType::FailedToGetMovieDetails)
         });
 
-    respond(response, warp::http::StatusCode::OK)
+    match response {
+        Ok(response) => {
+            let serialized_reviews = serde_json::to_string(&response).unwrap();
+
+            cache
+                .store_movie_details(
+                    movie_details_params.movie_id,
+                    serialized_reviews,
+                )
+                .await;
+
+            respond(Ok(response), warp::http::StatusCode::OK)
+        }
+        Err(err) => respond(Err(err), warp::http::StatusCode::OK),
+    }
 }
 
 fn person_details_filters(
+    cache: TmdbCache,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
     warp::path!("tmdb" / "person")
         .and(warp::post())
+        .and(with_tmdb_cache(cache))
         .and(with_form_body::<PersonDetailsParams>())
         .and_then(person_details)
 }
 
 async fn person_details(
+    cache: TmdbCache,
     person_details_params: PersonDetailsParams,
 ) -> Result<impl warp::Reply, warp::Rejection> {
+    let cached_value = cache
+        .retrieve_person_details(&person_details_params.person_id)
+        .await;
+
+    match cached_value {
+        Ok(value) => {
+            println!("got the movie details");
+            let response: Result<PersonDetails, serde_json::Error> =
+                serde_json::from_str(&value[..]);
+
+            match response {
+                Ok(r) => return respond(Ok(r), warp::http::StatusCode::OK),
+                Err(err) => println!("couldn't deserialize the value: {}", err),
+            }
+        }
+        Err(err) => println!("Didn't get the value: {}", err),
+    }
+
     let tmdb_base_url = env::var("TMDB_BASE_URL").unwrap();
     let tmdb_api_key = env::var("TMDB_API_KEY").unwrap();
 
@@ -381,5 +480,19 @@ async fn person_details(
             AppError::new(&err.to_string(), ErrorType::FailedToGetPersonDetails)
         });
 
-    respond(response, warp::http::StatusCode::OK)
+    match response {
+        Ok(response) => {
+            let serialized_reviews = serde_json::to_string(&response).unwrap();
+
+            cache
+                .store_person_details(
+                    person_details_params.person_id,
+                    serialized_reviews,
+                )
+                .await;
+
+            respond(Ok(response), warp::http::StatusCode::OK)
+        }
+        Err(err) => respond(Err(err), warp::http::StatusCode::OK),
+    }
 }

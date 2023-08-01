@@ -5,6 +5,7 @@ pub mod utils;
 
 use db::config::db_connect::establish_connection;
 use cache::reviews::ReviewsCache;
+use cache::tmdb::TmdbCache;
 use utils::error_handling::handle_rejection;
 use utils::websockets::make_client_list;
 
@@ -23,6 +24,7 @@ async fn main() {
     let pg_pool = establish_connection();
 
     let reviews_cache = ReviewsCache::new();
+    let tmdb_cache = TmdbCache::new();
 
     let reviews_ws_client_list = make_client_list();
     let comments_ws_client_list = make_client_list();
@@ -48,7 +50,7 @@ async fn main() {
             reviews_cache,
             comments_ws_client_list,
         ))
-        .or(tmdb_filters())
+        .or(tmdb_filters(tmdb_cache))
         .recover(handle_rejection)
         .map(|reply| {
             warp::reply::with_header(
