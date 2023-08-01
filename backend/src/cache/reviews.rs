@@ -20,8 +20,8 @@ pub struct ReviewsCache {
 impl ReviewsCache {
     pub fn new() -> ReviewsCache {
         ReviewsCache {
-            reviews: Cache::new("reviews".to_string()),
-            review_details: Cache::new("review_details".to_string()),
+            reviews: Cache::new("reviews".to_string(), true),
+            review_details: Cache::new("review_details".to_string(), false),
         }
     }
 
@@ -55,7 +55,7 @@ impl ReviewsCache {
         &self,
         movie_id: &String,
     ) -> Result<(), String> {
-        self.reviews.write().await.delete(movie_id, true).await
+        self.reviews.write().await.delete(movie_id).await
     }
 
     pub async fn store_review_details(
@@ -94,7 +94,7 @@ impl ReviewsCache {
         self.review_details
             .write()
             .await
-            .delete(review_id, false)
+            .delete(review_id)
             .await
     }
 }

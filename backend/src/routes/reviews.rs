@@ -1,11 +1,11 @@
 use crate::db::config::db_connect::PgPool;
+use crate::db::reviews::ReviewsDbManager;
 use crate::db::config::models::{
     DeleteRatingRequest, GetRatingsRequest, GetReviewsRequest,
     GetReviewsResponse, InsertingNewLike, InsertingNewRating,
     InsertingNewReview, UserMovie,
 };
 
-use crate::db::reviews::ReviewsDbManager;
 use crate::cache::reviews::{ReviewsCache, with_reviews_cache};
 use crate::routes::{auth_check, respond, with_form_body};
 
@@ -180,6 +180,7 @@ async fn get_reviews(
                     serialized_reviews,
                 )
                 .await;
+
             respond(Ok(response), warp::http::StatusCode::OK)
         }
         Err(err) => respond(Err(err), warp::http::StatusCode::OK),

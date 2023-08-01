@@ -14,19 +14,11 @@ use routes::review::review_filters;
 use routes::reviews::reviews_filters;
 use routes::tmdb::tmdb_filters;
 
-use cache::review::fetch_int;
-
 use dotenvy::dotenv;
 use warp::{http::Method, Filter};
 
 #[tokio::main]
 async fn main() {
-    let suh_res = fetch_int().await;
-    match suh_res {
-        Ok(suh) => println!("{}", suh),
-        Err(_) => (),
-    }
-
     dotenv().ok();
     let pg_pool = establish_connection();
 

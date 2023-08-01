@@ -1,17 +1,17 @@
 use crate::db::config::db_connect::PgPool;
+use crate::db::review::ReviewDbManager;
 use crate::db::config::models::{
     DeleteCommentRequest, DeleteReviewRequest, GetReviewRequest,
     GetReviewResponse, InsertingNewComment,
 };
-use crate::db::review::ReviewDbManager;
-use crate::cache;
 use crate::cache::reviews::{ReviewsCache, with_reviews_cache};
 use crate::routes::{auth_check, respond, with_form_body};
+
+use crate::utils::error_handling::{AppError, ErrorType};
 use crate::utils::websockets::{
     make_ws_connection, register_ws_client, saul_good_man, with_clients,
     ClientList, WsConnectionRequest, WsRegisterRequest, WsUnregisterRequest,
 };
-use crate::utils::error_handling::{AppError, ErrorType};
 
 use chrono::Utc;
 use serde::Deserialize;

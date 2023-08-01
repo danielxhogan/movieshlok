@@ -4,7 +4,6 @@ pub mod reviews;
 
 extern crate redis;
 use redis::{AsyncCommands, RedisResult};
-// use std::sync::{Arc, RwLock};
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
@@ -29,21 +28,21 @@ async fn establish_connection() -> RedisResult<redis::aio::Connection> {
 }
 
 struct Cache {
-    key: String,
     set_key: String,
     hash_key: String,
     time_stamp: u64,
     capacity: i32,
+    paged: bool,
 }
 
 impl Cache {
-    fn new(key: String) -> Arc<RwLock<Cache>> {
+    fn new(key: String, paged: bool) -> Arc<RwLock<Cache>> {
         Arc::new(RwLock::new(Cache {
-            key: key.clone(),
             set_key: format!("{}_set", &key),
             hash_key: format!("{}_hash", key),
-            time_stamp: 27,
+            time_stamp: 64,
             capacity: 5,
+            paged,
         }))
     }
 
@@ -52,9 +51,23 @@ impl Cache {
         uuid: String,
         page: Option<i64>,
         value: String,
-    ) -> Result<(), String> {
+    ) -> Result<(), String>
+    {
         match CACHE_METHOD {
             CacheMethod::REDIS => {
+                match page {
+                    Some(_) => {
+                        if !self.paged {
+                            return Err("this cache does not manage paginated data. Pass None for page.".to_string());
+                        }
+                    }
+                    None => {
+                        if self.paged {
+                            return Err("this cache manages paginated data. Must pass a page number.".to_string());
+                        }
+                    }
+                }
+
                 let con_res = establish_connection().await;
                 let mut con: redis::aio::Connection;
 
@@ -102,7 +115,6 @@ impl Cache {
                     let _: redis::RedisResult<i32> =
                         con.hdel(&self.hash_key, &least_recent_name).await;
 
-                    // if page != none
                     match page {
                         Some(_) => {
                             let mut least_recent_split =
@@ -145,9 +157,22 @@ impl Cache {
         &mut self,
         uuid: &String,
         page: Option<&i64>,
-    ) -> Result<String, String> {
+    ) -> Result<String, String>
+    {
         match CACHE_METHOD {
             CacheMethod::REDIS => {
+                match page {
+                    Some(_) => {
+                        if !self.paged {
+                            return Err("this cache does not manage paginated data. Pass None for page.".to_string());
+                        }
+                    }
+                    None => {
+                        if self.paged {
+                            return Err("this cache manages paginated data. Must pass a page number.".to_string());
+                        }
+                    }
+                }
                 let con_res = establish_connection().await;
                 let mut con: redis::aio::Connection;
 
@@ -160,7 +185,7 @@ impl Cache {
 
                 match page {
                     Some(p) => name = format!("{}_{}", uuid, p),
-                    None => name = uuid.clone()
+                    None => name = uuid.clone(),
                 }
 
                 println!("name: {}", name);
@@ -178,8 +203,7 @@ impl Cache {
                         con.zadd(&self.set_key, &name, self.time_stamp).await;
                     println!("added popped value in front");
 
-                    con
-                        .hget(&self.hash_key, name)
+                    con.hget(&self.hash_key, name)
                         .await
                         .map_err(|err| err.to_string())
                 } else {
@@ -190,7 +214,7 @@ impl Cache {
         }
     }
 
-    async fn delete(&self, uuid: &String, paged: bool) -> Result<(), String> {
+    async fn delete(&self, uuid: &String) -> Result<(), String> {
         match CACHE_METHOD {
             CacheMethod::REDIS => {
                 let con_res = establish_connection().await;
@@ -201,7 +225,7 @@ impl Cache {
                     Err(err) => return Err(err.to_string()),
                 };
 
-                if paged {
+                if self.paged {
                     let pages: Vec<String> = con
                         .lrange(&uuid, 0, -1)
                         .await
