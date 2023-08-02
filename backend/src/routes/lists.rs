@@ -112,7 +112,7 @@ async fn get_lists(
 
     match cached_value {
         Ok(value) => {
-            println!("got the value: {}", value);
+            // println!("got the value: {}", value);
             let response: Result<Vec<List>, serde_json::Error> =
                 serde_json::from_str(&value[..]);
 
@@ -123,7 +123,8 @@ async fn get_lists(
                 Err(err) => println!("couldn't deserialize the value: {}", err),
             }
         }
-        Err(err) => println!("Didn't get the value: {}", err),
+        // Err(err) => println!("Didn't get the value: {}", err),
+        Err(_) => (),
     }
 
     let response = lists_db_manager.get_lists(&lists_request);
@@ -171,7 +172,7 @@ async fn get_list_items(
 
     match cached_value {
         Ok(value) => {
-            println!("got the value: {}", value);
+            // println!("got the value: {}", value);
             let response: Result<GetListItemsResponse, serde_json::Error> =
                 serde_json::from_str(&value[..]);
 
@@ -180,7 +181,8 @@ async fn get_list_items(
                 Err(err) => println!("couldn't deserialize the value: {}", err),
             }
         }
-        Err(err) => println!("Didn't get the value: {}", err),
+        // Err(err) => println!("Didn't get the value: {}", err),
+        Err(_) => (),
     }
 
     let response = lists_db_manager.get_list_items(&list_items_request);
@@ -244,7 +246,7 @@ async fn get_watchlist(
 
     match cached_value {
         Ok(value) => {
-            println!("got the value: {}", value);
+            // println!("got the value: {}", value);
             let response: Result<GetListItemsResponse, serde_json::Error> =
                 serde_json::from_str(&value[..]);
 
@@ -253,7 +255,8 @@ async fn get_watchlist(
                 Err(err) => println!("couldn't deserialize the value: {}", err),
             }
         }
-        Err(err) => println!("Didn't get the value: {}", err),
+        // Err(err) => println!("Didn't get the value: {}", err),
+        Err(_) => (),
     }
 
     let list_items_request = GetListItemsRequest {

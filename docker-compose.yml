@@ -10,6 +10,12 @@ services:
     volumes:
       - movieshlok-data:/var/lib/postgresql/data
 
+  cache:
+    image: redis
+    container_name: movieshlok-cache
+    ports:
+      - 6379:6379
+
   backend:
     image: danielxhogan/movieshlok-backend
     container_name: movieshlok-backend

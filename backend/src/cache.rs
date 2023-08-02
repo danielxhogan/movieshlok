@@ -40,8 +40,8 @@ impl Cache {
         Arc::new(RwLock::new(Cache {
             set_key: format!("{}_set", &key),
             hash_key: format!("{}_hash", key),
-            time_stamp: 161,
-            capacity: 5,
+            time_stamp: 0,
+            capacity: 1000,
             paged,
         }))
     }
@@ -104,13 +104,13 @@ impl Cache {
                     .expect("to get count of members");
 
                 if count > self.capacity {
-                    println!("count is: {}", &count);
+                    // println!("count is: {}", &count);
                     let least_recent: Vec<String> = con
                         .zpopmin(&self.set_key, 1)
                         .await
                         .expect("to get the least recently used");
 
-                    println!("{}, {}", &least_recent[0], &least_recent[1]);
+                    // println!("{}, {}", &least_recent[0], &least_recent[1]);
 
                     let least_recent_name = &least_recent[0];
 
@@ -127,20 +127,20 @@ impl Cache {
                             let least_recent_page = least_recent_split.next()
                                 .expect("set member name of popped item has an underscore");
 
-                            println!(
-                                "least_recent_uuid: {}",
-                                &least_recent_uuid
-                            );
+                            // println!(
+                            //     "least_recent_uuid: {}",
+                            //     &least_recent_uuid
+                            // );
 
-                            println!(
-                                "least_recent_page: {}",
-                                &least_recent_page
-                            );
+                            // println!(
+                            //     "least_recent_page: {}",
+                            //     &least_recent_page
+                            // );
 
-                            let pages: Vec<String> = con.lrange(least_recent_uuid, 0, -1).await
+                            let _: Vec<String> = con.lrange(least_recent_uuid, 0, -1).await
                                 .expect("there is a list with name of least_recent_uuid");
 
-                            println!("pages: {}", &pages[0]);
+                            // println!("pages: {}", &pages[0]);
 
                             let _: i32 = con.lrem(least_recent_uuid, 1, least_recent_page).await
                                 .expect("will be able to remove the page deleted from pages array");
@@ -190,7 +190,7 @@ impl Cache {
                     None => name = uuid.clone(),
                 }
 
-                println!("name: {}", name);
+                // println!("name: {}", name);
 
                 let member: i32 = con
                     .zrem(&self.set_key, &name)
@@ -198,12 +198,12 @@ impl Cache {
                     .expect("to get number of removed items");
 
                 if member == 1 {
-                    println!("popped the retrieved value");
+                    // println!("popped the retrieved value");
                     self.time_stamp += 1;
 
                     let _: redis::RedisResult<i32> =
                         con.zadd(&self.set_key, &name, self.time_stamp).await;
-                    println!("added popped value in front");
+                    // println!("added popped value in front");
 
                     con.hget(&self.hash_key, name)
                         .await

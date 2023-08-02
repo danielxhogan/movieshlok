@@ -158,7 +158,7 @@ async fn get_reviews(
 
     match cached_value {
         Ok(value) => {
-            println!("got the value: {}", value);
+            // println!("got the value: {}", value);
             let response: Result<GetReviewsResponse, serde_json::Error> =
                 serde_json::from_str(&value[..]);
 
@@ -167,7 +167,8 @@ async fn get_reviews(
                 Err(err) => println!("couldn't deserialize the value: {}", err),
             }
         }
-        Err(err) => println!("Didn't get the value: {}", err),
+        // Err(err) => println!("Didn't get the value: {}", err),
+        Err(_) => (),
     }
 
     let response = reviews_db_manager.get_reviews(&get_reviews_request);
@@ -228,7 +229,7 @@ async fn get_rating_like(
 
     match cached_value {
         Ok(value) => {
-            println!("got the value: {}", value);
+            // println!("got the value: {}", value);
             let response: Result<RatingLike, serde_json::Error> =
                 serde_json::from_str(&value[..]);
 
@@ -237,7 +238,8 @@ async fn get_rating_like(
                 Err(err) => println!("couldn't deserialize the value: {}", err),
             }
         }
-        Err(err) => println!("Didn't get the value: {}", err),
+        // Err(err) => println!("Didn't get the value: {}", err),
+        Err(_) => (),
     }
 
     let user_movie = UserMovie {
@@ -294,7 +296,7 @@ async fn get_ratings(
 
     match cached_value {
         Ok(value) => {
-            println!("got the value: {}", value);
+            // println!("got the value: {}", value);
             let response: Result<GetRatingsResponse, serde_json::Error> =
                 serde_json::from_str(&value[..]);
 
@@ -303,7 +305,8 @@ async fn get_ratings(
                 Err(err) => println!("couldn't deserialize the value: {}", err),
             }
         }
-        Err(err) => println!("Didn't get the value: {}", err),
+        // Err(err) => println!("Didn't get the value: {}", err),
+        Err(_) => (),
     }
 
     let response = reviews_db_manager.get_ratings(&get_ratings_request);

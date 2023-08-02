@@ -311,7 +311,7 @@ async fn search(
 
     match cached_value {
         Ok(value) => {
-            println!("got the seach results");
+            // println!("got the seach results");
             let response: Result<SearchResults, serde_json::Error> =
                 serde_json::from_str(&value[..]);
 
@@ -320,7 +320,8 @@ async fn search(
                 Err(err) => println!("couldn't deserialize the value: {}", err),
             }
         }
-        Err(err) => println!("Didn't get the value: {}", err),
+        // Err(err) => println!("Didn't get the value: {}", err),
+        Err(_) => (),
     }
 
     let tmdb_base_url = env::var("TMDB_BASE_URL").unwrap();
@@ -384,7 +385,7 @@ async fn movie_details(
 
     match cached_value {
         Ok(value) => {
-            println!("got the movie details");
+            // println!("got the movie details");
             let response: Result<MovieDetails, serde_json::Error> =
                 serde_json::from_str(&value[..]);
 
@@ -393,7 +394,8 @@ async fn movie_details(
                 Err(err) => println!("couldn't deserialize the value: {}", err),
             }
         }
-        Err(err) => println!("Didn't get the value: {}", err),
+        // Err(err) => println!("Didn't get the value: {}", err),
+        Err(_) => (),
     }
 
     let tmdb_base_url = env::var("TMDB_BASE_URL").unwrap();
@@ -451,7 +453,7 @@ async fn person_details(
 
     match cached_value {
         Ok(value) => {
-            println!("got the movie details");
+            // println!("got the movie details");
             let response: Result<PersonDetails, serde_json::Error> =
                 serde_json::from_str(&value[..]);
 
@@ -460,7 +462,8 @@ async fn person_details(
                 Err(err) => println!("couldn't deserialize the value: {}", err),
             }
         }
-        Err(err) => println!("Didn't get the value: {}", err),
+        // Err(err) => println!("Didn't get the value: {}", err),
+        Err(_) => (),
     }
 
     let tmdb_base_url = env::var("TMDB_BASE_URL").unwrap();
