@@ -205,6 +205,7 @@ export function ListItemCard(props: ListItemCardProps) {
     if (props.cardType === CardType.LIST && credentials.jwt_token) {
       const deleteRequest: DeleteListItemRequest = {
         jwt_token: credentials.jwt_token,
+        list_id: props.listItem.list_id,
         list_item_id: props.listItem.id
       };
 

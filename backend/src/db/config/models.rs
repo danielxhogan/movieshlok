@@ -35,7 +35,7 @@ pub struct LoginCreds {
 
 // LISTS
 // ***********************************************
-#[derive(Queryable, Serialize)]
+#[derive(Queryable, Serialize, Deserialize)]
 pub struct List {
     pub id: Uuid,
     pub user_id: Uuid,
@@ -61,7 +61,7 @@ pub struct InsertingNewList {
     pub created_at: i64,
 }
 
-#[derive(Queryable, Serialize)]
+#[derive(Queryable, Serialize, Deserialize)]
 pub struct ListItem {
     pub id: Uuid,
     pub list_id: Uuid,
@@ -81,7 +81,7 @@ pub struct GetListItemsRequest {
 
 // results from db query for all list_items for a list
 // sent to client in response to get-list-items endpoint
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct GetListItemsResponse {
     pub total_results: i64,
     pub list_items: Box<Vec<ListItem>>,

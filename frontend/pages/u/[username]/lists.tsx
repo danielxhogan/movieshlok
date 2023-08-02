@@ -81,6 +81,7 @@ export default function ListsPage() {
     ) {
       const newList: NewList = {
         jwt_token: credentials.jwt_token,
+        username: credentials.username,
         name: newListTitle
       };
 
@@ -121,9 +122,10 @@ export default function ListsPage() {
   }
 
   function dispatchDeleteList() {
-    if (credentials.jwt_token && deletingList) {
+    if (credentials.jwt_token && credentials.username && deletingList) {
       const deleteRequest: DeleteListRequest = {
         jwt_token: credentials.jwt_token,
+        username: credentials.username,
         list_id: deletingList.id
       };
 

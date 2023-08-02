@@ -26,7 +26,7 @@ impl ListsDbManager {
     // *************************
     pub fn get_lists(
         &mut self,
-        lists_request: GetListsRequest,
+        lists_request: &GetListsRequest,
     ) -> Result<Box<Vec<List>>, AppError> {
         let users_lists = lists::table
             .inner_join(users::table.on(lists::user_id.eq(users::id)))
@@ -37,7 +37,7 @@ impl ListsDbManager {
                 lists::watchlist,
                 lists::created_at,
             ))
-            .filter(users::username.eq(lists_request.username))
+            .filter(users::username.eq(&lists_request.username))
             .order(lists::created_at.desc())
             .load::<List>(&mut self.connection)
             .map_err(|err| {
@@ -54,7 +54,7 @@ impl ListsDbManager {
     // ******************************
     pub fn get_list_items(
         &mut self,
-        list_items_request: GetListItemsRequest,
+        list_items_request: &GetListItemsRequest,
     ) -> Result<GetListItemsResponse, AppError> {
         let count = list_items::table
             .filter(list_items::list_id.eq(&list_items_request.list_id))

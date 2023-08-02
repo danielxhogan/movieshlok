@@ -4,8 +4,9 @@ pub mod cache;
 pub mod utils;
 
 use db::config::db_connect::establish_connection;
-use cache::reviews::ReviewsCache;
-use cache::tmdb::TmdbCache;
+use cache::reviews::ReviewsCacheStruct;
+use cache::lists::ListsCacheStruct;
+use cache::tmdb::TmdbCacheStruct;
 use utils::error_handling::handle_rejection;
 use utils::websockets::make_client_list;
 
@@ -23,8 +24,9 @@ async fn main() {
     dotenv().ok();
     let pg_pool = establish_connection();
 
-    let reviews_cache = ReviewsCache::new();
-    let tmdb_cache = TmdbCache::new();
+    let reviews_cache = ReviewsCacheStruct::new();
+    let lists_cache = ListsCacheStruct::new();
+    let tmdb_cache = TmdbCacheStruct::new();
 
     let reviews_ws_client_list = make_client_list();
     let comments_ws_client_list = make_client_list();
@@ -39,7 +41,7 @@ async fn main() {
         .allow_any_origin();
 
     let routes = auth_filters(pg_pool.clone())
-        .or(lists_filters(pg_pool.clone()))
+        .or(lists_filters(pg_pool.clone(), lists_cache))
         .or(reviews_filters(
             pg_pool.clone(),
             reviews_cache.clone(),

@@ -462,9 +462,10 @@ export default function Ratings() {
   function onSubmitNewList(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (credentials.jwt_token) {
+    if (credentials.jwt_token && credentials.username) {
       const newList: NewList = {
         jwt_token: credentials.jwt_token,
+        username: credentials.username,
         name: newListTitle
       };
 

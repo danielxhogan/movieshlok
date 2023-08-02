@@ -40,7 +40,7 @@ impl Cache {
         Arc::new(RwLock::new(Cache {
             set_key: format!("{}_set", &key),
             hash_key: format!("{}_hash", key),
-            time_stamp: 122,
+            time_stamp: 161,
             capacity: 5,
             paged,
         }))

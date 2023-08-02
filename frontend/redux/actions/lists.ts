@@ -68,6 +68,7 @@ interface GetWatchlistPayload {
 // ***************************
 export interface NewList {
   jwt_token: string;
+  username: string;
   name: string;
 }
 
@@ -101,6 +102,7 @@ interface CreateListItemPayload {
 // **************
 export interface DeleteListRequest {
   jwt_token: string;
+  username: string;
   list_id: string;
 }
 
@@ -115,6 +117,7 @@ interface DeleteListPayload {
 // ****************************
 export interface DeleteListItemRequest {
   jwt_token: string;
+  list_id: string;
   list_item_id: string;
 }
 
@@ -304,6 +307,7 @@ export const createList = createAsyncThunk(
 
     const params = new URLSearchParams();
     params.append("jwt_token", newList.jwt_token);
+    params.append("username", newList.username);
     params.append("name", newList.name);
 
     const request = new Request(createListsUrl, {
@@ -405,6 +409,7 @@ export const deleteList = createAsyncThunk(
 
     const params = new URLSearchParams();
     params.append("jwt_token", deleteRequest.jwt_token);
+    params.append("username", deleteRequest.username);
     params.append("list_id", deleteRequest.list_id);
 
     const request = new Request(deleteListUrl, {
@@ -456,6 +461,7 @@ export const deleteListItem = createAsyncThunk(
 
     const params = new URLSearchParams();
     params.append("jwt_token", deleteRequest.jwt_token);
+    params.append("list_id", deleteRequest.list_id);
     params.append("list_item_id", deleteRequest.list_item_id);
 
     const request = new Request(deleteListItemUrl, {

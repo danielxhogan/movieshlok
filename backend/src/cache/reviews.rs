@@ -11,22 +11,24 @@ pub fn with_reviews_cache(
     warp::any().map(move || reviews_cache.clone())
 }
 
+pub type ReviewsCache = Box<ReviewsCacheStruct>;
+
 #[derive(Clone)]
-pub struct ReviewsCache {
+pub struct ReviewsCacheStruct {
     reviews: Arc<RwLock<Cache>>,
     rating_like: Arc<RwLock<Cache>>,
     review_details: Arc<RwLock<Cache>>,
     ratings: Arc<RwLock<Cache>>,
 }
 
-impl ReviewsCache {
+impl ReviewsCacheStruct {
     pub fn new() -> ReviewsCache {
-        ReviewsCache {
+        Box::new(ReviewsCacheStruct {
             reviews: Cache::new("reviews".to_string(), true),
             rating_like: Cache::new("rating_like".to_string(), false),
             review_details: Cache::new("review_details".to_string(), false),
             ratings: Cache::new("ratings".to_string(), true),
-        }
+        })
     }
 
     pub async fn store_reviews(
