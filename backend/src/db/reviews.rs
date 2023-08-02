@@ -107,7 +107,7 @@ impl ReviewsDbManager {
     // ********************************
     pub fn get_rating_like(
         &mut self,
-        user_movie: UserMovie,
+        user_movie: &UserMovie,
     ) -> Result<RatingLike, AppError> {
         let ratings = ratings::table
             .filter(ratings::user_id.eq(&user_movie.user_id))
@@ -148,7 +148,7 @@ impl ReviewsDbManager {
     // ************************************
     pub fn get_ratings(
         &mut self,
-        get_ratings_request: GetRatingsRequest,
+        get_ratings_request: &GetRatingsRequest,
     ) -> Result<GetRatingsResponse, AppError> {
         let mut results = Vec::new();
 
@@ -205,7 +205,7 @@ impl ReviewsDbManager {
                 ratings::last_updated,
             ))
             .order(ratings::last_updated.desc())
-            .filter(users::username.eq(get_ratings_request.username))
+            .filter(users::username.eq(&get_ratings_request.username))
             .filter(ratings::user_id.eq(likes::user_id))
             .filter(ratings::reviewed.eq(false))
             .load::<RatingsRating>(&mut self.connection)

@@ -91,7 +91,8 @@ export default function ReviewsPage() {
       } else if (deletingRating.rating_id) {
         const deleteRequest: DeleteRatingRequest = {
           jwt_token: credentials.jwt_token,
-          rating_id: deletingRating.rating_id
+          rating_id: deletingRating.rating_id,
+          movie_id: deletingRating.movie_id
         };
 
         dispatch<any>(deleteRating(deleteRequest));

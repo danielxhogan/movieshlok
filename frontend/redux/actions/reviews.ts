@@ -91,6 +91,7 @@ interface GetRatingsPayload {
 // passed in when postReview action is dispatched
 export interface NewReview {
   jwt_token: string;
+  username: string;
   movieId: string;
   movie_title: string;
   poster_path: string;
@@ -123,6 +124,7 @@ interface NewReviewPayload {
 export interface DeleteRatingRequest {
   jwt_token: string;
   rating_id: string;
+  movie_id: string;
 }
 
 export interface ReturnedDeletedRating {
@@ -325,6 +327,7 @@ export const postReview = createAsyncThunk(
 
     const params = new URLSearchParams();
     params.append("jwt_token", newReview.jwt_token);
+    params.append("username", newReview.username);
     params.append("movie_id", newReview.movieId);
     params.append("movie_title", newReview.movie_title);
     params.append("poster_path", newReview.poster_path);
@@ -383,6 +386,7 @@ export const deleteRating = createAsyncThunk(
     const params = new URLSearchParams();
     params.append("jwt_token", deleteRequest.jwt_token);
     params.append("rating_id", deleteRequest.rating_id);
+    params.append("movie_id", deleteRequest.movie_id);
 
     const request = new Request(deleteRatingUrl, {
       headers,

@@ -114,6 +114,7 @@ export default function Ratings() {
 
     if (
       credentials.jwt_token &&
+      credentials.username &&
       movieDetails.data.id &&
       movieDetails.data &&
       movieDetails.data.title &&
@@ -126,6 +127,7 @@ export default function Ratings() {
 
       const params = new URLSearchParams();
       params.append("jwt_token", credentials.jwt_token);
+      params.append("username", credentials.username);
       params.append("movie_id", movieDetails.data.id.toString());
       params.append("movie_title", movieDetails.data.title);
       params.append("poster_path", movieDetails.data.poster_path);
@@ -345,6 +347,7 @@ export default function Ratings() {
 
       const newReview: NewReview = {
         jwt_token: credentials.jwt_token,
+        username: credentials.username,
         movieId,
         movie_title: movieDetails.data.title,
         poster_path: movieDetails.data.poster_path,

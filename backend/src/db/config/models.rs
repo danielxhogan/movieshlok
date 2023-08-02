@@ -195,7 +195,7 @@ pub struct UserMovie {
     pub movie_id: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct RatingLike {
     pub rating: i32,
     pub liked: bool,
@@ -224,7 +224,7 @@ pub struct GetRatingsRequest {
     pub offset: i64,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct GetRatingsResponse {
     pub total_pages: u64,
     pub ratings: Box<VecDeque<Option<RatingReview>>>,
@@ -252,7 +252,7 @@ pub struct RatingsRating {
     pub timestamp: i64,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct RatingReview {
     pub movie_id: String,
     pub movie_title: String,

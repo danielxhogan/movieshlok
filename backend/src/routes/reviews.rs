@@ -1,9 +1,9 @@
 use crate::db::config::db_connect::PgPool;
 use crate::db::reviews::ReviewsDbManager;
 use crate::db::config::models::{
-    DeleteRatingRequest, GetRatingsRequest, GetReviewsRequest,
-    GetReviewsResponse, InsertingNewLike, InsertingNewRating,
-    InsertingNewReview, UserMovie,
+    DeleteRatingRequest, GetRatingsRequest, GetRatingsResponse,
+    GetReviewsRequest, GetReviewsResponse, InsertingNewLike,
+    InsertingNewRating, InsertingNewReview, UserMovie, RatingLike,
 };
 
 use crate::cache::reviews::{ReviewsCache, with_reviews_cache};
@@ -27,6 +27,7 @@ use chrono::Utc;
 #[derive(Deserialize)]
 struct IncomingNewReview {
     jwt_token: String,
+    username: String,
     movie_id: String,
     movie_title: String,
     poster_path: String,
@@ -46,6 +47,7 @@ struct IncomingUserMovie {
 #[derive(Deserialize)]
 struct IncomingNewRating {
     jwt_token: String,
+    username: String,
     movie_id: String,
     movie_title: String,
     poster_path: String,
@@ -64,6 +66,7 @@ struct IncomingNewLike {
 struct IncomingDeleteRatingRequest {
     jwt_token: String,
     rating_id: Uuid,
+    movie_id: String,
 }
 
 // STRUCTS FOR MANAGING WEBSOCKETS
@@ -111,12 +114,12 @@ pub fn reviews_filters(
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
     get_reviews_filters(pool.clone(), reviews_cache.clone())
-        .or(get_rating_like_filters(pool.clone()))
-        .or(get_ratings_filters(pool.clone()))
+        .or(get_rating_like_filters(pool.clone(), reviews_cache.clone()))
+        .or(get_ratings_filters(pool.clone(), reviews_cache.clone()))
         .or(post_review_filters(pool.clone(), reviews_cache.clone()))
-        .or(post_rating_filters(pool.clone()))
-        .or(post_like_filters(pool.clone()))
-        .or(delete_rating_filters(pool.clone()))
+        .or(post_rating_filters(pool.clone(), reviews_cache.clone()))
+        .or(post_like_filters(pool.clone(), reviews_cache.clone()))
+        .or(delete_rating_filters(pool.clone(), reviews_cache.clone()))
         .or(register_reviews_ws_client_filters(ws_client_list.clone()))
         .or(unregister_reviews_ws_client_filters(ws_client_list.clone()))
         .or(make_reviews_ws_connection_filters(ws_client_list.clone()))
@@ -191,17 +194,20 @@ async fn get_reviews(
 // **************************************************
 fn get_rating_like_filters(
     pool: PgPool,
+    cache: ReviewsCache,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
     warp::path!("get-rating-like")
         .and(warp::post())
         .and(with_reviews_db_manager(pool))
+        .and(with_reviews_cache(cache))
         .and(with_form_body::<IncomingUserMovie>())
         .and_then(get_rating_like)
 }
 
 async fn get_rating_like(
     mut reviews_db_manager: ReviewsDbManager,
+    cache: ReviewsCache,
     user_movie: IncomingUserMovie,
 ) -> Result<impl warp::Reply, warp::Rejection> {
     let payload = auth_check(user_movie.jwt_token);
@@ -216,34 +222,108 @@ async fn get_rating_like(
     let payload = payload.unwrap();
     let user_id = payload.claims.user_id;
 
+    let cached_value = cache
+        .retrieve_rating_like(&user_id.to_string(), &user_movie.movie_id)
+        .await;
+
+    match cached_value {
+        Ok(value) => {
+            println!("got the value: {}", value);
+            let response: Result<RatingLike, serde_json::Error> =
+                serde_json::from_str(&value[..]);
+
+            match response {
+                Ok(r) => return respond(Ok(r), warp::http::StatusCode::OK),
+                Err(err) => println!("couldn't deserialize the value: {}", err),
+            }
+        }
+        Err(err) => println!("Didn't get the value: {}", err),
+    }
+
     let user_movie = UserMovie {
         user_id,
         movie_id: user_movie.movie_id,
     };
 
-    let response = reviews_db_manager.get_rating_like(user_movie);
-    respond(response, warp::http::StatusCode::OK)
+    let response = reviews_db_manager.get_rating_like(&user_movie);
+
+    match response {
+        Ok(response) => {
+            let serialized_reviews = serde_json::to_string(&response).unwrap();
+
+            cache
+                .store_rating_like(
+                    user_id.to_string(),
+                    user_movie.movie_id,
+                    serialized_reviews,
+                )
+                .await;
+
+            respond(Ok(response), warp::http::StatusCode::OK)
+        }
+        Err(err) => respond(Err(err), warp::http::StatusCode::OK),
+    }
 }
 
 // GET ALL RATINGS FOR A USER
 // **************************************************
 fn get_ratings_filters(
     pool: PgPool,
+    cache: ReviewsCache,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
     warp::path!("get-ratings")
         .and(warp::post())
         .and(with_reviews_db_manager(pool))
+        .and(with_reviews_cache(cache))
         .and(with_form_body::<GetRatingsRequest>())
         .and_then(get_ratings)
 }
 
 async fn get_ratings(
     mut reviews_db_manager: ReviewsDbManager,
+    cache: ReviewsCache,
     get_ratings_request: GetRatingsRequest,
 ) -> Result<impl warp::Reply, warp::Rejection> {
-    let response = reviews_db_manager.get_ratings(get_ratings_request);
-    respond(response, warp::http::StatusCode::OK)
+    let cached_value = cache
+        .retrieve_ratings(
+            &get_ratings_request.username,
+            &get_ratings_request.offset,
+        )
+        .await;
+
+    match cached_value {
+        Ok(value) => {
+            println!("got the value: {}", value);
+            let response: Result<GetRatingsResponse, serde_json::Error> =
+                serde_json::from_str(&value[..]);
+
+            match response {
+                Ok(r) => return respond(Ok(r), warp::http::StatusCode::OK),
+                Err(err) => println!("couldn't deserialize the value: {}", err),
+            }
+        }
+        Err(err) => println!("Didn't get the value: {}", err),
+    }
+
+    let response = reviews_db_manager.get_ratings(&get_ratings_request);
+
+    match response {
+        Ok(response) => {
+            let serialized_reviews = serde_json::to_string(&response).unwrap();
+
+            cache
+                .store_ratings(
+                    get_ratings_request.username,
+                    get_ratings_request.offset,
+                    serialized_reviews,
+                )
+                .await;
+
+            respond(Ok(response), warp::http::StatusCode::OK)
+        }
+        Err(err) => respond(Err(err), warp::http::StatusCode::OK),
+    }
 }
 
 // ENDPOINTS FOR INSERTING INTO/UPDATING/DELETING DATABASE
@@ -278,11 +358,15 @@ async fn post_review(
         Ok(_) => (),
     }
 
-    let _ = cache.delete_reviews(&new_review.movie_id).await;
-
     let payload = payload.unwrap();
     let user_id = payload.claims.user_id;
     let created_at = Utc::now().timestamp();
+
+    let _ = cache.delete_ratings(&new_review.username).await;
+    let _ = cache.delete_reviews(&new_review.movie_id).await;
+    let _ = cache
+        .delete_rating_like(&user_id.to_string(), &new_review.movie_id)
+        .await;
 
     let inserting_new_review = InsertingNewReview {
         user_id,
@@ -341,17 +425,20 @@ async fn post_review(
 // **************************************************
 fn post_rating_filters(
     pool: PgPool,
+    cache: ReviewsCache,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
     warp::path!("post-rating")
         .and(warp::post())
         .and(with_reviews_db_manager(pool))
+        .and(with_reviews_cache(cache))
         .and(with_form_body::<IncomingNewRating>())
         .and_then(post_rating)
 }
 
 async fn post_rating(
     mut reviews_db_manager: ReviewsDbManager,
+    cache: ReviewsCache,
     new_rating: IncomingNewRating,
 ) -> Result<impl warp::Reply, warp::Rejection> {
     let payload = auth_check(new_rating.jwt_token);
@@ -365,6 +452,11 @@ async fn post_rating(
 
     let payload = payload.unwrap();
     let user_id = payload.claims.user_id;
+
+    let _ = cache.delete_ratings(&new_rating.username);
+    let _ = cache
+        .delete_rating_like(&user_id.to_string(), &new_rating.movie_id)
+        .await;
 
     let inserting_new_rating = InsertingNewRating {
         user_id,
@@ -384,17 +476,20 @@ async fn post_rating(
 // **************************************************
 fn post_like_filters(
     pool: PgPool,
+    cache: ReviewsCache,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
     warp::path!("post-like")
         .and(warp::post())
         .and(with_reviews_db_manager(pool))
+        .and(with_reviews_cache(cache))
         .and(with_form_body::<IncomingNewLike>())
         .and_then(post_like)
 }
 
 async fn post_like(
     mut reviews_db_manager: ReviewsDbManager,
+    cache: ReviewsCache,
     new_like: IncomingNewLike,
 ) -> Result<impl warp::Reply, warp::Rejection> {
     let payload = auth_check(new_like.jwt_token);
@@ -408,6 +503,10 @@ async fn post_like(
 
     let payload = payload.unwrap();
     let user_id = payload.claims.user_id;
+
+    let _ = cache
+        .delete_rating_like(&user_id.to_string(), &new_like.movie_id)
+        .await;
 
     let inserting_new_like = InsertingNewLike {
         user_id,
@@ -423,17 +522,20 @@ async fn post_like(
 // **************************************************
 fn delete_rating_filters(
     pool: PgPool,
+    cache: ReviewsCache,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
 {
     warp::path!("delete-rating")
         .and(warp::delete())
         .and(with_reviews_db_manager(pool))
+        .and(with_reviews_cache(cache))
         .and(with_form_body::<IncomingDeleteRatingRequest>())
         .and_then(delete_rating)
 }
 
 async fn delete_rating(
     mut reviews_db_manager: ReviewsDbManager,
+    cache: ReviewsCache,
     delete_request: IncomingDeleteRatingRequest,
 ) -> Result<impl warp::Reply, warp::Rejection> {
     let payload = auth_check(delete_request.jwt_token);
@@ -447,6 +549,10 @@ async fn delete_rating(
 
     let payload = payload.unwrap();
     let user_id = payload.claims.user_id;
+
+    let _ = cache
+        .delete_rating_like(&user_id.to_string(), &delete_request.movie_id)
+        .await;
 
     let delete_rating_request = DeleteRatingRequest {
         user_id,
