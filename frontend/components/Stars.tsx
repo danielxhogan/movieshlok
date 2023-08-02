@@ -130,6 +130,7 @@ export default function Stars(props: Props) {
   }, [props.id, props.interactive]);
 
   function makeStars(rating: Rating) {
+    console.log(`inside makeStars: rating: ${rating}`);
     // prettier-ignore
     switch (rating) {
       case Rating.ZERO:

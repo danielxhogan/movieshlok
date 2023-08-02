@@ -14,6 +14,7 @@ import {
   selectNewListItem,
   resetNewListItem
 } from "@/redux/reducers/lists";
+
 import {
   createList,
   createListItem,
@@ -21,6 +22,7 @@ import {
   NewList,
   NewListItem
 } from "@/redux/actions/lists";
+
 import { postReview, NewReview } from "@/redux/actions/reviews";
 
 import { useRouter } from "next/router";
@@ -501,21 +503,11 @@ export default function Ratings() {
       {credentials.jwt_token ? (
         <>
           <div className={styles["rating-review"]}>
-            {ratingLike.data ? (
+            {ratingLike.data && (
               <span className={styles["stars"]}>
                 <Stars
                   id="rating"
                   initialRating={ratingLike.data.rating}
-                  setParentRating={updateRating}
-                  interactive={true}
-                  size="2xl"
-                />
-              </span>
-            ) : (
-              <span>
-                <Stars
-                  id="rating"
-                  initialRating={Rating.ZERO}
                   setParentRating={updateRating}
                   interactive={true}
                   size="2xl"
