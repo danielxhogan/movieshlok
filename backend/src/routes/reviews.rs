@@ -456,7 +456,7 @@ async fn post_rating(
     let payload = payload.unwrap();
     let user_id = payload.claims.user_id;
 
-    let _ = cache.delete_ratings(&new_rating.username);
+    let _ = cache.delete_ratings(&new_rating.username).await;
     let _ = cache
         .delete_rating_like(&user_id.to_string(), &new_rating.movie_id)
         .await;
