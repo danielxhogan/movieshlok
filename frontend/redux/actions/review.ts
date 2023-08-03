@@ -69,6 +69,7 @@ interface NewCommentPayload {
 // type passed in to deleteReview action
 export interface DeleteReviewRequest {
   jwt_token: string;
+  username: string;
   review_id: string;
   movie_id: string;
 }
@@ -222,6 +223,7 @@ export const deleteReview = createAsyncThunk(
 
     const params = new URLSearchParams();
     params.append("jwt_token", deleteRequest.jwt_token);
+    params.append("username", deleteRequest.username);
     params.append("review_id", deleteRequest.review_id);
     params.append("movie_id", deleteRequest.movie_id);
 

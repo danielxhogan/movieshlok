@@ -79,10 +79,11 @@ export default function ReviewsPage() {
   }
 
   function dispatchDeleteRating() {
-    if (credentials.jwt_token && deletingRating) {
+    if (credentials.jwt_token && credentials.username && deletingRating) {
       if (deletingRating.review_id) {
         const deleteRequest: DeleteReviewRequest = {
           jwt_token: credentials.jwt_token,
+          username: credentials.username,
           review_id: deletingRating.review_id,
           movie_id: deletingRating.movie_id
         };
@@ -91,6 +92,7 @@ export default function ReviewsPage() {
       } else if (deletingRating.rating_id) {
         const deleteRequest: DeleteRatingRequest = {
           jwt_token: credentials.jwt_token,
+          username: credentials.username,
           rating_id: deletingRating.rating_id,
           movie_id: deletingRating.movie_id
         };

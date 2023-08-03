@@ -123,6 +123,7 @@ interface NewReviewPayload {
 // type passed in to deleteRating action
 export interface DeleteRatingRequest {
   jwt_token: string;
+  username: string;
   rating_id: string;
   movie_id: string;
 }
@@ -385,6 +386,7 @@ export const deleteRating = createAsyncThunk(
 
     const params = new URLSearchParams();
     params.append("jwt_token", deleteRequest.jwt_token);
+    params.append("username", deleteRequest.username);
     params.append("rating_id", deleteRequest.rating_id);
     params.append("movie_id", deleteRequest.movie_id);
 

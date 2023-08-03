@@ -65,6 +65,7 @@ struct IncomingNewLike {
 #[derive(Deserialize)]
 struct IncomingDeleteRatingRequest {
     jwt_token: String,
+    username: String,
     rating_id: Uuid,
     movie_id: String,
 }
@@ -553,6 +554,7 @@ async fn delete_rating(
     let payload = payload.unwrap();
     let user_id = payload.claims.user_id;
 
+    let _ = cache.delete_ratings(&delete_request.username).await;
     let _ = cache
         .delete_rating_like(&user_id.to_string(), &delete_request.movie_id)
         .await;

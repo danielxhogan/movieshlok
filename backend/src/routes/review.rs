@@ -31,6 +31,7 @@ struct IncomingNewComment {
 #[derive(Deserialize)]
 struct IncomingDeleteReviewRequest {
     jwt_token: String,
+    username: String,
     review_id: Uuid,
     movie_id: String,
 }
@@ -232,7 +233,11 @@ async fn delete_review(
         Ok(_) => (),
     }
 
+    let _ = cache.delete_ratings(&delete_request.username).await;
     let _ = cache.delete_reviews(&delete_request.movie_id).await;
+    let _ = cache
+        .delete_review_details(&delete_request.review_id.to_string())
+        .await;
 
     let payload = payload.unwrap();
     let user_id = payload.claims.user_id;
