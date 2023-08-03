@@ -11,7 +11,7 @@ pub fn with_lists_cache(
     warp::any().map(move || lists_cache.clone())
 }
 
-pub type ListsCache = Box<ListsCacheStruct>;
+pub type ListsCache = Arc<ListsCacheStruct>;
 
 #[derive(Clone)]
 pub struct ListsCacheStruct {
@@ -21,7 +21,7 @@ pub struct ListsCacheStruct {
 
 impl ListsCacheStruct {
     pub fn new() -> ListsCache {
-        Box::new(ListsCacheStruct {
+        Arc::new(ListsCacheStruct {
             lists: Cache::new("lists".to_string(), false),
             list_items: Cache::new("list_items".to_string(), true),
         })

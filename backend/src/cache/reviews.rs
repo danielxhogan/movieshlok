@@ -11,7 +11,7 @@ pub fn with_reviews_cache(
     warp::any().map(move || reviews_cache.clone())
 }
 
-pub type ReviewsCache = Box<ReviewsCacheStruct>;
+pub type ReviewsCache = Arc<ReviewsCacheStruct>;
 
 #[derive(Clone)]
 pub struct ReviewsCacheStruct {
@@ -23,7 +23,7 @@ pub struct ReviewsCacheStruct {
 
 impl ReviewsCacheStruct {
     pub fn new() -> ReviewsCache {
-        Box::new(ReviewsCacheStruct {
+        Arc::new(ReviewsCacheStruct {
             reviews: Cache::new("reviews".to_string(), true),
             rating_like: Cache::new("rating_like".to_string(), false),
             review_details: Cache::new("review_details".to_string(), false),

@@ -11,7 +11,7 @@ pub fn with_tmdb_cache(
     warp::any().map(move || tmdb_cache.clone())
 }
 
-pub type TmdbCache = Box<TmdbCacheStruct>;
+pub type TmdbCache = Arc<TmdbCacheStruct>;
 
 #[derive(Clone)]
 pub struct TmdbCacheStruct {
@@ -22,7 +22,7 @@ pub struct TmdbCacheStruct {
 
 impl TmdbCacheStruct {
     pub fn new() -> TmdbCache {
-        Box::new(TmdbCacheStruct {
+        Arc::new(TmdbCacheStruct {
             search_results: Cache::new("search_results".to_string(), true),
             movie_details: Cache::new("movie_details".to_string(), false),
             person_details: Cache::new("person_details".to_string(), false),
