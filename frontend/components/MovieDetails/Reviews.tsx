@@ -284,9 +284,15 @@ export default function Reviews() {
   function dispatchDeleteReview() {
     onClose();
 
-    if (credentials.jwt_token && movieDetails.data && movieDetails.data.id) {
+    if (
+      credentials.jwt_token &&
+      credentials.username &&
+      movieDetails.data &&
+      movieDetails.data.id
+    ) {
       const deleteRequest: DeleteReviewRequest = {
         jwt_token: credentials.jwt_token,
+        username: credentials.username,
         review_id: deletingReviewId,
         movie_id: movieDetails.data.id.toString()
       };

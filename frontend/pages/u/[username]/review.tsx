@@ -396,11 +396,13 @@ export default function ReviewDetailsPage() {
   function dispatchDeleteReview() {
     if (
       credentials.jwt_token &&
+      credentials.username &&
       typeof router.query.id === "string" &&
       typeof router.query.movieId === "string"
     ) {
       const deleteRequest: DeleteReviewRequest = {
         jwt_token: credentials.jwt_token,
+        username: credentials.username,
         review_id: router.query.id,
         movie_id: router.query.movieId
       };
