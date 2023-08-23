@@ -1,3 +1,6 @@
+use crate::utils::error_handling::{AppError, ErrorType};
+use crate::db::config::schema::{likes, ratings, reviews, users};
+use crate::db::PooledPg;
 use crate::db::config::models::{
     // get all reviews for a movie
     GetReviewsRequest,
@@ -28,10 +31,6 @@ use crate::db::config::models::{
     RatingsRating,
     RatingsReview,
 };
-use crate::db::config::schema::{likes, ratings, reviews, users};
-use crate::db::PooledPg;
-
-use crate::utils::error_handling::{AppError, ErrorType};
 
 use diesel::prelude::*;
 use std::collections::VecDeque;
