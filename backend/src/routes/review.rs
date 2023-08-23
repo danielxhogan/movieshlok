@@ -124,7 +124,7 @@ async fn get_review(
 
     match cached_value {
         Ok(value) => {
-            println!("got the value: {}", value);
+            // println!("got the value: {}", value);
             let response: Result<GetReviewResponse, serde_json::Error> =
                 serde_json::from_str(&value[..]);
 
@@ -133,7 +133,8 @@ async fn get_review(
                 Err(err) => println!("couldn't deserialize the value: {}", err),
             }
         }
-        Err(err) => println!("Didn't get the value: {}", err),
+        // Err(err) => println!("Didn't get the value: {}", err),
+        Err(_) => (),
     }
 
     let response = review_db_manager.get_review(&get_review_request);
