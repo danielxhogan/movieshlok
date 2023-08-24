@@ -1,47 +1,43 @@
 pub mod create_data;
-use crate::create_data::post_review;
-
-use uuid::Uuid;
 
 #[tokio::main]
 async fn main() {
     println!("benchmarking movieshlok cache");
+    
+    // GENERATE TESTING DATA
+    // ****************************************************************
+    // the movie with movie_id will have 100 reviews.
+    // the first review for this movie with review_id will have 100 comments.
+    // the user will have 101 ratings for movies with ids 1-100, and movie_id.
 
-    // each paginated end will recieve a limit of 50
+    // use crate::create_data::{create_review, create_comment};
+    // let movie_id = "577922";
+    // let review_id = "3316eb10-c7d5-46b6-803b-88355e01c3b6";
+
+    // MAKE REVIEWS
+    // for i in 0..100 {
+    //     create_review(movie_id, (i % 10) as i32, true).await;
+    //     create_review(&(i + 1).to_string(), (i % 10) as i32, true).await;
+    // }
+
+    // MAKE COMMENTS
+    // for _ in 0..100 {
+    //     create_comment(review_id).await;
+    // }
+
+    // QUERY TEST DATA
+    // ****************************************************************
+    // Limit will be 50.
+    // When getting all reveiws for movie with movie_id, there will be 2 pages of reviews.
+    // the user will have 101 ratings for movies with ids 1-100, and movie_id.
+    // the first 2 pages will be queried.
+
     let limit = 50;
-
-    let mut review_ids: Vec<&Uuid> = Vec::new();
-
-    let new_review_id = post_review("hi", 23, true).await;
-    println!("new_review_id: {}", &new_review_id);
-    review_ids.push(&new_review_id);
-
-    while let Some(id) = review_ids.pop() {
-        println!("deleting id: {}", id);
-    }
 
     // endpoints to test:
     // - get-reviews
     // - get-rating-like
     // - get-ratings
-
-    // to generate data, send requests to the post-review endpoint.
-    // post 100 reviews for 100 different movies.
-
-    // There will be a total of 10,000 reviews
-    // there will be 2 pages of reviews for each movie.
-    // There will be 200 pages of ratings for the user.
-    // record the review_id for each review in a vec.
-    // record the review_id of the first review of each movie in a seperate vec.
-
-    // for each of the 100 movies, send 5 requests for each of the 2 pages of reviews.
-    // 100 x 5 x 2 = 1,000 total requests.
-
-    // for each of the 100 movies, send 10 requests for the rating-like for the user.
-    // 100 x 10 = 1,000 total requests.
-
-    // for each of the 200 pages of ratings, send 5 reqeusts.
-    // 200 x 5 = 1,000 total requests.
 
 
     // - get-review

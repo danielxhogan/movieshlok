@@ -2,7 +2,7 @@ use serde_derive::Deserialize;
 use uuid::Uuid;
 
 const API_BASE_URL: &str = "http://localhost:3030";
-const JWT_TOKEN: &str = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiM2ZmMjU5NTEtODAwNS00MWFhLThjMWMtNDk1Y2JhYzQ4NzA4IiwiZXhwIjoxNjkyOTIyMjE3fQ.RRsIjWdhCESUBQa52Ha69b4fJt1EAY918h8SfjzxECU";
+const JWT_TOKEN: &str = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiM2ZmMjU5NTEtODAwNS00MWFhLThjMWMtNDk1Y2JhYzQ4NzA4IiwiZXhwIjoxNjkyOTg4NDUwfQ.JUnMqpJFhbE_-x1Aqin_ASyzeoLJ0ZI_dkUNd_fKa3k";
 const USERNAME: &str = "danielxhogan";
 const LOREM_IPSUM: &str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin faucibus convallis lacus eget consectetur. Nullam varius urna vel purus scelerisque faucibus quis id mauris. Ut tempus erat vitae egestas accumsan. Donec convallis odio at quam fringilla, ac aliquet sem rutrum. Sed tempor porttitor leo sit amet commodo. Fusce feugiat, neque non molestie tincidunt, justo ligula egestas erat, sit amet varius ante tortor nec tellus. Sed elementum gravida orci sit amet scelerisque. Quisque euismod nulla enim, sit amet volutpat nulla egestas ut. Pellentesque consectetur est ac leo egestas finibus eget quis magna. Sed sollicitudin dignissim orci. Nam ex nisl, dictum id purus eu, semper mollis eros. Praesent molestie imperdiet erat, vel viverra elit porta mattis. Nunc laoreet tempus sapien, in cursus nisi fringilla vitae. Etiam lorem urna, pulvinar eget bibendum ac, suscipit ut ipsum. Donec at convallis ligula, eget scelerisque risus. Nulla facilisi.
 
@@ -26,7 +26,16 @@ pub struct Review {
     pub created_at: i64,
 }
 
-pub async fn post_review(movie_id: &str, rating: i32, liked: bool) -> Uuid {
+#[derive(Deserialize)]
+pub struct Comment {
+    pub id: Uuid,
+    pub user_id: Uuid,
+    pub review_id: Uuid,
+    pub comment: String,
+    pub created_at: i64,
+}
+
+pub async fn create_review(movie_id: &str, rating: i32, liked: bool) {
     let params = [
         ("jwt_token", JWT_TOKEN.clone()),
         ("username", USERNAME.clone()),
@@ -39,14 +48,28 @@ pub async fn post_review(movie_id: &str, rating: i32, liked: bool) -> Uuid {
     ];
 
     let client = reqwest::Client::new();
-    let res = client.post(format!("{API_BASE_URL}/post-review"))
+    let _ = client.post(format!("{API_BASE_URL}/post-review"))
         .form(&params)
         .send()
         .await
-        .expect("should get a response from the api when posting a review")
+        .unwrap()
         .json::<Review>()
-        .await
-        .expect("should get a serialized Review type response");
+        .await;
+}
 
-    res.id
+pub async fn create_comment(review_id: &str) {
+    let params = [
+        ("jwt_token", JWT_TOKEN.clone()),
+        ("review_id", review_id),
+        ("comment", LOREM_IPSUM.clone())
+    ];
+
+    let client = reqwest::Client::new();
+    let _ = client.post(format!("{API_BASE_URL}/post-comment"))
+        .form(&params)
+        .send()
+        .await
+        .unwrap()
+        .json::<Comment>()
+        .await;
 }
