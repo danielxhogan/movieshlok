@@ -1,5 +1,7 @@
-pub mod requests;
-use crate::requests::{test, post_review};
+pub mod create_data;
+use crate::create_data::post_review;
+
+use uuid::Uuid;
 
 #[tokio::main]
 async fn main() {
@@ -8,8 +10,15 @@ async fn main() {
     // each paginated end will recieve a limit of 50
     let limit = 50;
 
+    let mut review_ids: Vec<&Uuid> = Vec::new();
+
     let new_review_id = post_review("hi", 23, true).await;
-    println!("new_review_id: {}", new_review_id);
+    println!("new_review_id: {}", &new_review_id);
+    review_ids.push(&new_review_id);
+
+    while let Some(id) = review_ids.pop() {
+        println!("deleting id: {}", id);
+    }
 
     // endpoints to test:
     // - get-reviews
