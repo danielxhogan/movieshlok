@@ -8,6 +8,6 @@ Languages: Typescript, HTML, CSS, Rust, SQL
 
 Libraries and Frameworks: Next, React, Redux Toolkit, ChakraUI, Warp, Diesel, Jwt, Bcrypt
 
-Tools and Technology: PostgreSQL, Docker, Postman, DigitalOcean
+Tools and Technology: PostgreSQL, Redis, Docker, Postman, DigitalOcean
 
 Apis: TMDB api
