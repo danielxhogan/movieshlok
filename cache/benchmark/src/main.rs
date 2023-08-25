@@ -1,11 +1,11 @@
-pub mod create_data;
-pub mod query_data;
+// pub mod create_data;
+// pub mod query_data;
 
 #[tokio::main]
 async fn main() {
-    println!("benchmarking movieshlok cache");
+    // println!("benchmarking movieshlok cache");
 
-    let movie_id = "577922";
+    // let movie_id = "577922";
 
     // GENERATE TESTING DATA
     // ****************************************************************
@@ -13,18 +13,17 @@ async fn main() {
     // the first review for this movie with review_id will have 100 comments.
     // the user will have 101 ratings for movies with ids 1-100, and movie_id.
 
-    use crate::create_data::{
-        create_review, create_comment, create_list, create_list_item, create_watchlist_item,
-    };
+    // use crate::create_data::{
+    //     create_review, create_comment, create_list, create_list_item, create_watchlist_item,
+    // };
 
     // MAKE REVIEWS
     // for i in 0..100 {
     //     create_review(movie_id, (i % 10) as i32, true).await;
-    //     create_review(&(i + 1).to_string(), (i % 10) as i32, true).await;
-    // }
+    //  }
 
     // id of the first review created from the loop above
-    let review_id = "f673d218-fe1c-450a-bb19-9ce30b5c9981";
+    // let review_id = "f673d218-fe1c-450a-bb19-9ce30b5c9981";
 
     // MAKE COMMENTS
     // for _ in 0..100 {
@@ -36,7 +35,7 @@ async fn main() {
     // will have 100 list_items added to them.
 
     // MAKE LISTS
-    // for i in 1..=100 {
+    // for i in 0..99 {
     //     create_list(&i.to_string()).await;
     // }
 
@@ -44,11 +43,11 @@ async fn main() {
     // let list_id = "5932f66f-7ab0-432a-9227-4a16e135db73";
 
     // MAKE LIST ITEMS
-    // for i in 1..=100 {
+    // for i in 0..100 {
     //     create_list_item(list_id, &i.to_string()).await;
     // }
 
-    // for i in 1..=100 {
+    // for i in 0..100 {
     //     create_watchlist_item(&i.to_string()).await;
     // }
 
@@ -59,11 +58,10 @@ async fn main() {
     // the user will have 101 ratings for movies with ids 1-100, and movie_id.
     // the first 2 pages will be queried.
 
-    use crate::query_data::{
-        get_reviews, get_rating_like, get_review, get_ratings, get_lists, get_list_items,
-        get_watchlist_items,
-    };
-    let limit = "100";
+    // use crate::query_data::{
+    //     get_reviews, get_rating_like, get_review, get_ratings, get_lists, get_list_items, get_watchlist_items,
+    // };
+    // let limit = "100";
 
     // INITIAL REQUESTS
     // ****************************************************************
