@@ -141,52 +141,52 @@ async fn main() {
     let now = Instant::now();
     let mut elapsed_time: Duration = Duration::new(0, 0);
 
-    // for _ in 0..100 {
+    // for _ in 0..1000 {
     //     get_reviews(limit, "0").await;
     // }
 
     // elapsed_time = now.elapsed();
-    // println!("Running get_reviews 100 times took {} miliseconds.", elapsed_time.as_millis());
+    // println!("Running get_reviews 1000 times took {} miliseconds.", elapsed_time.as_millis());
 
-    // for _ in 0..100 {
+    // for _ in 0..1000 {
     //     get_rating_like().await;
     // }
 
     // elapsed_time = now.elapsed() - elapsed_time;
-    // println!("Running get_rating_like 100 times took {} miliseconds.", elapsed_time.as_millis());
+    // println!("Running get_rating_like 1000 times took {} miliseconds.", elapsed_time.as_millis());
 
-    // for _ in 0..100 {
+    // for _ in 0..1000 {
     //     get_review(&review_id).await;
     // }
 
     // elapsed_time = now.elapsed() - elapsed_time;
-    // println!("Running get_review 100 times took {} miliseconds.", elapsed_time.as_millis());
+    // println!("Running get_review 1000 times took {} miliseconds.", elapsed_time.as_millis());
 
-    // for _ in 0..100 {
+    // for _ in 0..1000 {
     //     get_ratings(limit, "0").await;
     // }
 
     // elapsed_time = now.elapsed() - elapsed_time;
-    // println!("Running get_ratings 100 times took {} miliseconds.", elapsed_time.as_millis());
+    // println!("Running get_ratings 1000 times took {} miliseconds.", elapsed_time.as_millis());
 
-    // for _ in 0..100 {
+    // for _ in 0..1000 {
     //     get_lists().await;
     // }
 
     // elapsed_time = now.elapsed() - elapsed_time;
-    // println!("Running get_lists 100 times took {} miliseconds.", elapsed_time.as_millis());
+    // println!("Running get_lists 1000 times took {} miliseconds.", elapsed_time.as_millis());
 
-    // for _ in 0..100 {
+    // for _ in 0..1000 {
     //     get_list_items(&list_id, "0", limit).await;
     // }
 
     // elapsed_time = now.elapsed() - elapsed_time;
-    // println!("Running get_list_items 100 times took {} miliseconds.", elapsed_time.as_millis());
+    // println!("Running get_list_items 1000 times took {} miliseconds.", elapsed_time.as_millis());
 
-    for _ in 0..100 {
+    for _ in 0..1000 {
         get_watchlist_items("0", limit).await;
     }
 
     elapsed_time = now.elapsed() - elapsed_time;
-    println!("Running get_list_watchlist_items 100 times took {} miliseconds.", elapsed_time.as_millis());
+    println!("Running get_list_watchlist_items 1000 times took {} miliseconds.", elapsed_time.as_millis());
 }
