@@ -1,6 +1,3 @@
-use serde_derive::Deserialize;
-use uuid::Uuid;
-
 const API_BASE_URL: &str = "http://localhost:3030";
 const JWT_TOKEN: &str = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiM2ZmMjU5NTEtODAwNS00MWFhLThjMWMtNDk1Y2JhYzQ4NzA4IiwiZXhwIjoxNjkyOTg4NDUwfQ.JUnMqpJFhbE_-x1Aqin_ASyzeoLJ0ZI_dkUNd_fKa3k";
 const USERNAME: &str = "danielxhogan";
@@ -14,27 +11,6 @@ Curabitur pharetra, tortor non tempus cursus, ipsum tortor porttitor lacus, sit 
 
 Praesent facilisis venenatis consequat. Nam auctor tempor nisi, at auctor turpis aliquam sodales. Aliquam rhoncus mauris id felis porta venenatis. Sed lacinia eu elit ut condimentum. Sed pulvinar ipsum lectus, nec eleifend dolor ultrices vel. Nam non velit sed quam malesuada imperdiet. Fusce maximus elementum nisl non consequat. Donec hendrerit condimentum massa in lacinia. Nam at iaculis dolor. Nunc et rhoncus turpis. Sed sed leo in nunc auctor varius et id sapien. Etiam semper nunc eget tempus pulvinar. Nullam non urna vel libero eleifend sollicitudin.";
 
-#[derive(Deserialize)]
-pub struct Review {
-    pub id: Uuid,
-    pub user_id: Uuid,
-    pub movie_id: String,
-    pub movie_title: String,
-    pub poster_path: String,
-    pub review: String,
-    pub rating: i32,
-    pub created_at: i64,
-}
-
-#[derive(Deserialize)]
-pub struct Comment {
-    pub id: Uuid,
-    pub user_id: Uuid,
-    pub review_id: Uuid,
-    pub comment: String,
-    pub created_at: i64,
-}
-
 pub async fn create_review(movie_id: &str, rating: i32, liked: bool) {
     let params = [
         ("jwt_token", JWT_TOKEN.clone()),
@@ -44,16 +20,14 @@ pub async fn create_review(movie_id: &str, rating: i32, liked: bool) {
         ("poster_path", movie_id),
         ("review", LOREM_IPSUM.clone()),
         ("rating", &rating.to_string()),
-        ("liked", &liked.to_string())
+        ("liked", &liked.to_string()),
     ];
 
     let client = reqwest::Client::new();
-    let _ = client.post(format!("{API_BASE_URL}/post-review"))
+    let _ = client
+        .post(format!("{API_BASE_URL}/post-review"))
         .form(&params)
         .send()
-        .await
-        .unwrap()
-        .json::<Review>()
         .await;
 }
 
@@ -61,15 +35,63 @@ pub async fn create_comment(review_id: &str) {
     let params = [
         ("jwt_token", JWT_TOKEN.clone()),
         ("review_id", review_id),
-        ("comment", LOREM_IPSUM.clone())
+        ("comment", LOREM_IPSUM.clone()),
     ];
 
     let client = reqwest::Client::new();
-    let _ = client.post(format!("{API_BASE_URL}/post-comment"))
+    let _ = client
+        .post(format!("{API_BASE_URL}/post-comment"))
         .form(&params)
         .send()
-        .await
-        .unwrap()
-        .json::<Comment>()
+        .await;
+}
+
+pub async fn create_list(name: &str) {
+    let params = [
+        ("jwt_token", JWT_TOKEN.clone()),
+        ("username", USERNAME.clone()),
+        ("name", name),
+    ];
+
+    let client = reqwest::Client::new();
+    let _ = client
+        .post(format!("{API_BASE_URL}/create-list"))
+        .form(&params)
+        .send()
+        .await;
+}
+
+pub async fn create_list_item(list_id: &str, movie_id: &str) {
+    let params = [
+        ("jwt_token", JWT_TOKEN.clone()),
+        ("list_id", list_id),
+        ("movie_id", movie_id),
+        ("movie_title", movie_id),
+        ("poster_path", movie_id),
+        ("watchlist", "false"),
+    ];
+
+    let client = reqwest::Client::new();
+    let _ = client
+        .post(format!("{API_BASE_URL}/create-list-item"))
+        .form(&params)
+        .send()
+        .await;
+}
+
+pub async fn create_watchlist_item(movie_id: &str) {
+    let params = [
+        ("jwt_token", JWT_TOKEN.clone()),
+        ("movie_id", movie_id),
+        ("movie_title", movie_id),
+        ("poster_path", movie_id),
+        ("watchlist", "true"),
+    ];
+
+    let client = reqwest::Client::new();
+    let _ = client
+        .post(format!("{API_BASE_URL}/create-list-item"))
+        .form(&params)
+        .send()
         .await;
 }

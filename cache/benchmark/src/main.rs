@@ -1,18 +1,21 @@
 pub mod create_data;
+pub mod query_data;
 
 #[tokio::main]
 async fn main() {
     println!("benchmarking movieshlok cache");
-    
+
+    let movie_id = "577922";
+
     // GENERATE TESTING DATA
     // ****************************************************************
     // the movie with movie_id will have 100 reviews.
     // the first review for this movie with review_id will have 100 comments.
     // the user will have 101 ratings for movies with ids 1-100, and movie_id.
 
-    // use crate::create_data::{create_review, create_comment};
-    // let movie_id = "577922";
-    // let review_id = "3316eb10-c7d5-46b6-803b-88355e01c3b6";
+    use crate::create_data::{
+        create_review, create_comment, create_list, create_list_item, create_watchlist_item,
+    };
 
     // MAKE REVIEWS
     // for i in 0..100 {
@@ -20,9 +23,33 @@ async fn main() {
     //     create_review(&(i + 1).to_string(), (i % 10) as i32, true).await;
     // }
 
+    // id of the first review created from the loop above
+    let review_id = "f673d218-fe1c-450a-bb19-9ce30b5c9981";
+
     // MAKE COMMENTS
     // for _ in 0..100 {
     //     create_comment(review_id).await;
+    // }
+
+    // there will be 100 lists for the user.
+    // the user's watchlist and the first list generated in the loop below
+    // will have 100 list_items added to them.
+
+    // MAKE LISTS
+    // for i in 1..=100 {
+    //     create_list(&i.to_string()).await;
+    // }
+
+    // id of the first list created from the loop above
+    // let list_id = "5932f66f-7ab0-432a-9227-4a16e135db73";
+
+    // MAKE LIST ITEMS
+    // for i in 1..=100 {
+    //     create_list_item(list_id, &i.to_string()).await;
+    // }
+
+    // for i in 1..=100 {
+    //     create_watchlist_item(&i.to_string()).await;
     // }
 
     // QUERY TEST DATA
@@ -32,32 +59,52 @@ async fn main() {
     // the user will have 101 ratings for movies with ids 1-100, and movie_id.
     // the first 2 pages will be queried.
 
-    let limit = 50;
+    use crate::query_data::{
+        get_reviews, get_rating_like, get_review, get_ratings, get_lists, get_list_items,
+        get_watchlist_items,
+    };
+    let limit = "100";
 
-    // endpoints to test:
-    // - get-reviews
-    // - get-rating-like
-    // - get-ratings
+    // INITIAL REQUESTS
+    // ****************************************************************
+    // when testing cache speed, inital requests will query from database and store to cache.
+    // all subsequent requests will retrieve from cache.
 
+    // get_reviews(movie_id, limit, "0").await;
+    // get_rating_like(movie_id).await;
+    // get_review(review_id).await;
+    // get_ratings(limit, "0").await;
+    // get_lists().await;
+    // get_list_items(list_id, "0", limit).await;
+    // get_watchlist_items("0", limit).await;
 
-    // - get-review
+    // TIMED REQUESTS
+    // ****************************************************************
+    // for _ in 0..100 {
+    //     get_reviews(movie_id, limit, "0").await;
+    // }
 
-    // to generate data, send requests to the post-comment endpoint.
-    // post 100 comments for the first review of each of the 100 movies.
+    // for _ in 0..100 {
+    //     get_rating_like(movie_id).await;
+    // }
 
-    // There will be a total of 100 reviews with comments.
-    // send 10 requests to get the review details of the first review for each of the 100 movies.
+    // for _ in 0..100 {
+    // get_review(review_id).await;
+    // }
 
+    // for _ in 0..100 {
+    //     get_ratings(limit, "0").await;
+    // }
 
-    // - get-lists
-    // - get-list-items
-    // - get-watchlist
+    // for _ in 0..100 {
+    //     get_lists().await;
+    // }
 
-    // create 100 lists for the user.
-    // record the list_id for each lists created in a vec.
-    // add all 100 movies to every lists.
+    // for _ in 0..100 {
+    //     get_list_items(list_id, "0", limit).await;
+    // }
 
-    // send 1,000 requests to get all lists for the users.
-    // send 10 requests to get list_items for each of the 100 lists.
-    // 100 x 10 = 1,000 total requests.
+    // for _ in 0..100 {
+    //     get_watchlist_items("0", limit).await;
+    // }
 }
