@@ -5,9 +5,12 @@ import { authMiddleware } from "@clerk/nextjs";
 // See https://clerk.com/docs/references/nextjs/auth-middleware for more information about configuring your middleware
 export default authMiddleware({
   publicRoutes: [
+    // pages
     "/",
+    "/search",
+
+    // endopoints
     "/api/trpc/example.hello",
-    "/api/trpc/example.getAll",
     "/api/trpc/example.getAll",
   ],
 });
