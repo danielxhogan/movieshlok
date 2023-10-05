@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --primary-bg: #f1efef;
+    --secondary-bg: #ffffff;
+  }
+
+  :root[class~="dark"] {
+    --primary-bg: #000b1e;
+    --secondary-bg: #18978f;
+  }
+}
