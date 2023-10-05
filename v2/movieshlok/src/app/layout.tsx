@@ -1,8 +1,11 @@
-import { TRPCProvider } from "@/api/TRPCProvider";
-import { api } from "@/api/client";
-import "@/styles/globals.css";
+import Body from "@/components/layout/Body";
+import "@/globals.css";
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+
+import { TRPCProvider } from "@/api/TRPCProvider";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,10 +20,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <TRPCProvider>{children}</TRPCProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <TRPCProvider>
+        <html lang="en">
+          <Body inter={inter}>{children}</Body>
+        </html>
+      </TRPCProvider>
+    </ClerkProvider>
   );
 }
