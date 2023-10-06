@@ -3,10 +3,8 @@ import { auth } from "@clerk/nextjs";
 import { cookies } from "next/headers";
 
 export default function SignInPage() {
-  const user = auth();
-  const isSignedIn = !!user.sessionId;
+  const isSignedIn = !!auth().sessionId;
+  const afterSignInUrl = cookies().get("afterAuthUrl")?.value || "/";
 
-  const returnPath = cookies().get("pathBeforeLogin")?.value || "/";
-
-  return <SignIn returnPath={returnPath} isSignedIn={isSignedIn} />;
+  return <SignIn isSignedIn={isSignedIn} afterSignInUrl={afterSignInUrl} />;
 }

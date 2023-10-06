@@ -1,15 +1,15 @@
 "use client";
 
 import { SignIn } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function SignInClient({
-  returnPath,
   isSignedIn,
+  afterSignInUrl,
 }: {
-  returnPath: string;
   isSignedIn: boolean;
+  afterSignInUrl: string;
 }) {
   const router = useRouter();
 
@@ -22,7 +22,7 @@ export default function SignInClient({
   return (
     <main className="flex items-center justify-center py-20">
       {!isSignedIn ? (
-        <SignIn afterSignInUrl={returnPath} />
+        <SignIn afterSignInUrl={afterSignInUrl} />
       ) : (
         <h1>Already Signed In</h1>
       )}
