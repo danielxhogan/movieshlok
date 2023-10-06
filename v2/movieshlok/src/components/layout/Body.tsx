@@ -1,3 +1,4 @@
+import { useUser } from "@clerk/nextjs";
 import Theme from "./Theme";
 import Header from "@/components/layout/header/Header";
 import { NextFont } from "next/dist/compiled/@next/font";
