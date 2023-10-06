@@ -2,15 +2,12 @@ import "@/globals.css";
 import Body from "@/components/layout/Body";
 
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 
 import { TRPCProvider } from "@/api/TRPCProvider";
 import { ClerkProvider } from "@clerk/nextjs";
 
 import { Inter } from "next/font/google";
 const inter = Inter({ subsets: ["latin"] });
-
-const theme = cookies().get("theme")?.value;
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,7 +22,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <TRPCProvider>
-        <html lang="en" className={theme}>
+        <html lang="en" suppressHydrationWarning>
           <Body inter={inter}>{children}</Body>
         </html>
       </TRPCProvider>

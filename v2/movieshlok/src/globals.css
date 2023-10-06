@@ -4,12 +4,18 @@
 
 @layer base {
   :root {
-    --primary-bg: #f1efef;
-    --secondary-bg: #ffffff;
+    --primary-bg: #f1f6f9;
+    --secondary-bg: #dde6ed;
+    --primary-fg: #212a3e;
+    --secondary-fg: #526d82;
+    --shadow: #6096b4;
   }
 
   :root[class~="dark"] {
     --primary-bg: #000b1e;
-    --secondary-bg: #18978f;
+    --secondary-bg: #212a3e;
+    --primary-fg: #f1f6f9;
+    --secondary-fg: #9db2bf;
+    --shadow: #408e91;
   }
 }

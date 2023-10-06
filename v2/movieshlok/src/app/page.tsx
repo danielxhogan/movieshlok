@@ -7,6 +7,8 @@ import Head from "next/head";
 export default async function Home() {
   const hello = await api.example.hello({ text: "from the server" });
   const dbData = await api.example.getAll();
+  console.log(`DBDATA::::::{ ${dbData} }`);
+
   return (
     <>
       <Head>

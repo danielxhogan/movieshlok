@@ -12,9 +12,12 @@ export default function SearchBar() {
   }
 
   return (
-    <div>
-      <form>
-        <input type="text" onSubmit={onSubmitSearch} />
+    <div className="flex items-center">
+      <form onSubmit={onSubmitSearch}>
+        <input
+          type="text"
+          className="bg-secondarybg rounded px-2 py-1 outline-none "
+        />
       </form>
     </div>
   );

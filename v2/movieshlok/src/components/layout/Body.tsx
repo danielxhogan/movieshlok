@@ -1,6 +1,5 @@
-// import ThemeProvider from "@/components/ThemeProvider";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import Theme from "./Theme";
+import Header from "@/components/layout/header/Header";
 import { NextFont } from "next/dist/compiled/@next/font";
 
 export default function Layout({
@@ -11,10 +10,16 @@ export default function Layout({
   inter: NextFont;
 }) {
   return (
-    <body className={`${inter.className} bg-primarybg relative min-h-screen`}>
-      <Header />
-      {children}
-      <Footer />
+    <body className={`${inter.className} bg-secondarybg relative min-h-screen`}>
+      <Theme>
+        <Header />
+        {children}
+        <Footer />
+      </Theme>
     </body>
   );
+}
+
+function Footer() {
+  return <footer className="absolute bottom-0">Footer</footer>;
 }
