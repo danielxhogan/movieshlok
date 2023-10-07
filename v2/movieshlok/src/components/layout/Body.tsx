@@ -1,5 +1,7 @@
-import Theme from "./Theme";
+"use client";
+
 import Header from "@/components/layout/header/Header";
+import { ThemeProvider } from "next-themes";
 import { NextFont } from "next/dist/compiled/@next/font";
 
 export default function Layout({
@@ -13,11 +15,11 @@ export default function Layout({
     <body
       className={`${inter.className} bg-secondarybg text-primaryfg relative min-h-screen`}
     >
-      <Theme>
+      <ThemeProvider attribute="class">
         <Header />
         {children}
         <Footer />
-      </Theme>
+      </ThemeProvider>
     </body>
   );
 }
