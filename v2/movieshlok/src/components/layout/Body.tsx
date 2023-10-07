@@ -1,4 +1,3 @@
-import { useUser } from "@clerk/nextjs";
 import Theme from "./Theme";
 import Header from "@/components/layout/header/Header";
 import { NextFont } from "next/dist/compiled/@next/font";
@@ -11,7 +10,9 @@ export default function Layout({
   inter: NextFont;
 }) {
   return (
-    <body className={`${inter.className} bg-secondarybg relative min-h-screen`}>
+    <body
+      className={`${inter.className} bg-secondarybg text-primaryfg relative min-h-screen`}
+    >
       <Theme>
         <Header />
         {children}

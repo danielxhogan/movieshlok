@@ -8,6 +8,9 @@ export default authMiddleware({
     // pages
     "/",
     "/search",
+    "/test1",
+    "/test2",
+    "/test3",
 
     // endopoints
     "/api/trpc/example.hello",

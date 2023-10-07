@@ -9,7 +9,7 @@ export default function Header() {
       <Logo />
       <SearchBar />
 
-      <div className="flex">
+      <div className="flex gap-3">
         <ThemeSwitcher />
         <User />
       </div>
