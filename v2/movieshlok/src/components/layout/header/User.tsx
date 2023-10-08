@@ -50,7 +50,7 @@ function UserDropdown() {
 
       function closeUserDropdown(event: MouseEvent) {
         if (
-          !userDropdown.current?.contains(event.target as Node) &&
+          // !userDropdown.current?.contains(event.target as Node) &&
           !menuButton.current?.contains(event.target as Node)
         ) {
           setShown(false);
@@ -115,7 +115,7 @@ function UserDropdown() {
                 linkHref={`/u/${user?.fullName}/videos`}
               />
 
-              <hr className="my-2" />
+              <hr className="border-shadow my-2" />
 
               <NavLink linkName="Movie Nights" linkHref="/movie-nights" />
 
