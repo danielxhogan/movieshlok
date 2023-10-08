@@ -93,16 +93,34 @@ function UserDropdown() {
         >
           <nav>
             <ul className="font-Audiowide w-36 text-right ">
-              <NavLink linkName="Profile" linkHref="/u/profile" />
-              <NavLink linkName="Ratings" linkHref="/u/ratings" />
-              <NavLink linkName="Watchlist" linkHref="/u/watchlist" />
-              <NavLink linkName="Lists" linkHref="/u/lists" />
-              <NavLink linkName="Videos" linkHref="/u/videos" />
-              <NavLink linkName="Movie Nights" linkHref="/u/movie-nights" />
+              <NavLink linkName="Profile" linkHref={`/u/${user?.fullName}`} />
+
+              <NavLink
+                linkName="Ratings"
+                linkHref={`/u/${user?.fullName}/ratings`}
+              />
+
+              <NavLink
+                linkName="Watchlist"
+                linkHref={`/u/${user?.fullName}/watchlist`}
+              />
+
+              <NavLink
+                linkName="Lists"
+                linkHref={`/u/${user?.fullName}/lists`}
+              />
+
+              <NavLink
+                linkName="Videos"
+                linkHref={`/u/${user?.fullName}/videos`}
+              />
 
               <hr className="my-2" />
 
-              <NavLink linkName="Account" linkHref="/u/account" />
+              <NavLink linkName="Movie Nights" linkHref="/movie-nights" />
+
+              <NavLink linkName="Account" linkHref="/account" />
+
               <li className="hover:bg-secondarybg rounded p-1">
                 <SignOutButton />
               </li>

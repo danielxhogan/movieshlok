@@ -1,5 +1,6 @@
 import { api } from "@/api/server";
 import HelloClient from "@/components/HelloClient";
+import Client from "@/components/Client";
 import HelloServer from "@/components/HelloServer";
 import HelloDB from "@/components/HelloDB";
 import Head from "next/head";
@@ -19,17 +20,9 @@ export default async function Home() {
 
       <main>
         <HelloClient />
+        {/* <Client /> */}
         <HelloServer data={hello} />
         <HelloDB data={dbData} />
-        <div>
-          <Link href="/test1">test 1</Link>
-        </div>
-        <div>
-          <Link href="/test2">test 2</Link>
-        </div>
-        <div>
-          <Link href="/test3">test 3</Link>
-        </div>
       </main>
     </>
   );
