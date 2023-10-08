@@ -1,11 +1,12 @@
 "use client";
 
-import { HamburgerIcon } from "@/components/icons";
+import { ChevronDownIcon } from "@/components/icons";
 
 import { useUser, SignOutButton } from "@clerk/nextjs";
-import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function User() {
   const { isSignedIn } = useUser();
@@ -36,9 +37,11 @@ export default function User() {
 }
 
 function UserDropdown() {
+  const { user } = useUser();
+
   const [shown, setShown] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
   const userDropdown = useRef<HTMLDivElement>(null);
-  const hamburger = useRef<HTMLButtonElement>(null);
 
   let flag = false;
   useEffect(() => {
@@ -48,7 +51,7 @@ function UserDropdown() {
       function closeUserDropdown(event: MouseEvent) {
         if (
           !userDropdown.current?.contains(event.target as Node) &&
-          !hamburger.current?.contains(event.target as Node)
+          !menuButton.current?.contains(event.target as Node)
         ) {
           setShown(false);
         }
@@ -59,31 +62,48 @@ function UserDropdown() {
   }, []);
 
   return (
-    <div className="relative flex items-center">
-      <div className="relative">
-        <button ref={hamburger} onClick={() => setShown(!shown)}>
-          <HamburgerIcon />
+    <div className="flex items-center">
+      <div className="relative flex">
+        <button
+          ref={menuButton}
+          onClick={() => setShown(!shown)}
+          className="flex"
+        >
+          <Image
+            src={user?.imageUrl ?? ""}
+            alt={`${user?.username}'s profile image`}
+            width={40}
+            height={40}
+            className="z-10 rounded-full"
+          />
+
+          <div className="bg-secondarybg font-Audiowide -ml-2 flex self-center rounded p-1 pl-3">
+            {user?.fullName}
+            <span className={`flex items-center ${shown && "rotate-180"}`}>
+              <ChevronDownIcon />
+            </span>
+          </div>
         </button>
 
         <div
           ref={userDropdown}
-          className={`${!shown && "top-8 opacity-0 transition-all"} ${
-            shown && "top-10 opacity-100 transition-all"
+          className={`${!shown && "top-10 opacity-0 transition-all"} ${
+            shown && "top-12 opacity-100 transition-all"
           } bg-primarybg border-shadow absolute right-0 rounded border p-3 transition`}
         >
           <nav>
-            <ul className="font-Audiowide w-36 text-right text-lg">
-              <li>Profile</li>
-              <li>Ratings</li>
-              <li>Watchlist</li>
-              <li>Lists</li>
-              <li>Videos</li>
-              <li>Movie Nights</li>
+            <ul className="font-Audiowide w-36 text-right ">
+              <NavLink linkName="Profile" linkHref="/u/profile" />
+              <NavLink linkName="Ratings" linkHref="/u/ratings" />
+              <NavLink linkName="Watchlist" linkHref="/u/watchlist" />
+              <NavLink linkName="Lists" linkHref="/u/lists" />
+              <NavLink linkName="Videos" linkHref="/u/videos" />
+              <NavLink linkName="Movie Nights" linkHref="/u/movie-nights" />
 
               <hr className="my-2" />
 
-              <li>Account</li>
-              <li>
+              <NavLink linkName="Account" linkHref="/u/account" />
+              <li className="hover:bg-secondarybg rounded p-1">
                 <SignOutButton />
               </li>
             </ul>
@@ -91,5 +111,19 @@ function UserDropdown() {
         </div>
       </div>
     </div>
+  );
+}
+
+function NavLink({
+  linkName,
+  linkHref,
+}: {
+  linkName: string;
+  linkHref: string;
+}) {
+  return (
+    <Link href={linkHref}>
+      <li className="hover:bg-secondarybg rounded p-1">{linkName}</li>
+    </Link>
   );
 }
