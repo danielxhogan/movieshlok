@@ -1,4 +1,4 @@
-import { RouterOutputs } from "@/api/types";
+import type { RouterOutputs } from "@/api/types";
 
 type HelloResonse = RouterOutputs["example"]["hello"];
 

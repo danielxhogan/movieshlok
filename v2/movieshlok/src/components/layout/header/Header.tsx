@@ -11,11 +11,11 @@ export default function Header() {
   const [shown, setShown] = useState(false);
   const searchFormRef = useRef<HTMLFormElement>(null);
   const searchToggleRef = useRef<HTMLButtonElement>(null);
-  let flag = false;
+  const flag = useRef<boolean>(false);
 
   useEffect(() => {
-    if (!flag) {
-      flag = true;
+    if (!flag.current) {
+      flag.current = true;
 
       function closeSearchBarDrawer(event: MouseEvent) {
         if (

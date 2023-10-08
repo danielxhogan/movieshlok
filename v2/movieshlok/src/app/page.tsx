@@ -4,7 +4,6 @@ import Client from "@/components/Client";
 import HelloServer from "@/components/HelloServer";
 import HelloDB from "@/components/HelloDB";
 import Head from "next/head";
-import Link from "next/link";
 
 export default async function Home() {
   const hello = await api.example.hello({ text: "from the server" });

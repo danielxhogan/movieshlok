@@ -11,7 +11,7 @@ import Link from "next/link";
 export default function User() {
   const { isSignedIn } = useUser();
   const router = useRouter();
-  let pathname = usePathname();
+  const pathname = usePathname();
 
   function onClickSignIn() {
     if (pathname !== "/sign-in" && pathname !== "/sign-up") {
@@ -42,11 +42,11 @@ function UserDropdown() {
   const [shown, setShown] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
   const userDropdown = useRef<HTMLDivElement>(null);
+  const flag = useRef<boolean>(false);
 
-  let flag = false;
   useEffect(() => {
-    if (!flag) {
-      flag = true;
+    if (!flag.current) {
+      flag.current = true;
 
       function closeUserDropdown(event: MouseEvent) {
         if (

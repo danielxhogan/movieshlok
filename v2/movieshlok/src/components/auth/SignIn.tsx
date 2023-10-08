@@ -17,7 +17,7 @@ export default function SignInClient({
     if (isSignedIn) {
       router.back();
     }
-  }, []);
+  }, [isSignedIn, router]);
 
   return (
     <main className="flex items-center justify-center py-20">
