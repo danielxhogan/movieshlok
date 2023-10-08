@@ -27,7 +27,7 @@ export default function User() {
       <div className="flex items-center">
         <button
           onClick={onClickSignIn}
-          className=" hover:bg-shadow hover:text-invertedfg rounded p-1 transition"
+          className=" hover:bg-shadow hover:text-invertedfg font-Audiowide rounded p-1 transition"
         >
           Sign In
         </button>
