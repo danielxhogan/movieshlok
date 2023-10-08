@@ -2,7 +2,7 @@
 
 import Header from "@/components/layout/header/Header";
 import { ThemeProvider } from "next-themes";
-import { NextFont } from "next/dist/compiled/@next/font";
+import { type NextFont } from "next/dist/compiled/@next/font";
 
 export default function Layout({
   children,
@@ -17,7 +17,7 @@ export default function Layout({
     >
       <ThemeProvider attribute="class">
         <Header />
-        {children}
+        <div className="pt-28">{children}</div>
         <Footer />
       </ThemeProvider>
     </body>
