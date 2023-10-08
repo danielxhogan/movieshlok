@@ -5,7 +5,7 @@ import { HamburgerIcon } from "@/components/icons";
 import { useUser, SignOutButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function User() {
   const { isSignedIn } = useUser();
@@ -20,13 +20,7 @@ export default function User() {
   }
 
   if (isSignedIn) {
-    return (
-      // <div>
-      //   <SignOutButton />
-      //   <Link href="/account">Account</Link>
-      // </div>
-      <UserDropdown />
-    );
+    return <UserDropdown />;
   } else {
     return (
       <div className="flex items-center">
@@ -43,30 +37,59 @@ export default function User() {
 
 function UserDropdown() {
   const [shown, setShown] = useState(false);
+  const userDropdown = useRef<HTMLDivElement>(null);
+  const hamburger = useRef<HTMLButtonElement>(null);
+
+  let flag = false;
+  useEffect(() => {
+    if (!flag) {
+      flag = true;
+
+      function closeUserDropdown(event: MouseEvent) {
+        if (
+          !userDropdown.current?.contains(event.target as Node) &&
+          !hamburger.current?.contains(event.target as Node)
+        ) {
+          setShown(false);
+        }
+      }
+
+      document.addEventListener("click", closeUserDropdown);
+    }
+  }, []);
 
   return (
     <div className="relative flex items-center">
-      <button onClick={() => setShown(!shown)} className="relative">
-        <HamburgerIcon />
+      <div className="relative">
+        <button ref={hamburger} onClick={() => setShown(!shown)}>
+          <HamburgerIcon />
+        </button>
+
         <div
+          ref={userDropdown}
           className={`${!shown && "top-8 opacity-0 transition-all"} ${
             shown && "top-10 opacity-100 transition-all"
           } bg-primarybg border-shadow absolute right-0 rounded border p-3 transition`}
         >
-          <ul className="font-Audiowide text-right text-lg">
-            <li>Profile</li>
-            <li>Ratings</li>
-            <li>Watchlist</li>
-            <li>Lists</li>
-            <li>Videos</li>
+          <nav>
+            <ul className="font-Audiowide w-36 text-right text-lg">
+              <li>Profile</li>
+              <li>Ratings</li>
+              <li>Watchlist</li>
+              <li>Lists</li>
+              <li>Videos</li>
+              <li>Movie Nights</li>
 
-            <hr className="my-2" />
+              <hr className="my-2" />
 
-            <li>Account</li>
-            <li>Logout</li>
-          </ul>
+              <li>Account</li>
+              <li>
+                <SignOutButton />
+              </li>
+            </ul>
+          </nav>
         </div>
-      </button>
+      </div>
     </div>
   );
 }
