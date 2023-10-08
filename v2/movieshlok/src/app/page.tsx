@@ -20,7 +20,7 @@ export default async function Home() {
 
       <main>
         <HelloClient />
-        {/* <Client /> */}
+        <Client />
         <HelloServer data={hello} />
         <HelloDB data={dbData} />
       </main>
