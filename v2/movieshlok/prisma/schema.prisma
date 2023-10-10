@@ -11,20 +11,199 @@ datasource db {
   relationMode = "prisma"
 }
 
-model Example {
-  id        Int      @id @default(autoincrement())
-  name      String
+model User {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  reviews         Review[]
+  comments        Comment[]
+  ratings RatingLike[]
+  movieLists MovieList[]
+  specialFeatures SpecialFeature[]
+  articles        Article[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([name])
 }
 
-model User {
+model Movie {
+  id     Int    @id @default(autoincrement())
+  tmdbId Int
+  title   String
+  posterPath String
+
+  reviews         Review[]
+  ratings RatingLike[]
+  movieListItems MovieListItem[]
+  specialFeatures SpecialFeature[]
+  articles        Article[]
+
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+}
+
+
+model Review {
+  id     Int         @id @default(autoincrement())
+  review String
+  rating Rating
+  comments Comment[]
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  movie   Movie @relation(fields: [movieId], references: [id])
+  movieId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([movieId])
+}
+
+model Comment {
+  id      Int    @id @default(autoincrement())
+  comment String
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  review   Review @relation(fields: [reviewId], references: [id])
+  reviewId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([reviewId])
+  @@index([userId])
+}
+
+model RatingLike {
+  id        Int      @id @default(autoincrement())
+  rating Rating
+  like Boolean
+  reviewed Boolean
+
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+
+  movie Movie @relation(fields: [movieId], references: [id])
+  movieId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([movieId])
+}
+
+model MovieNight {
   id        Int      @id @default(autoincrement())
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
 
-  @@index([name])
+model Notification {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MovieList {
+  id        Int      @id @default(autoincrement())
+  name String
+  watchlist Boolean
+  listItems MovieListItem[]
+
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model MovieListItem {
+  id        Int      @id @default(autoincrement())
+
+  list MovieList @relation(fields: [listId], references: [id])
+  listId Int
+
+  movie Movie @relation(fields: [movieId], references: [id])
+  movieId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([listId])
+  @@index([movieId])
+}
+
+model VideoList {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VideoListItem {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SpecialFeature {
+  id          Int    @id @default(autoincrement())
+  ytId        Int
+  name        String
+  description String
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  movie   Movie @relation(fields: [movieId], references: [id])
+  movieId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([movieId])
+}
+
+model Article {
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  Movie   Movie @relation(fields: [movieId], references: [id])
+  movieId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([movieId])
+}
+
+enum Rating {
+  ZERO
+  ONE
+  TWO
+  THREE
+  FOUR
+  FIVE
+  SIX
+  SEVEN
+  EIGHT
+  NINE
+  TEN
 }
