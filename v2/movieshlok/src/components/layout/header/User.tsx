@@ -1,15 +1,15 @@
 "use client";
 
 import { ChevronDownIcon } from "@/components/icons";
+import { type UserType } from "@/server/routers/user";
 
-import { useUser, SignOutButton } from "@clerk/nextjs";
+import { SignOutButton } from "@clerk/nextjs";
 import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function User() {
-  const { isSignedIn, isLoaded } = useUser();
+export default function User({ user }: { user: UserType | null }) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -20,12 +20,8 @@ export default function User() {
     }
   }
 
-  if (!isLoaded) {
-    return <div></div>;
-  }
-
-  if (isSignedIn) {
-    return <UserDropdown />;
+  if (user) {
+    return <UserDropdown user={user} />;
   } else {
     return (
       <div className="flex items-center">
@@ -40,9 +36,7 @@ export default function User() {
   }
 }
 
-function UserDropdown() {
-  const { user } = useUser();
-
+function UserDropdown({ user }: { user: UserType }) {
   const [shown, setShown] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
   const flag = useRef<boolean>(false);

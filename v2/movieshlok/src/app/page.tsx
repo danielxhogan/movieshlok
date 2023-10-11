@@ -1,14 +1,8 @@
-import { api } from "@/api/server";
 import HelloClient from "@/components/HelloClient";
 import Client from "@/components/Client";
-import HelloServer from "@/components/HelloServer";
-import HelloDB from "@/components/HelloDB";
 import Head from "next/head";
 
-export default async function Home() {
-  const hello = await api.example.hello({ text: "from the server" });
-  const dbData = await api.example.getAll();
-
+export default function Home() {
   return (
     <>
       <Head>
@@ -20,8 +14,6 @@ export default async function Home() {
       <main>
         <HelloClient />
         <Client />
-        <HelloServer data={hello} />
-        <HelloDB data={dbData} />
       </main>
     </>
   );

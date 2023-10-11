@@ -4,10 +4,11 @@ import Logo from "./Logo";
 import { SearchBar, SearchBarDrawer } from "./searchbars";
 import ThemeSwitcher from "./ThemeSwtcher";
 import User from "./User";
+import { type UserType } from "@/server/routers/user";
 
 import { useEffect, useRef, useState } from "react";
 
-export default function Header() {
+export default function Header({ user }: { user: UserType | null }) {
   const [shown, setShown] = useState(false);
   const searchFormRef = useRef<HTMLFormElement>(null);
   const searchToggleRef = useRef<HTMLButtonElement>(null);
@@ -34,6 +35,7 @@ export default function Header() {
     <header className="absolute w-full">
       <div className="bg-primarybg shadow-shadow relative z-10 flex w-full justify-between px-5 py-3 shadow-lg">
         <Logo />
+
         <SearchBar
           shown={shown}
           setShown={setShown}
@@ -42,7 +44,7 @@ export default function Header() {
 
         <div className="flex gap-3">
           <ThemeSwitcher />
-          <User />
+          <User user={user} />
         </div>
       </div>
 
