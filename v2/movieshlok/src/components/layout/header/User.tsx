@@ -9,7 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function User() {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -20,6 +20,10 @@ export default function User() {
     }
   }
 
+  if (!isLoaded) {
+    return <div></div>;
+  }
+
   if (isSignedIn) {
     return <UserDropdown />;
   } else {
@@ -27,7 +31,7 @@ export default function User() {
       <div className="flex items-center">
         <button
           onClick={onClickSignIn}
-          className=" hover:bg-shadow hover:text-invertedfg font-Audiowide rounded p-1 transition"
+          className="hover:bg-shadow hover:text-invertedfg font-Audiowide rounded p-1 transition"
         >
           Sign In
         </button>
@@ -41,7 +45,6 @@ function UserDropdown() {
 
   const [shown, setShown] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
-  const userDropdown = useRef<HTMLDivElement>(null);
   const flag = useRef<boolean>(false);
 
   useEffect(() => {
@@ -49,10 +52,7 @@ function UserDropdown() {
       flag.current = true;
 
       function closeUserDropdown(event: MouseEvent) {
-        if (
-          // !userDropdown.current?.contains(event.target as Node) &&
-          !menuButton.current?.contains(event.target as Node)
-        ) {
+        if (!menuButton.current?.contains(event.target as Node)) {
           setShown(false);
         }
       }
@@ -86,41 +86,25 @@ function UserDropdown() {
         </button>
 
         <div
-          ref={userDropdown}
           className={`${!shown && "top-10 opacity-0 transition-all"} ${
             shown && "top-12 opacity-100 transition-all"
           } bg-primarybg border-shadow absolute right-0 rounded border p-3 transition`}
         >
           <nav>
             <ul className="font-Audiowide w-36 text-right ">
-              <NavLink linkName="Profile" linkHref={`/u/${user?.fullName}`} />
-
+              <NavLink label="Profile" href={`/u/${user?.fullName}`} />
+              <NavLink label="Ratings" href={`/u/${user?.fullName}/ratings`} />
               <NavLink
-                linkName="Ratings"
-                linkHref={`/u/${user?.fullName}/ratings`}
+                label="Watchlist"
+                href={`/u/${user?.fullName}/watchlist`}
               />
-
-              <NavLink
-                linkName="Watchlist"
-                linkHref={`/u/${user?.fullName}/watchlist`}
-              />
-
-              <NavLink
-                linkName="Lists"
-                linkHref={`/u/${user?.fullName}/lists`}
-              />
-
-              <NavLink
-                linkName="Videos"
-                linkHref={`/u/${user?.fullName}/videos`}
-              />
+              <NavLink label="Lists" href={`/u/${user?.fullName}/lists`} />
+              <NavLink label="Videos" href={`/u/${user?.fullName}/videos`} />
 
               <hr className="border-shadow my-2" />
 
-              <NavLink linkName="Movie Nights" linkHref="/movie-nights" />
-
-              <NavLink linkName="Account" linkHref="/account" />
-
+              <NavLink label="Movie Nights" href="/movie-nights" />
+              <NavLink label="Account" href="/account" />
               <li className="hover:bg-secondarybg rounded p-1">
                 <SignOutButton />
               </li>
@@ -132,16 +116,10 @@ function UserDropdown() {
   );
 }
 
-function NavLink({
-  linkName,
-  linkHref,
-}: {
-  linkName: string;
-  linkHref: string;
-}) {
+function NavLink({ label, href }: { label: string; href: string }) {
   return (
-    <Link href={linkHref}>
-      <li className="hover:bg-secondarybg rounded p-1">{linkName}</li>
+    <Link href={href}>
+      <li className="hover:bg-secondarybg rounded p-1">{label}</li>
     </Link>
   );
 }
