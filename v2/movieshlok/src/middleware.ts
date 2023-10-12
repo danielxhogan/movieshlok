@@ -17,6 +17,7 @@ export default authMiddleware({
     // endopoints
     "/api/trpc/example.hello",
     "/api/trpc/example.getAll",
+    "/api/new-user",
   ],
 });
 
