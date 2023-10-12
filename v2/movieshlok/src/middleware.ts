@@ -8,7 +8,7 @@ export default authMiddleware({
     // pages
     "/",
     "/search",
-    "/u(.*)",
+    "/u/(.*)",
 
     "/test1",
     "/test2",

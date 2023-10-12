@@ -13,23 +13,31 @@ export default function User({ user }: { user: UserType | null }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  function onClickSignIn() {
+  function onClickSignIn(path: string) {
     if (pathname !== "/sign-in" && pathname !== "/sign-up") {
-      document.cookie = `afterAuthUrl=${pathname}`;
-      router.push("/sign-in");
+      document.cookie = `afterSignInUrl=${pathname}`;
+      localStorage.setItem("refresh", "false");
     }
+
+    router.push(path);
   }
 
   if (user) {
     return <UserDropdown user={user} />;
   } else {
     return (
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
         <button
-          onClick={onClickSignIn}
+          onClick={() => onClickSignIn("/sign-in")}
           className="hover:bg-shadow hover:text-invertedfg font-Audiowide rounded p-1 transition"
         >
           Sign In
+        </button>
+        <button
+          onClick={() => onClickSignIn("/sign-up")}
+          className="hover:bg-shadow hover:text-invertedfg font-Audiowide border-shadow rounded border-2 p-1 transition"
+        >
+          Sign Up
         </button>
       </div>
     );
@@ -71,7 +79,7 @@ function UserDropdown({ user }: { user: UserType }) {
             className="z-10 rounded-full"
           />
 
-          <div className="bg-secondarybg font-Audiowide -ml-2 flex self-center rounded p-1 pl-3">
+          <div className="bg-secondarybg font-Audiowide hover:bg-shadow hover:text-invertedfg -ml-2 flex self-center rounded p-1 pl-3 transition-all">
             {user?.fullName}
             <span className={`flex items-center ${shown && "rotate-180"}`}>
               <ChevronDownIcon />

@@ -37,7 +37,9 @@ export function SearchBar({
         onClick={() => setShown(!shown)}
         className="flex items-center lg:hidden"
       >
-        <MagnifyingGlassIcon />
+        <div className="hover:bg-shadow hover:text-invertedfg rounded p-1 transition-all">
+          <MagnifyingGlassIcon />
+        </div>
       </button>
     </>
   );
