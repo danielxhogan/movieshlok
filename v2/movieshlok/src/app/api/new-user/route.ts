@@ -3,7 +3,7 @@ import { db } from "@/server/db";
 
 import { Webhook } from "svix";
 import { headers } from "next/headers";
-import { WebhookEvent } from "@clerk/nextjs/server";
+import { type WebhookEvent } from "@clerk/nextjs/server";
 
 export async function POST(req: Request) {
   const headerPayload = headers();
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
   }
 
   if (evt.type === "user.created") {
-    const newUser = await db.user.create({
+    await db.user.create({
       data: {
         clerkId: evt.data.id,
         firstName: evt.data.first_name,

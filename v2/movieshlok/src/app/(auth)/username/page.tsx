@@ -6,14 +6,13 @@ export default function UsernamePage() {
   const router = useRouter();
 
   useEffect(() => {
-    const refresh = localStorage.getItem("refresh");
+    const refresh = localStorage.getItem("newUserRefresh");
 
     if (refresh === "false") {
       setTimeout(() => {
-        localStorage.setItem("refresh", "true");
-        // router.refresh();
-        window.location.reload();
-      }, 500);
+        localStorage.setItem("newUserRefresh", "true");
+        router.refresh();
+      }, 2000);
     }
   });
 

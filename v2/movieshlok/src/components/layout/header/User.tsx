@@ -16,7 +16,7 @@ export default function User({ user }: { user: UserType | null }) {
   function onClickSignIn(path: string) {
     if (pathname !== "/sign-in" && pathname !== "/sign-up") {
       document.cookie = `afterSignInUrl=${pathname}`;
-      localStorage.setItem("refresh", "false");
+      localStorage.setItem("newUserRefresh", "false");
     }
 
     router.push(path);
