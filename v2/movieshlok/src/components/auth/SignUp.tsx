@@ -15,11 +15,7 @@ export default function SignUpClient({ isSignedIn }: { isSignedIn: boolean }) {
 
   return (
     <main className="flex items-center justify-center py-20">
-      {!isSignedIn ? (
-        <SignUp afterSignUpUrl="/username" signInUrl="/sign-in" />
-      ) : (
-        <h1>Already Signed In</h1>
-      )}
+      {!isSignedIn ? <SignUp /> : <h1>Already Signed In</h1>}
     </main>
   );
 }

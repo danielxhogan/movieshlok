@@ -13,10 +13,27 @@ export default function User({ user }: { user: UserType | null }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  function onClickSignIn(path: string) {
-    if (pathname !== "/sign-in" && pathname !== "/sign-up") {
-      document.cookie = `afterSignInUrl=${pathname}`;
+  function onClickSignInUp(endpoint: string) {
+    let path = "";
+
+    if (!pathname.includes("/sign-in") && !pathname.includes("/sign-up")) {
+      path = endpoint
+        .concat(
+          "?after_sign_up_url=http%3A%2F%2Flocalhost%3A3000%2Fusername&after_sign_in_url=http%3A%2F%2Flocalhost%3A3000",
+        )
+        .concat(pathname)
+        .concat(window.location.search);
+
       localStorage.setItem("newUserRefresh", "false");
+    } else {
+      switch (endpoint) {
+        case "/sign-in":
+          path = window.location.href.replace("/sign-up", "/sign-in");
+          break;
+        case "/sign-up":
+          path = window.location.href.replace("/sign-in", "/sign-up");
+          break;
+      }
     }
 
     router.push(path);
@@ -28,13 +45,14 @@ export default function User({ user }: { user: UserType | null }) {
     return (
       <div className="flex items-center gap-2">
         <button
-          onClick={() => onClickSignIn("/sign-in")}
+          onClick={() => onClickSignInUp("/sign-in")}
           className="hover:bg-shadow hover:text-invertedfg font-Audiowide rounded p-1 transition"
         >
           Sign In
         </button>
+
         <button
-          onClick={() => onClickSignIn("/sign-up")}
+          onClick={() => onClickSignInUp("/sign-up")}
           className="hover:bg-shadow hover:text-invertedfg font-Audiowide border-shadow rounded border-2 p-1 transition"
         >
           Sign Up

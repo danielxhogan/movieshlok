@@ -4,13 +4,7 @@ import { SignIn } from "@clerk/nextjs";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export default function SignInClient({
-  isSignedIn,
-  afterSignInUrl,
-}: {
-  isSignedIn: boolean;
-  afterSignInUrl: string;
-}) {
+export default function SignInClient({ isSignedIn }: { isSignedIn: boolean }) {
   const router = useRouter();
 
   useEffect(() => {
@@ -21,11 +15,7 @@ export default function SignInClient({
 
   return (
     <main className="flex items-center justify-center py-20">
-      {!isSignedIn ? (
-        <SignIn afterSignInUrl={afterSignInUrl} signUpUrl="/sign-up" />
-      ) : (
-        <h1>Already Signed In</h1>
-      )}
+      {!isSignedIn ? <SignIn /> : <h1>Already Signed In</h1>}
     </main>
   );
 }
