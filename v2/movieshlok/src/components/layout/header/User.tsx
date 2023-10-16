@@ -8,6 +8,9 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { env } from "@/env.mjs";
+
+const HOSTNAME = env.NEXT_PUBLIC_HOSTNAME;
 
 export default function User({ user }: { user: UserType | null }) {
   const router = useRouter();
@@ -18,9 +21,10 @@ export default function User({ user }: { user: UserType | null }) {
 
     if (!pathname.includes("/sign-in") && !pathname.includes("/sign-up")) {
       path = endpoint
-        .concat(
-          "?after_sign_up_url=http%3A%2F%2Flocalhost%3A3000%2Fusername&after_sign_in_url=http%3A%2F%2Flocalhost%3A3000",
-        )
+        .concat("?after_sign_up_url=")
+        .concat(HOSTNAME)
+        .concat("/username&after_sign_in_url=")
+        .concat(HOSTNAME)
         .concat(pathname)
         .concat(window.location.search);
 
