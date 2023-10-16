@@ -97,11 +97,13 @@ function UserDropdown({ user }: { user: UserType }) {
             className="z-10 rounded-full"
           />
 
-          <div className="bg-secondarybg font-Audiowide hover:bg-shadow hover:text-invertedfg -ml-2 flex self-center rounded p-1 pl-3 transition-all">
-            {user?.fullName}
-            <span className={`flex items-center ${shown && "rotate-180"}`}>
-              <ChevronDownIcon />
-            </span>
+          <div className="hidden sm:block">
+            <div className="bg-secondarybg font-Audiowide hover:bg-shadow hover:text-invertedfg -ml-2 flex self-center rounded p-1 pl-3 transition-all">
+              {user?.username}
+              <span className={`flex items-center ${shown && "rotate-180"}`}>
+                <ChevronDownIcon />
+              </span>
+            </div>
           </div>
         </button>
 
