@@ -45,9 +45,11 @@ export default function UsernamePage() {
         router.refresh();
       }, 2000);
     }
-  }, [username, router]);
+  }, [username]);
 
   const submitNewUsername: SubmitHandler<{ username: string }> = (data) => {
+    console.log(data.username);
+
     if (user) {
       mutate({
         clerkId: user?.id,
@@ -66,10 +68,10 @@ export default function UsernamePage() {
   return (
     <main>
       <form
-        onSubmit={void handleSubmit(submitNewUsername)}
+        onSubmit={handleSubmit(submitNewUsername)}
         className="bg-primarybg mx-auto mt-10 flex w-60 flex-col gap-6 rounded p-6 sm:w-96"
       >
-        <label htmlFor="username">choose a username</label>
+        <label>choose a username</label>
         <input
           {...register("username", { required: true })}
           className="bg-secondarybg focus:border-shadow rounded px-2 py-1 focus:border focus:outline-none"
