@@ -90,12 +90,12 @@ function UserDropdown({ user }: { user: UserType }) {
   }, []);
 
   return (
-    <div className="flex items-center">
+    <div className="flex">
       <div className="relative flex">
         <button
           ref={menuButton}
           onClick={() => setShown(!shown)}
-          className="flex"
+          className="flex items-center"
         >
           <Image
             src={user?.imageUrl ?? ""}
@@ -116,20 +116,22 @@ function UserDropdown({ user }: { user: UserType }) {
         </button>
 
         <div
-          className={`${!shown && "top-10 opacity-0 transition-all"} ${
-            shown && "top-12 opacity-100 transition-all"
+          className={`${
+            !shown && "invisible top-14 opacity-0 transition-all"
+          } ${
+            shown && "visible top-16 opacity-100 transition-all"
           } bg-primarybg border-shadow absolute right-0 rounded border p-3 transition`}
         >
           <nav>
             <ul className="font-Audiowide w-36 text-right ">
               <NavLink label="Profile" href={`/u/${user?.username}`} />
-              <NavLink label="Ratings" href={`/u/${user?.fullName}/ratings`} />
+              <NavLink label="Ratings" href={`/u/${user?.username}/ratings`} />
               <NavLink
                 label="Watchlist"
-                href={`/u/${user?.fullName}/watchlist`}
+                href={`/u/${user?.username}/watchlist`}
               />
-              <NavLink label="Lists" href={`/u/${user?.fullName}/lists`} />
-              <NavLink label="Videos" href={`/u/${user?.fullName}/videos`} />
+              <NavLink label="Lists" href={`/u/${user?.username}/lists`} />
+              <NavLink label="Videos" href={`/u/${user?.username}/videos`} />
 
               <hr className="border-shadow my-2" />
 
