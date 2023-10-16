@@ -25,6 +25,10 @@ export default function User({ user }: { user: UserType | null }) {
         .concat(window.location.search);
 
       localStorage.setItem("newUserRefresh", "false");
+      localStorage.setItem(
+        "afterSignUpUrl",
+        `${pathname}${window.location.search}`,
+      );
     } else {
       switch (endpoint) {
         case "/sign-in":

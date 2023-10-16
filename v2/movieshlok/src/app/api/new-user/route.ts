@@ -42,6 +42,7 @@ export async function POST(req: Request) {
         firstName: evt.data.first_name,
         lastName: evt.data.last_name,
         fullName: `${evt.data.first_name} ${evt.data.last_name}`,
+        username: `${evt.data.first_name} ${evt.data.last_name}`,
         imageUrl: evt.data.image_url,
       },
     });
