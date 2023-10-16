@@ -5,7 +5,7 @@ import { useUser } from "@clerk/nextjs";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, type SubmitHandler } from "react-hook-form";
 
 export default function UsernamePage() {
   const [username, setUsername] = useState("");
@@ -45,7 +45,7 @@ export default function UsernamePage() {
         router.refresh();
       }, 2000);
     }
-  }, [username]);
+  }, [username, router]);
 
   const submitNewUsername: SubmitHandler<{ username: string }> = (data) => {
     if (user) {
@@ -66,7 +66,7 @@ export default function UsernamePage() {
   return (
     <main>
       <form
-        onSubmit={handleSubmit(submitNewUsername)}
+        onSubmit={void handleSubmit(submitNewUsername)}
         className="bg-primarybg mx-auto mt-10 flex w-60 flex-col gap-6 rounded p-6 sm:w-96"
       >
         <label htmlFor="username">choose a username</label>

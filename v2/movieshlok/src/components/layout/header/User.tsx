@@ -122,7 +122,7 @@ function UserDropdown({ user }: { user: UserType }) {
         >
           <nav>
             <ul className="font-Audiowide w-36 text-right ">
-              <NavLink label="Profile" href={`/u/${user?.fullName}`} />
+              <NavLink label="Profile" href={`/u/${user?.username}`} />
               <NavLink label="Ratings" href={`/u/${user?.fullName}/ratings`} />
               <NavLink
                 label="Watchlist"
