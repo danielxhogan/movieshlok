@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --primary-bg: #f1f6f9;
+    --secondary-bg: #d6e4e5;
+
+    --primary-fg: #000b1e;
+    --secondary-fg: #526d82;
+    --inverted-fg: #f1f6f9;
+
+    --shadow: #6096b4;
+  }
+
+  :root[class~="dark"] {
+    --primary-bg: #000b1e;
+    --secondary-bg: #212a3e;
+
+    --primary-fg: #f1f6f9;
+    --secondary-fg: #9db2bf;
+    --inverted-fg: #000b1e;
+
+    --shadow: #408e91;
+  }
+}
+
+@font-face {
+  font-family: Audiowide;
+  src: url(/Audiowide.ttf);
+}
