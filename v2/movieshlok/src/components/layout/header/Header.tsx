@@ -6,12 +6,18 @@ import ThemeSwitcher from "./ThemeSwtcher";
 import User from "./User";
 import { type UserType } from "@/server/routers/user";
 
-import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef, type FormEvent } from "react";
 
 export default function Header({ user }: { user: UserType | null }) {
+  const router = useRouter();
+
+  const [searchQuery, setSearchQuery] = useState("");
   const [shown, setShown] = useState(false);
+
   const searchFormRef = useRef<HTMLFormElement>(null);
   const searchToggleRef = useRef<HTMLButtonElement>(null);
+
   const flag = useRef<boolean>(false);
 
   useEffect(() => {
@@ -31,12 +37,20 @@ export default function Header({ user }: { user: UserType | null }) {
     }
   });
 
+  function onSubmitSearchForm(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    router.push(`/search?q=${searchQuery}`);
+  }
+
   return (
     <header className="absolute w-full">
       <div className="bg-primarybg shadow-shadow relative z-10 flex w-full justify-between px-5 py-3 shadow-lg">
         <Logo />
 
         <SearchBar
+          onSubmitSearchForm={onSubmitSearchForm}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
           shown={shown}
           setShown={setShown}
           searchToggleRef={searchToggleRef}
@@ -48,7 +62,13 @@ export default function Header({ user }: { user: UserType | null }) {
         </div>
       </div>
 
-      <SearchBarDrawer shown={shown} searchFormRef={searchFormRef} />
+      <SearchBarDrawer
+        onSubmitSearchForm={onSubmitSearchForm}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        shown={shown}
+        searchFormRef={searchFormRef}
+      />
     </header>
   );
 }

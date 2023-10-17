@@ -1,33 +1,39 @@
 "use client";
 
 import { MagnifyingGlassIcon } from "@/components/icons";
-import { useRouter } from "next/navigation";
-import type { FormEvent, Dispatch, SetStateAction, RefObject } from "react";
+
+import type {
+  Dispatch,
+  SetStateAction,
+  FormEventHandler,
+  RefObject,
+} from "react";
 
 export function SearchBar({
+  searchQuery,
+  setSearchQuery,
+  onSubmitSearchForm,
   shown,
   setShown,
   searchToggleRef,
 }: {
+  searchQuery: string;
+  setSearchQuery: Dispatch<SetStateAction<string>>;
+  onSubmitSearchForm: FormEventHandler<HTMLFormElement>;
   shown: boolean;
   setShown: Dispatch<SetStateAction<boolean>>;
   searchToggleRef: RefObject<HTMLButtonElement>;
 }) {
-  const router = useRouter();
-
-  function onSubmitSearch(e: FormEvent) {
-    e.preventDefault();
-    router.push("/search");
-  }
-
   return (
     <>
       <form
-        onSubmit={onSubmitSearch}
+        onSubmit={(e) => onSubmitSearchForm(e)}
         className="hidden lg:flex lg:items-center"
       >
         <input
           type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           className="bg-secondarybg rounded px-2 py-1 outline-none "
         />
       </form>
@@ -46,9 +52,15 @@ export function SearchBar({
 }
 
 export function SearchBarDrawer({
+  searchQuery,
+  setSearchQuery,
+  onSubmitSearchForm,
   shown,
   searchFormRef,
 }: {
+  searchQuery: string;
+  setSearchQuery: Dispatch<SetStateAction<string>>;
+  onSubmitSearchForm: FormEventHandler<HTMLFormElement>;
   shown: boolean;
   searchFormRef: RefObject<HTMLFormElement>;
 }) {
@@ -59,9 +71,11 @@ export function SearchBarDrawer({
       } `}
     >
       <div className="flex h-full w-full items-end justify-center pb-4">
-        <form ref={searchFormRef}>
+        <form ref={searchFormRef} onSubmit={(e) => onSubmitSearchForm(e)}>
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="bg-secondarybg rounded px-2 py-1 outline-none "
           />
         </form>

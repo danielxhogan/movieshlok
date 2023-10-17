@@ -45,11 +45,9 @@ export default function UsernamePage() {
         router.refresh();
       }, 2000);
     }
-  }, [username]);
+  }, [username, router]);
 
   const submitNewUsername: SubmitHandler<{ username: string }> = (data) => {
-    console.log(data.username);
-
     if (user) {
       mutate({
         clerkId: user?.id,
