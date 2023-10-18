@@ -39,7 +39,8 @@ export default function Header({ user }: { user: UserType | null }) {
 
   function onSubmitSearchForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    router.push(`/search?q=${searchQuery}`);
+    setShown(false);
+    router.push(`/search/${searchQuery}/movie`);
   }
 
   return (

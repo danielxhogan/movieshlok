@@ -1,4 +1,5 @@
 import { appRouter } from "@/server";
 import { db } from "@/server/db";
 
-export const api = appRouter.createCaller({ db });
+const api = appRouter.createCaller({ db });
+export default api;

@@ -1,6 +1,6 @@
 import Theme from "./Theme";
 import Header from "@/components/layout/header/Header";
-import { api } from "@/api/server";
+import api from "@/api/server";
 import { type UserType } from "@/server/routers/user";
 
 import { auth } from "@clerk/nextjs";
