@@ -30,12 +30,18 @@ export function SearchBar({
         onSubmit={(e) => onSubmitSearchForm(e)}
         className="hidden lg:flex lg:items-center"
       >
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="bg-secondarybg rounded px-2 py-1 outline-none "
-        />
+        <div className="relative">
+          <div className="text-secondaryfg absolute inset-y-0 left-0 flex items-center pl-3">
+            <MagnifyingGlassIcon />
+          </div>
+          <input
+            type="text"
+            placeholder="Search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="bg-secondarybg focus:border-shadow rounded py-1 pl-10 pr-2 outline-none focus:border"
+          />
+        </div>
       </form>
 
       <button
@@ -66,18 +72,25 @@ export function SearchBarDrawer({
 }) {
   return (
     <div
-      className={`bg-primarybg absolute left-0 h-full w-full transition-all lg:hidden ${
+      className={`bg-primarybg border-b-shadow absolute left-0 h-full w-full border-b transition-all lg:hidden ${
         shown ? "top-20" : "top-0"
       } `}
     >
       <div className="flex h-full w-full items-end justify-center pb-4">
         <form ref={searchFormRef} onSubmit={(e) => onSubmitSearchForm(e)}>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="bg-secondarybg rounded px-2 py-1 outline-none "
-          />
+          <div className="relative">
+            <div className="text-secondaryfg absolute inset-y-0 left-0 flex items-center pl-3">
+              <MagnifyingGlassIcon />
+            </div>
+
+            <input
+              type="text"
+              placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-secondarybg focus:border-shadow rounded py-1 pl-10 pr-2 outline-none focus:border"
+            />
+          </div>
         </form>
       </div>
     </div>

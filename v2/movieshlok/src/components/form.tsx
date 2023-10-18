@@ -18,11 +18,12 @@ export function Input({
   register,
 }: InputProps) {
   return (
-    <label className="flex flex-col gap-2">
+    <label className="flex flex-col gap-2" htmlFor={name}>
       <span>{label}</span>
       <div className="relative pb-5">
         <div className="h-10">
           <input
+            id={name}
             {...register(name, { required: required })}
             className="bg-secondarybg focus:border-shadow w-full rounded px-2 py-1 focus:border focus:outline-none"
           />
