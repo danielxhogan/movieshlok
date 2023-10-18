@@ -6,17 +6,22 @@ import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, type SubmitHandler } from "react-hook-form";
+import { Input } from "@/components/form";
 
 export default function UsernamePage() {
   const [username, setUsername] = useState("");
   const { user } = useUser();
   const router = useRouter();
 
+  interface Fields {
+    username: string;
+  }
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<{ username: string }>();
+  } = useForm<Fields>();
 
   const { mutate } = api.user.updateUsername.useMutation({
     onSuccess: () => {
@@ -47,7 +52,7 @@ export default function UsernamePage() {
     }
   }, [username, router]);
 
-  const submitNewUsername: SubmitHandler<{ username: string }> = (data) => {
+  const submitNewUsername: SubmitHandler<Fields> = (data) => {
     if (user) {
       mutate({
         clerkId: user?.id,
@@ -69,12 +74,15 @@ export default function UsernamePage() {
         onSubmit={handleSubmit(submitNewUsername)}
         className="bg-primarybg mx-auto mt-10 flex w-60 flex-col gap-6 rounded p-6 sm:w-96"
       >
-        <label>choose a username</label>
-        <input
-          {...register("username", { required: true })}
-          className="bg-secondarybg focus:border-shadow rounded px-2 py-1 focus:border focus:outline-none"
+        <Input
+          name="username"
+          label="Choose a username"
+          required={true}
+          error={errors.username}
+          errorMsg="This field is required"
+          register={register}
         />
-        {errors.username && <span>This field is required</span>}
+
         <button
           type="submit"
           className="hover:bg-shadow hover:text-invertedfg border-shadow mx-auto w-fit rounded border px-2 py-1"
