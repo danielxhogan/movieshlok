@@ -1,6 +1,10 @@
+import { type RouterOutputs } from "@/api/types";
 import { createTRPCRouter, publicProcedure } from "@/server/trpc";
 import { getMovies, getPeople } from "@/tmdb/search";
 import { z } from "zod";
+
+export type MoviesResults = RouterOutputs["tmdbSearch"]["getMovies"];
+export type PeopleResults = RouterOutputs["tmdbSearch"]["getPeople"];
 
 export const tmdbSearchRouter = createTRPCRouter({
   getMovies: publicProcedure

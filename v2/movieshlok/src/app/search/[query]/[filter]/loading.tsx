@@ -1,4 +1,4 @@
-export default function Loading() {
+export default function SearchLoading() {
   return (
     <div role="status">
       <svg

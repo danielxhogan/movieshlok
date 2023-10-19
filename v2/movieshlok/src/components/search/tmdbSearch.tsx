@@ -1,16 +1,21 @@
 "use client";
 
 import api from "@/api/client";
-import { type RouterOutputs } from "@/api/types";
+import type { MoviesResults, PeopleResults } from "@/server/routers/tmdb";
 
-type InitialMoviesResults = RouterOutputs["tmdbSearch"]["getMovies"];
-type InitialPeopleResults = RouterOutputs["tmdbSearch"]["getPeople"];
+function SearchResults({ children }: { children: React.ReactNode }) {
+  return <section className="bg-primarybg rounded p-4">{children}</section>;
+}
 
-export function MovieSearchResults({
+function MovieResult({ title }: { title: string }) {
+  return <div>{title}</div>;
+}
+
+export function MoviesSearchResults({
   initialResults,
   query,
 }: {
-  initialResults: InitialMoviesResults | undefined;
+  initialResults: MoviesResults | undefined;
   query: string;
 }) {
   const { data, fetchNextPage } = api.tmdbSearch.getMovies.useInfiniteQuery(
@@ -24,27 +29,27 @@ export function MovieSearchResults({
   );
 
   return (
-    <div>
-      {initialResults?.results.map((result) => (
-        <div key={result.title}>{result.title}</div>
-      ))}
+    <SearchResults>
+      {initialResults?.results.map((result) => <MovieResult {...result} />)}
 
       {data?.pages.map((page) =>
-        page.results.map((result) => (
-          <div key={result.title}>{result.title}</div>
-        )),
+        page.results.map((result) => <MovieResult {...result} />),
       )}
 
       <button onClick={() => fetchNextPage()}>Load more results</button>
-    </div>
+    </SearchResults>
   );
+}
+
+function PersonResult({ name }: { name: string }) {
+  return <div>{name}</div>;
 }
 
 export function PeopleSearchResults({
   initialResults,
   query,
 }: {
-  initialResults: InitialPeopleResults | undefined;
+  initialResults: PeopleResults | undefined;
   query: string;
 }) {
   const { data, fetchNextPage } = api.tmdbSearch.getPeople.useInfiniteQuery(
@@ -58,18 +63,14 @@ export function PeopleSearchResults({
   );
 
   return (
-    <div>
-      {initialResults?.results.map((result) => (
-        <div key={result.name}>{result.name}</div>
-      ))}
+    <SearchResults>
+      {initialResults?.results.map((result) => <PersonResult {...result} />)}
 
       {data?.pages.map((page) =>
-        page.results.map((result) => (
-          <div key={result.name}>{result.name}</div>
-        )),
+        page.results.map((result) => <PersonResult {...result} />),
       )}
 
       <button onClick={() => fetchNextPage()}>Load more results</button>
-    </div>
+    </SearchResults>
   );
 }
