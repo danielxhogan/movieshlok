@@ -1,5 +1,3 @@
-import HelloClient from "@/components/HelloClient";
-import Client from "@/components/Client";
 import Head from "next/head";
 
 export default function Home() {
@@ -11,10 +9,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
-        <HelloClient />
-        <Client />
-      </main>
+      <main></main>
     </>
   );
 }

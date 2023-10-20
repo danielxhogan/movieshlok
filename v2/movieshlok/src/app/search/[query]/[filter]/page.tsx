@@ -1,7 +1,7 @@
 import {
   MoviesSearchResults,
   PeopleSearchResults,
-} from "@/components/search/tmdbSearch";
+} from "@/components/search/tmdb";
 import api from "@/api/server";
 import type { MoviesResults, PeopleResults } from "@/server/routers/tmdb";
 

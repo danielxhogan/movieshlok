@@ -1,7 +1,6 @@
 "use client";
 
 import api from "@/api/client";
-// import type { MoviesResults, PeopleResults } from "@/server/routers/tmdb";
 import type { MoviesResult, PeopleResult } from "@/tmdb/search";
 
 function SearchResults({ children }: { children: React.ReactNode }) {
