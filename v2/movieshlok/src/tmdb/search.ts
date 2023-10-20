@@ -1,35 +1,41 @@
 import { env } from "@/env.mjs";
 import axios from "axios";
 
-interface MovieResults {
+interface MoviesResults {
   data: {
-    results: [
-      {
-        title: string;
-      },
-    ];
+    results: MoviesResult[];
   };
 }
 
-interface PersonResults {
+export interface MoviesResult {
+  title: string;
+}
+
+interface PeopleResults {
   data: {
-    results: [
-      {
-        name: string;
-      },
-    ];
+    results: PeopleResult[];
   };
 }
 
-export async function getMovies(query: string, page: number) {
-  const results: MovieResults = await axios(
+export interface PeopleResult {
+  name: string;
+}
+
+export async function getMovies(
+  query: string,
+  page: number,
+): Promise<MoviesResult[]> {
+  const results: MoviesResults = await axios(
     makeSearchPayload("movie", query, page),
   );
   return results.data.results;
 }
 
-export async function getPeople(query: string, page: number) {
-  const results: PersonResults = await axios(
+export async function getPeople(
+  query: string,
+  page: number,
+): Promise<PeopleResult[]> {
+  const results: PeopleResults = await axios(
     makeSearchPayload("person", query, page),
   );
 

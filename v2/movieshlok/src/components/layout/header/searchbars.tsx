@@ -1,29 +1,22 @@
 "use client";
 
+import { useSearchStore } from "@/zustand/search";
 import { MagnifyingGlassIcon } from "@/components/icons";
 
-import type {
-  Dispatch,
-  SetStateAction,
-  FormEventHandler,
-  RefObject,
-} from "react";
+import type { FormEventHandler, RefObject } from "react";
 
 export function SearchBar({
-  searchQuery,
-  setSearchQuery,
   onSubmitSearchForm,
-  shown,
-  setShown,
   searchToggleRef,
 }: {
-  searchQuery: string;
-  setSearchQuery: Dispatch<SetStateAction<string>>;
   onSubmitSearchForm: FormEventHandler<HTMLFormElement>;
-  shown: boolean;
-  setShown: Dispatch<SetStateAction<boolean>>;
   searchToggleRef: RefObject<HTMLButtonElement>;
 }) {
+  const searchQuery = useSearchStore((state) => state.searchQuery);
+  const setSearchQuery = useSearchStore((state) => state.setSearchQuery);
+  const shown = useSearchStore((state) => state.shown);
+  const toggleShown = useSearchStore((state) => state.toggleShown);
+
   return (
     <>
       <form
@@ -46,7 +39,7 @@ export function SearchBar({
 
       <button
         ref={searchToggleRef}
-        onClick={() => setShown(!shown)}
+        onClick={() => toggleShown(shown)}
         className="flex items-center lg:hidden"
       >
         <div className="hover:bg-shadow hover:text-invertedfg rounded p-1 transition-all">
@@ -58,18 +51,16 @@ export function SearchBar({
 }
 
 export function SearchBarDrawer({
-  searchQuery,
-  setSearchQuery,
   onSubmitSearchForm,
-  shown,
   searchFormRef,
 }: {
-  searchQuery: string;
-  setSearchQuery: Dispatch<SetStateAction<string>>;
   onSubmitSearchForm: FormEventHandler<HTMLFormElement>;
-  shown: boolean;
   searchFormRef: RefObject<HTMLFormElement>;
 }) {
+  const searchQuery = useSearchStore((state) => state.searchQuery);
+  const setSearchQuery = useSearchStore((state) => state.setSearchQuery);
+  const shown = useSearchStore((state) => state.shown);
+
   return (
     <div
       className={`bg-primarybg border-b-shadow absolute left-0 h-full w-full border-b transition-all lg:hidden ${

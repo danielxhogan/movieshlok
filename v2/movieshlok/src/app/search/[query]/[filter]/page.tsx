@@ -11,14 +11,7 @@ export default async function SearchPage({
   params: { query: string; filter: string };
 }) {
   function SearchHeading({ children }: { children: React.ReactNode }) {
-    return (
-      <main className="w-full">
-        <h1 className="text-shadow font-Audiowide border-b-shadow mb-5 border-b text-4xl">
-          Results for: <strong>{decodeURI(params.query)}</strong>
-        </h1>
-        {children}
-      </main>
-    );
+    return <main className="w-full">{children}</main>;
   }
 
   async function makeMoviesSearchResults() {
@@ -29,7 +22,7 @@ export default async function SearchPage({
     return (
       <SearchHeading>
         <MoviesSearchResults
-          initialResults={moviesResults}
+          initialResults={moviesResults.results}
           query={params.query}
         />
       </SearchHeading>
@@ -44,7 +37,7 @@ export default async function SearchPage({
     return (
       <SearchHeading>
         <PeopleSearchResults
-          initialResults={peopleResults}
+          initialResults={peopleResults.results}
           query={params.query}
         />
       </SearchHeading>

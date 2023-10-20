@@ -4,16 +4,20 @@ import Logo from "./Logo";
 import { SearchBar, SearchBarDrawer } from "./searchbars";
 import ThemeSwitcher from "./ThemeSwtcher";
 import User from "./User";
+
+import { useSearchStore } from "@/zustand/search";
 import { type UserType } from "@/server/routers/user";
 
 import { useRouter } from "next/navigation";
-import { useState, useEffect, useRef, type FormEvent } from "react";
+import { useEffect, useRef, type FormEvent } from "react";
 
 export default function Header({ user }: { user: UserType | null }) {
   const router = useRouter();
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [shown, setShown] = useState(false);
+  const filter = useSearchStore((state) => state.filter);
+  const setShown = useSearchStore((state) => state.setShown);
+  const setSearchHeading = useSearchStore((state) => state.setSearchHeading);
+  const searchQuery = useSearchStore((state) => state.searchQuery);
 
   const searchFormRef = useRef<HTMLFormElement>(null);
   const searchToggleRef = useRef<HTMLButtonElement>(null);
@@ -39,37 +43,36 @@ export default function Header({ user }: { user: UserType | null }) {
 
   function onSubmitSearchForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setSearchHeading(searchQuery);
     setShown(false);
-    router.push(`/search/${searchQuery}/movie`);
+
+    if (searchQuery) {
+      router.push(`/search/${searchQuery}/${filter}`);
+    }
   }
 
   return (
     <header className="absolute w-full">
-      <div className="bg-primarybg shadow-shadow relative z-10 flex w-full justify-between px-5 py-3 shadow-lg">
-        <Logo />
+      <div className="fixed w-full">
+        <div className="bg-primarybg shadow-shadow relative z-10 flex w-full justify-between px-5 py-3 shadow-lg">
+          <Logo />
 
-        <SearchBar
-          onSubmitSearchForm={onSubmitSearchForm}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          shown={shown}
-          setShown={setShown}
-          searchToggleRef={searchToggleRef}
-        />
+          <SearchBar
+            onSubmitSearchForm={onSubmitSearchForm}
+            searchToggleRef={searchToggleRef}
+          />
 
-        <div className="flex gap-3">
-          <ThemeSwitcher />
-          <User user={user} />
+          <div className="flex gap-3">
+            <ThemeSwitcher />
+            <User user={user} />
+          </div>
         </div>
-      </div>
 
-      <SearchBarDrawer
-        onSubmitSearchForm={onSubmitSearchForm}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        shown={shown}
-        searchFormRef={searchFormRef}
-      />
+        <SearchBarDrawer
+          onSubmitSearchForm={onSubmitSearchForm}
+          searchFormRef={searchFormRef}
+        />
+      </div>
     </header>
   );
 }

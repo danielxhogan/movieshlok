@@ -1,21 +1,22 @@
 "use client";
 
 import api from "@/api/client";
-import type { MoviesResults, PeopleResults } from "@/server/routers/tmdb";
+// import type { MoviesResults, PeopleResults } from "@/server/routers/tmdb";
+import type { MoviesResult, PeopleResult } from "@/tmdb/search";
 
 function SearchResults({ children }: { children: React.ReactNode }) {
   return <section className="bg-primarybg rounded p-4">{children}</section>;
 }
 
-function MovieResult({ title }: { title: string }) {
-  return <div>{title}</div>;
+function MovieResult(results: MoviesResult) {
+  return <div>{results.title}</div>;
 }
 
 export function MoviesSearchResults({
   initialResults,
   query,
 }: {
-  initialResults: MoviesResults | undefined;
+  initialResults: MoviesResult[] | undefined;
   query: string;
 }) {
   const { data, fetchNextPage } = api.tmdbSearch.getMovies.useInfiniteQuery(
@@ -30,7 +31,7 @@ export function MoviesSearchResults({
 
   return (
     <SearchResults>
-      {initialResults?.results.map((result) => <MovieResult {...result} />)}
+      {initialResults?.map((result) => <MovieResult {...result} />)}
 
       {data?.pages.map((page) =>
         page.results.map((result) => <MovieResult {...result} />),
@@ -41,15 +42,15 @@ export function MoviesSearchResults({
   );
 }
 
-function PersonResult({ name }: { name: string }) {
-  return <div>{name}</div>;
+function PersonResult(result: PeopleResult) {
+  return <div>{result.name}</div>;
 }
 
 export function PeopleSearchResults({
   initialResults,
   query,
 }: {
-  initialResults: PeopleResults | undefined;
+  initialResults: PeopleResult[] | undefined;
   query: string;
 }) {
   const { data, fetchNextPage } = api.tmdbSearch.getPeople.useInfiniteQuery(
@@ -64,7 +65,7 @@ export function PeopleSearchResults({
 
   return (
     <SearchResults>
-      {initialResults?.results.map((result) => <PersonResult {...result} />)}
+      {initialResults?.map((result) => <PersonResult {...result} />)}
 
       {data?.pages.map((page) =>
         page.results.map((result) => <PersonResult {...result} />),
