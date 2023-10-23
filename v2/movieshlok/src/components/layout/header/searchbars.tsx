@@ -3,7 +3,8 @@
 import { useSearchStore } from "@/zustand/search";
 import { MagnifyingGlassIcon } from "@/components/icons";
 
-import type { FormEventHandler, RefObject } from "react";
+import { useEffect, type FormEventHandler, type RefObject } from "react";
+import { useParams } from "next/navigation";
 
 export function SearchBar({
   onSubmitSearchForm,
@@ -12,10 +13,18 @@ export function SearchBar({
   onSubmitSearchForm: FormEventHandler<HTMLFormElement>;
   searchToggleRef: RefObject<HTMLButtonElement>;
 }) {
+  const params = useParams();
+
   const searchQuery = useSearchStore((state) => state.searchQuery);
   const setSearchQuery = useSearchStore((state) => state.setSearchQuery);
   const shown = useSearchStore((state) => state.shown);
   const toggleShown = useSearchStore((state) => state.toggleShown);
+
+  useEffect(() => {
+    if (typeof params.query === "string") {
+      setSearchQuery(params.query);
+    }
+  }, [params.query, setSearchQuery]);
 
   return (
     <>

@@ -122,7 +122,7 @@ function UserDropdown({ user }: { user: UserType }) {
             shown && "visible top-16 opacity-100 transition-all"
           } bg-primarybg border-shadow absolute right-0 rounded border p-3 transition`}
         >
-          <nav>
+          <nav className="z-10">
             <ul className="font-Audiowide w-36 text-right ">
               <NavLink label="Profile" href={`/u/${user?.username}`} />
               <NavLink label="Ratings" href={`/u/${user?.username}/ratings`} />

@@ -1,14 +1,23 @@
 "use client";
 
 import { useSearchStore } from "@/zustand/search";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
+import { useEffect } from "react";
 
 export default function SearchLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const params = useParams();
   const searchHeading = useSearchStore((state) => state.searchHeading);
+  const setSearchHeading = useSearchStore((state) => state.setSearchHeading);
+
+  useEffect(() => {
+    if (typeof params.query === "string") {
+      setSearchHeading(params.query);
+    }
+  }, [params.query, setSearchHeading]);
 
   return (
     <div>
@@ -26,7 +35,7 @@ export default function SearchLayout({
 
 function Filter() {
   return (
-    <aside className="font-Audiowide border-shadow mb-5 h-fit rounded border p-4 md:sticky md:top-28 md:order-2">
+    <aside className="font-Audiowide border-shadow mb-5 h-fit rounded border p-4 md:order-2">
       <p className="mb-2 text-sm underline">Show results for</p>
       <ul className="flex flex-row flex-wrap gap-4 md:flex-col md:justify-start md:gap-0">
         <FilterItem filter="movie">Movie</FilterItem>
@@ -44,12 +53,19 @@ function FilterItem({
   filter: string;
 }) {
   const router = useRouter();
+  const params = useParams();
 
   const searchQuery = useSearchStore((state) => state.searchQuery);
   const currentFilter = useSearchStore((state) => state.filter);
   const setSearchHeading = useSearchStore((state) => state.setSearchHeading);
   const setFilter = useSearchStore((state) => state.setFilter);
   const setShown = useSearchStore((state) => state.setShown);
+
+  useEffect(() => {
+    if (typeof params.filter === "string") {
+      setFilter(params.filter);
+    }
+  }, [params.filter, setFilter]);
 
   function onSubmitSearch() {
     setSearchHeading(searchQuery);
