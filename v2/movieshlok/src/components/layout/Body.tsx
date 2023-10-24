@@ -26,7 +26,7 @@ export default async function Body({
 
   return (
     <body
-      className={`${inter.className} bg-secondarybg text-primaryfg relative min-h-screen`}
+      className={`${inter.className} bg-secondarybg text-primaryfg relative min-h-screen pb-32 md:pb-20`}
     >
       <Theme>
         <Header user={user} />
@@ -38,5 +38,14 @@ export default async function Body({
 }
 
 function Footer() {
-  return <footer className="absolute bottom-0">Footer</footer>;
+  return (
+    <footer className="bg-primarybg border-t-shadow absolute bottom-0 flex h-32 w-full flex-col justify-around border-t p-5 md:h-20">
+      <h2 className="font-Audiowide text-2xl">
+        If you don&apos;t like movies then you can get out
+      </h2>
+      <p className="text-end">
+        This product uses the TMDB API but is not endorsed or certified by TMDB
+      </p>
+    </footer>
+  );
 }

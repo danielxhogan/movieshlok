@@ -22,7 +22,7 @@ export function SearchBar({
 
   useEffect(() => {
     if (typeof params.query === "string") {
-      setSearchQuery(params.query);
+      setSearchQuery(decodeURI(params.query));
     }
   }, [params.query, setSearchQuery]);
 

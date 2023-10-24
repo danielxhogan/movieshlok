@@ -35,7 +35,7 @@ export default function SearchLayout({
 
 function Filter() {
   return (
-    <aside className="font-Audiowide border-shadow mb-5 h-fit rounded border p-4 md:order-2">
+    <aside className="font-Audiowide border-shadow mb-5 h-fit rounded border p-4 md:sticky md:top-28 md:order-2">
       <p className="mb-2 text-sm underline">Show results for</p>
       <ul className="flex flex-row flex-wrap gap-4 md:flex-col md:justify-start md:gap-0">
         <FilterItem filter="movie">Movie</FilterItem>

@@ -52,7 +52,7 @@ export default function Header({ user }: { user: UserType | null }) {
   }
 
   return (
-    <header className="absolute w-full">
+    <header className="absolute z-10 w-full">
       <div className="fixed w-full">
         <div className="bg-primarybg shadow-shadow relative z-10 flex w-full justify-between px-5 py-3 shadow-lg">
           <Logo />
