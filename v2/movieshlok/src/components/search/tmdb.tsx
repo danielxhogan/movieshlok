@@ -2,12 +2,14 @@
 
 import { Spinner } from "../icons";
 import api from "@/api/client";
+import { env } from "@/env.mjs";
 import type {
   MoviesResult,
   MoviesResults,
   PeopleResult,
   PeopleResults,
 } from "@/tmdb/search";
+import Image from "next/image";
 
 function SearchResults({ children }: { children: React.ReactNode }) {
   return (
@@ -16,7 +18,27 @@ function SearchResults({ children }: { children: React.ReactNode }) {
 }
 
 function MovieResult(result: MoviesResult) {
-  return <div>{result.title}</div>;
+  return (
+    <div className="border-b-shadow border-b">
+      <h2 className="my-4 text-2xl">{result.title}</h2>
+      <div className="mb-6 grid grid-cols-5 gap-2 lg:grid-cols-7">
+        <div>
+          {result.poster_path && (
+            <Image
+              src={`${env.NEXT_PUBLIC_TMDB_POSTER_URL}/w92${result.poster_path}`}
+              alt={`poster for ${result.title}`}
+              width={92}
+              height={138}
+              className="w-auto rounded"
+            />
+          )}
+        </div>
+        <div className="col-span-4 lg:col-span-6">
+          <p>{result.overview}</p>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function MoviesSearchResults({
@@ -49,18 +71,18 @@ export function MoviesSearchResults({
             <MovieResult key={result.id} {...result} />
           )),
         )}
-      </SearchResults>
 
-      {data &&
-        data.pages[0] &&
-        data.pages.length < data.pages[0].results.total_pages - 1 && (
-          <button
-            onClick={() => fetchNextPage()}
-            className="hover:bg-shadow hover:text-invertedfg font-Audiowide border-shadow my-4 flex h-12 w-48 items-center justify-center rounded border transition-all"
-          >
-            {isFetching ? <Spinner /> : <p>Load more results</p>}
-          </button>
-        )}
+        {data &&
+          data.pages[0] &&
+          data.pages.length < data.pages[0].results.total_pages - 1 && (
+            <button
+              onClick={() => fetchNextPage()}
+              className="hover:bg-shadow hover:text-invertedfg font-Audiowide border-shadow mt-4 flex h-12 w-48 items-center justify-center rounded border transition-all"
+            >
+              {isFetching ? <Spinner /> : <p>Load more results</p>}
+            </button>
+          )}
+      </SearchResults>
     </>
   );
 }

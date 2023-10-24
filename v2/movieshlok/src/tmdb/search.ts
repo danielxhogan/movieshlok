@@ -14,6 +14,8 @@ export interface MoviesResults {
 export interface MoviesResult {
   id: number;
   title: string;
+  poster_path?: string;
+  overview: string;
 }
 
 interface PeopleResultsResponse {

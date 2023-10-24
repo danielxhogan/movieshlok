@@ -21,13 +21,13 @@ export default function SearchLayout({
 
   return (
     <div>
-      <h1 className="text-shadow font-Audiowide border-b-shadow mb-5 border-b text-4xl">
+      <h1 className="text-shadow font-Audiowide border-b-shadow border-b text-4xl">
         Results for: <strong>{decodeURI(searchHeading)}</strong>
       </h1>
 
       <div className="mt-10 flex flex-col px-4 sm:container sm:mx-auto sm:px-7 md:flex-row md:justify-center md:gap-6">
         <Filter />
-        <div className="flex justify-center md:w-4/5 lg:w-2/3">{children}</div>
+        <div className="flex justify-center lg:w-4/5">{children}</div>
       </div>
     </div>
   );

@@ -24,6 +24,11 @@ const config = {
         hostname: "img.clerk.com",
         port: "",
       },
+      {
+        protocol: "https",
+        hostname: "image.tmdb.org",
+        port: "",
+      },
     ],
   },
 };
