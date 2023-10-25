@@ -34,7 +34,16 @@ export interface PeopleResults {
 export interface PeopleResult {
   id: number;
   name: string;
+  profile_path?: string;
   popularity: number;
+  known_for: KnownFor[];
+}
+
+export interface KnownFor {
+  id: number;
+  title?: string;
+  poster_path: string;
+  release_date?: string;
 }
 
 export async function getMovies(

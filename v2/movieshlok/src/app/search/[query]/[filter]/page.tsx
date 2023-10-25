@@ -44,9 +44,11 @@ export default async function SearchPage({
   }
 
   async function makePeopleSearchResults() {
-    const peopleResults: PeopleResults = await api.tmdbSearch.getPeople({
+    let peopleResults: PeopleResults = await api.tmdbSearch.getPeople({
       query: params.query,
     });
+
+    sortTMDBResults(peopleResults);
 
     return (
       <SearchHeading>

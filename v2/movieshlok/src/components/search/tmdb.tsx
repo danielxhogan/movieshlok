@@ -3,13 +3,16 @@
 import { Spinner } from "../icons";
 import api from "@/api/client";
 import { env } from "@/env.mjs";
+import { formatDate } from "@/utils/dateFormat";
+
 import type {
   MoviesResult,
   MoviesResults,
   PeopleResult,
   PeopleResults,
+  KnownFor,
 } from "@/tmdb/search";
-import { formatDate } from "@/utils/dateFormat";
+
 import Image from "next/image";
 
 function SearchResults({ children }: { children: React.ReactNode }) {
@@ -25,25 +28,28 @@ function MovieResult(result: MoviesResult) {
   return (
     <div className="border-b-shadow border-b">
       <h2 className="my-4 text-2xl">{result.title}</h2>
+
       <div className="mb-6 grid grid-cols-5 gap-2 lg:grid-cols-9">
         <div>
           {result.poster_path && (
             <Image
-              src={`${env.NEXT_PUBLIC_TMDB_POSTER_URL}/w92${result.poster_path}`}
+              src={`${env.NEXT_PUBLIC_TMDB_IMG_URL}/w92${result.poster_path}`}
               alt={`poster for ${result.title}`}
               width={92}
               height={138}
-              className="w-auto rounded"
+              className="rounded"
             />
           )}
         </div>
 
         <div className="col-span-4 flex flex-col gap-3 lg:col-span-8">
           <p>{result.overview}</p>
+
           <p>
             <span className="text-3xl font-semibold">{score}</span>{" "}
             <span className="text-xl">/ 5</span>
           </p>
+
           <p>
             {result.release_date && (
               <>
@@ -51,6 +57,62 @@ function MovieResult(result: MoviesResult) {
               </>
             )}
           </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function KnownFor({ movie }: { movie: KnownFor }) {
+  let title = movie.title;
+  if (!title) {
+    return;
+  }
+
+  const year = movie.release_date ? movie.release_date.substring(0, 4) : "";
+
+  if (title && title.length > 20) {
+    title = title.substring(0, 20);
+  }
+
+  return (
+    <div key={movie.id} className="flex flex-col items-center gap-2">
+      <div>{title}</div>
+
+      <Image
+        src={`${env.NEXT_PUBLIC_TMDB_IMG_URL}/w92${movie.poster_path}`}
+        alt={`poster for ${movie.title}`}
+        width={92}
+        height={138}
+        className="rounded"
+      />
+      <div>{year}</div>
+    </div>
+  );
+}
+
+function PersonResult(result: PeopleResult) {
+  return (
+    <div className="border-b-shadow border-b">
+      <h2 className="my-4 text-center text-2xl sm:text-left">{result.name}</h2>
+
+      <div className="mb-6 sm:grid sm:grid-cols-6 sm:gap-2 lg:grid-cols-9">
+        <div className="mb-6 sm:col-span-2 sm:mb-0">
+          {result.profile_path && (
+            <Image
+              src={`${env.NEXT_PUBLIC_TMDB_IMG_URL}/w185${result.profile_path}`}
+              alt={`profile img for ${result.name}`}
+              width={150}
+              height={225}
+              className="mx-auto rounded sm:mx-0"
+            />
+          )}
+        </div>
+
+        <div className="col-span-4 grid grid-cols-3 content-center lg:col-span-7">
+          {result.known_for.map((movie) => (
+            <KnownFor movie={movie} />
+          ))}
         </div>
       </div>
     </div>
@@ -101,10 +163,6 @@ export function MoviesSearchResults({
       </SearchResults>
     </>
   );
-}
-
-function PersonResult(result: PeopleResult) {
-  return <div>{result.name}</div>;
 }
 
 export function PeopleSearchResults({

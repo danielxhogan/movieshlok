@@ -38,7 +38,7 @@ export const env = createEnv({
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string(),
 
     // tmdb
-    NEXT_PUBLIC_TMDB_POSTER_URL: z.string(),
+    NEXT_PUBLIC_TMDB_IMG_URL: z.string(),
   },
 
   /**
@@ -59,7 +59,7 @@ export const env = createEnv({
 
     //tmdb
     TMDB_API_KEY: process.env.TMDB_API_KEY,
-    NEXT_PUBLIC_TMDB_POSTER_URL: process.env.NEXT_PUBLIC_TMDB_POSTER_URL,
+    NEXT_PUBLIC_TMDB_IMG_URL: process.env.NEXT_PUBLIC_TMDB_IMG_URL,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
