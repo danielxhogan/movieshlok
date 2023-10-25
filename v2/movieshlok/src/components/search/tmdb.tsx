@@ -27,22 +27,22 @@ function MovieResult(result: MoviesResult) {
 
   return (
     <div className="border-b-shadow border-b">
-      <h2 className="my-4 text-2xl">{result.title}</h2>
+      <h2 className="my-4 text-center text-2xl sm:text-left">{result.title}</h2>
 
-      <div className="mb-6 grid grid-cols-5 gap-2 lg:grid-cols-9">
-        <div>
+      <div className="mb-6 gap-2 sm:grid sm:grid-cols-5 lg:grid-cols-12">
+        <div className="mb-6 sm:mb-0 md:col-span-1 lg:col-span-2">
           {result.poster_path && (
             <Image
-              src={`${env.NEXT_PUBLIC_TMDB_IMG_URL}/w92${result.poster_path}`}
+              src={`${env.NEXT_PUBLIC_TMDB_IMG_URL}/w154${result.poster_path}`}
               alt={`poster for ${result.title}`}
-              width={92}
+              width={150}
               height={138}
-              className="rounded"
+              className="mx-auto rounded sm:mx-0"
             />
           )}
         </div>
 
-        <div className="col-span-4 flex flex-col gap-3 lg:col-span-8">
+        <div className="col-span-4 flex flex-col gap-3 lg:col-span-9">
           <p>{result.overview}</p>
 
           <p>
@@ -60,6 +60,52 @@ function MovieResult(result: MoviesResult) {
         </div>
       </div>
     </div>
+  );
+}
+
+export function MoviesSearchResults({
+  initialResults,
+  query,
+}: {
+  initialResults: MoviesResults | undefined;
+  query: string;
+}) {
+  const { data, fetchNextPage, isFetching } =
+    api.tmdbSearch.getMovies.useInfiniteQuery(
+      {
+        query,
+      },
+      {
+        getNextPageParam: (lastPage) => lastPage.nextPage,
+        initialCursor: 2,
+      },
+    );
+
+  return (
+    <>
+      <SearchResults>
+        {initialResults?.results.map((result) => (
+          <MovieResult key={result.id} {...result} />
+        ))}
+
+        {data?.pages.map((page) =>
+          page.results.results.map((result) => (
+            <MovieResult key={result.id} {...result} />
+          )),
+        )}
+
+        {data &&
+          data.pages[0] &&
+          data.pages.length < data.pages[0].results.total_pages - 1 && (
+            <button
+              onClick={() => fetchNextPage()}
+              className="hover:bg-shadow hover:text-invertedfg font-Audiowide border-shadow mt-4 flex h-12 w-48 items-center justify-center rounded border transition-all"
+            >
+              {isFetching ? <Spinner /> : <p>Load more results</p>}
+            </button>
+          )}
+      </SearchResults>
+    </>
   );
 }
 
@@ -119,52 +165,6 @@ function PersonResult(result: PeopleResult) {
   );
 }
 
-export function MoviesSearchResults({
-  initialResults,
-  query,
-}: {
-  initialResults: MoviesResults | undefined;
-  query: string;
-}) {
-  const { data, fetchNextPage, isFetching } =
-    api.tmdbSearch.getMovies.useInfiniteQuery(
-      {
-        query,
-      },
-      {
-        getNextPageParam: (lastPage) => lastPage.nextPage,
-        initialCursor: 2,
-      },
-    );
-
-  return (
-    <>
-      <SearchResults>
-        {initialResults?.results.map((result) => (
-          <MovieResult key={result.id} {...result} />
-        ))}
-
-        {data?.pages.map((page) =>
-          page.results.results.map((result) => (
-            <MovieResult key={result.id} {...result} />
-          )),
-        )}
-
-        {data &&
-          data.pages[0] &&
-          data.pages.length < data.pages[0].results.total_pages - 1 && (
-            <button
-              onClick={() => fetchNextPage()}
-              className="hover:bg-shadow hover:text-invertedfg font-Audiowide border-shadow mt-4 flex h-12 w-48 items-center justify-center rounded border transition-all"
-            >
-              {isFetching ? <Spinner /> : <p>Load more results</p>}
-            </button>
-          )}
-      </SearchResults>
-    </>
-  );
-}
-
 export function PeopleSearchResults({
   initialResults,
   query,
@@ -191,18 +191,18 @@ export function PeopleSearchResults({
         {data?.pages.map((page) =>
           page.results.results.map((result) => <PersonResult {...result} />),
         )}
-      </SearchResults>
 
-      {data &&
-        data.pages[0] &&
-        data.pages.length < data.pages[0].results.total_pages - 1 && (
-          <button
-            onClick={() => fetchNextPage()}
-            className="hover:bg-shadow hover:text-invertedfg font-Audiowide border-shadow my-4 flex h-12 w-48 items-center justify-center rounded border transition-all"
-          >
-            {isFetching ? <Spinner /> : <p>Load more results</p>}
-          </button>
-        )}
+        {data &&
+          data.pages[0] &&
+          data.pages.length < data.pages[0].results.total_pages - 1 && (
+            <button
+              onClick={() => fetchNextPage()}
+              className="hover:bg-shadow hover:text-invertedfg font-Audiowide border-shadow my-4 flex h-12 w-48 items-center justify-center rounded border transition-all"
+            >
+              {isFetching ? <Spinner /> : <p>Load more results</p>}
+            </button>
+          )}
+      </SearchResults>
     </>
   );
 }
