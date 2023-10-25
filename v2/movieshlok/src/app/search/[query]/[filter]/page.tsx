@@ -14,10 +14,24 @@ export default async function SearchPage({
     return <main className="w-full">{children}</main>;
   }
 
+  function sortTMDBResults(results: MoviesResults | PeopleResults) {
+    results.results.results = results.results.results.sort((a, b) => {
+      if (a.popularity > b.popularity) {
+        return -1;
+      } else if (a.popularity < b.popularity) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+  }
+
   async function makeMoviesSearchResults() {
-    const moviesResults: MoviesResults = await api.tmdbSearch.getMovies({
+    let moviesResults: MoviesResults = await api.tmdbSearch.getMovies({
       query: params.query,
     });
+
+    sortTMDBResults(moviesResults);
 
     return (
       <SearchHeading>

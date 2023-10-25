@@ -9,6 +9,7 @@ import type {
   PeopleResult,
   PeopleResults,
 } from "@/tmdb/search";
+import { formatDate } from "@/utils/dateFormat";
 import Image from "next/image";
 
 function SearchResults({ children }: { children: React.ReactNode }) {
@@ -18,10 +19,13 @@ function SearchResults({ children }: { children: React.ReactNode }) {
 }
 
 function MovieResult(result: MoviesResult) {
+  const score = (result.vote_average / 2).toFixed(1);
+  const releaseDate = formatDate(result.release_date);
+
   return (
     <div className="border-b-shadow border-b">
       <h2 className="my-4 text-2xl">{result.title}</h2>
-      <div className="mb-6 grid grid-cols-5 gap-2 lg:grid-cols-7">
+      <div className="mb-6 grid grid-cols-5 gap-2 lg:grid-cols-9">
         <div>
           {result.poster_path && (
             <Image
@@ -33,8 +37,20 @@ function MovieResult(result: MoviesResult) {
             />
           )}
         </div>
-        <div className="col-span-4 lg:col-span-6">
+
+        <div className="col-span-4 flex flex-col gap-3 lg:col-span-8">
           <p>{result.overview}</p>
+          <p>
+            <span className="text-3xl font-semibold">{score}</span>{" "}
+            <span className="text-xl">/ 5</span>
+          </p>
+          <p>
+            {result.release_date && (
+              <>
+                Released on <span className="font-semibold">{releaseDate}</span>
+              </>
+            )}
+          </p>
         </div>
       </div>
     </div>

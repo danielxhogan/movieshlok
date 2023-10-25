@@ -16,6 +16,9 @@ export interface MoviesResult {
   title: string;
   poster_path?: string;
   overview: string;
+  vote_average: number;
+  popularity: number;
+  release_date: string;
 }
 
 interface PeopleResultsResponse {
@@ -31,6 +34,7 @@ export interface PeopleResults {
 export interface PeopleResult {
   id: number;
   name: string;
+  popularity: number;
 }
 
 export async function getMovies(
