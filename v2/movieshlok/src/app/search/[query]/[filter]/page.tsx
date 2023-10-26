@@ -10,10 +10,6 @@ export default async function SearchPage({
 }: {
   params: { query: string; filter: string };
 }) {
-  function SearchHeading({ children }: { children: React.ReactNode }) {
-    return <main className="w-full">{children}</main>;
-  }
-
   function sortTMDBResults(results: MoviesResults | PeopleResults) {
     results.results.results = results.results.results.sort((a, b) => {
       if (a.popularity > b.popularity) {
@@ -34,12 +30,10 @@ export default async function SearchPage({
     sortTMDBResults(moviesResults);
 
     return (
-      <SearchHeading>
-        <MoviesSearchResults
-          initialResults={moviesResults.results}
-          query={params.query}
-        />
-      </SearchHeading>
+      <MoviesSearchResults
+        initialResults={moviesResults.results}
+        query={params.query}
+      />
     );
   }
 
@@ -51,12 +45,10 @@ export default async function SearchPage({
     sortTMDBResults(peopleResults);
 
     return (
-      <SearchHeading>
-        <PeopleSearchResults
-          initialResults={peopleResults.results}
-          query={params.query}
-        />
-      </SearchHeading>
+      <PeopleSearchResults
+        initialResults={peopleResults.results}
+        query={params.query}
+      />
     );
   }
 

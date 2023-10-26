@@ -25,9 +25,9 @@ export default function SearchLayout({
         Results for: <strong>{decodeURI(searchHeading)}</strong>
       </h1>
 
-      <div className="mt-10 flex flex-col px-4 sm:container sm:mx-auto sm:px-7 md:flex-row md:justify-center md:gap-6">
+      <div className="mt-10 flex w-full flex-col px-4 sm:container sm:mx-auto sm:px-7 md:flex-row md:justify-center md:gap-6">
         <Filter />
-        <div className="flex justify-center lg:w-4/5">{children}</div>
+        <main className="bg-primarybg mb-6 w-full rounded p-4">{children}</main>
       </div>
     </div>
   );
@@ -59,7 +59,6 @@ function FilterItem({
   const currentFilter = useSearchStore((state) => state.filter);
   const setSearchHeading = useSearchStore((state) => state.setSearchHeading);
   const setFilter = useSearchStore((state) => state.setFilter);
-  const setShown = useSearchStore((state) => state.setShown);
 
   useEffect(() => {
     if (typeof params.filter === "string") {
@@ -70,7 +69,6 @@ function FilterItem({
   function onSubmitSearch() {
     setSearchHeading(searchQuery);
     setFilter(filter);
-    setShown(false);
 
     if (searchQuery) {
       router.push(`/search/${searchQuery}/${filter}`);

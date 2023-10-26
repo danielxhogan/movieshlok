@@ -15,9 +15,59 @@ import type {
 
 import Image from "next/image";
 
-function SearchResults({ children }: { children: React.ReactNode }) {
+function KnownFor({ movie }: { movie: KnownFor }) {
+  let title = movie.title;
+  if (!title) {
+    return;
+  }
+
+  const year = movie.release_date ? movie.release_date.substring(0, 4) : "";
+
+  if (title && title.length > 20) {
+    title = title.substring(0, 20).concat("...");
+  }
+
   return (
-    <section className="bg-primarybg mb-6 rounded p-4">{children}</section>
+    <div className="flex flex-col items-center gap-2">
+      <div>{title}</div>
+
+      <Image
+        src={`${env.NEXT_PUBLIC_TMDB_IMG_URL}/w92${movie.poster_path}`}
+        alt={`poster for ${movie.title}`}
+        width={92}
+        height={138}
+        className="rounded"
+      />
+      <div>{year}</div>
+    </div>
+  );
+}
+
+function PersonResult(result: PeopleResult) {
+  return (
+    <section className="border-b-shadow border-b">
+      <h2 className="my-4 text-center text-2xl sm:text-left">{result.name}</h2>
+
+      <div className="mb-6 sm:grid sm:grid-cols-6 sm:gap-2 lg:grid-cols-9">
+        <div className="mb-6 sm:col-span-2 sm:mb-0">
+          {result.profile_path && (
+            <Image
+              src={`${env.NEXT_PUBLIC_TMDB_IMG_URL}/w185${result.profile_path}`}
+              alt={`profile img for ${result.name}`}
+              width={150}
+              height={225}
+              className="mx-auto rounded sm:mx-0"
+            />
+          )}
+        </div>
+
+        <div className="col-span-4 grid grid-cols-3 content-center lg:col-span-7">
+          {result.known_for.map((movie) => (
+            <KnownFor key={movie.id} movie={movie} />
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -26,7 +76,7 @@ function MovieResult(result: MoviesResult) {
   const releaseDate = formatDate(result.release_date);
 
   return (
-    <div className="border-b-shadow border-b">
+    <section className="border-b-shadow border-b">
       <h2 className="my-4 text-center text-2xl sm:text-left">{result.title}</h2>
 
       <div className="mb-6 gap-2 sm:grid sm:grid-cols-5 lg:grid-cols-12">
@@ -59,109 +109,7 @@ function MovieResult(result: MoviesResult) {
           </p>
         </div>
       </div>
-    </div>
-  );
-}
-
-export function MoviesSearchResults({
-  initialResults,
-  query,
-}: {
-  initialResults: MoviesResults | undefined;
-  query: string;
-}) {
-  const { data, fetchNextPage, isFetching } =
-    api.tmdbSearch.getMovies.useInfiniteQuery(
-      {
-        query,
-      },
-      {
-        getNextPageParam: (lastPage) => lastPage.nextPage,
-        initialCursor: 2,
-      },
-    );
-
-  return (
-    <>
-      <SearchResults>
-        {initialResults?.results.map((result) => (
-          <MovieResult key={result.id} {...result} />
-        ))}
-
-        {data?.pages.map((page) =>
-          page.results.results.map((result) => (
-            <MovieResult key={result.id} {...result} />
-          )),
-        )}
-
-        {data &&
-          data.pages[0] &&
-          data.pages.length < data.pages[0].results.total_pages - 1 && (
-            <button
-              onClick={() => fetchNextPage()}
-              className="hover:bg-shadow hover:text-invertedfg font-Audiowide border-shadow mt-4 flex h-12 w-48 items-center justify-center rounded border transition-all"
-            >
-              {isFetching ? <Spinner /> : <p>Load more results</p>}
-            </button>
-          )}
-      </SearchResults>
-    </>
-  );
-}
-
-function KnownFor({ movie }: { movie: KnownFor }) {
-  let title = movie.title;
-  if (!title) {
-    return;
-  }
-
-  const year = movie.release_date ? movie.release_date.substring(0, 4) : "";
-
-  if (title && title.length > 20) {
-    title = title.substring(0, 20);
-  }
-
-  return (
-    <div key={movie.id} className="flex flex-col items-center gap-2">
-      <div>{title}</div>
-
-      <Image
-        src={`${env.NEXT_PUBLIC_TMDB_IMG_URL}/w92${movie.poster_path}`}
-        alt={`poster for ${movie.title}`}
-        width={92}
-        height={138}
-        className="rounded"
-      />
-      <div>{year}</div>
-    </div>
-  );
-}
-
-function PersonResult(result: PeopleResult) {
-  return (
-    <div className="border-b-shadow border-b">
-      <h2 className="my-4 text-center text-2xl sm:text-left">{result.name}</h2>
-
-      <div className="mb-6 sm:grid sm:grid-cols-6 sm:gap-2 lg:grid-cols-9">
-        <div className="mb-6 sm:col-span-2 sm:mb-0">
-          {result.profile_path && (
-            <Image
-              src={`${env.NEXT_PUBLIC_TMDB_IMG_URL}/w185${result.profile_path}`}
-              alt={`profile img for ${result.name}`}
-              width={150}
-              height={225}
-              className="mx-auto rounded sm:mx-0"
-            />
-          )}
-        </div>
-
-        <div className="col-span-4 grid grid-cols-3 content-center lg:col-span-7">
-          {result.known_for.map((movie) => (
-            <KnownFor movie={movie} />
-          ))}
-        </div>
-      </div>
-    </div>
+    </section>
   );
 }
 
@@ -169,7 +117,7 @@ export function PeopleSearchResults({
   initialResults,
   query,
 }: {
-  initialResults: PeopleResults | undefined;
+  initialResults: PeopleResults;
   query: string;
 }) {
   const { data, fetchNextPage, isFetching } =
@@ -185,24 +133,100 @@ export function PeopleSearchResults({
 
   return (
     <>
-      <SearchResults>
-        {initialResults?.results.map((result) => <PersonResult {...result} />)}
+      {initialResults.total_results === 0 && (
+        <>
+          <h3 className="font-Audiowide mb-4 text-center text-2xl">
+            Sorry, No Results
+          </h3>
+          <Image
+            src="/mandy-creeps.png"
+            alt="sorry no results"
+            width={1280}
+            height={536}
+            className="rounded"
+          />
+        </>
+      )}
 
-        {data?.pages.map((page) =>
-          page.results.results.map((result) => <PersonResult {...result} />),
+      {initialResults.results.map((result) => (
+        <PersonResult key={result.id} {...result} />
+      ))}
+
+      {data?.pages.map((page) =>
+        page.results.results.map((result) => (
+          <PersonResult key={result.id} {...result} />
+        )),
+      )}
+
+      {data &&
+        data.pages[0] &&
+        data.pages.length < data.pages[0].results.total_pages - 1 && (
+          <button
+            onClick={() => fetchNextPage()}
+            className="hover:bg-shadow hover:text-invertedfg font-Audiowide border-shadow mt-4 flex h-12 w-48 items-center justify-center rounded border transition-all"
+          >
+            {isFetching ? <Spinner /> : <p>Load more results</p>}
+          </button>
         )}
+    </>
+  );
+}
 
-        {data &&
-          data.pages[0] &&
-          data.pages.length < data.pages[0].results.total_pages - 1 && (
-            <button
-              onClick={() => fetchNextPage()}
-              className="hover:bg-shadow hover:text-invertedfg font-Audiowide border-shadow my-4 flex h-12 w-48 items-center justify-center rounded border transition-all"
-            >
-              {isFetching ? <Spinner /> : <p>Load more results</p>}
-            </button>
-          )}
-      </SearchResults>
+export function MoviesSearchResults({
+  initialResults,
+  query,
+}: {
+  initialResults: MoviesResults;
+  query: string;
+}) {
+  const { data, fetchNextPage, isFetching } =
+    api.tmdbSearch.getMovies.useInfiniteQuery(
+      {
+        query,
+      },
+      {
+        getNextPageParam: (lastPage) => lastPage.nextPage,
+        initialCursor: 2,
+      },
+    );
+
+  return (
+    <>
+      {initialResults.total_results === 0 && (
+        <>
+          <h3 className="font-Audiowide mb-4 text-center text-2xl">
+            Sorry, No Results
+          </h3>
+          <Image
+            src="/mandy-creeps.png"
+            alt="sorry no results"
+            width={1280}
+            height={536}
+            className="rounded"
+          />
+        </>
+      )}
+
+      {initialResults?.results.map((result) => (
+        <MovieResult key={result.id} {...result} />
+      ))}
+
+      {data?.pages.map((page) =>
+        page.results.results.map((result) => (
+          <MovieResult key={result.id} {...result} />
+        )),
+      )}
+
+      {data &&
+        data.pages[0] &&
+        data.pages.length < data.pages[0].results.total_pages - 1 && (
+          <button
+            onClick={() => fetchNextPage()}
+            className="hover:bg-shadow hover:text-invertedfg font-Audiowide border-shadow mt-4 flex h-12 w-48 items-center justify-center rounded border transition-all"
+          >
+            {isFetching ? <Spinner /> : <p>Load more results</p>}
+          </button>
+        )}
     </>
   );
 }
