@@ -7,17 +7,14 @@ export default authMiddleware({
   publicRoutes: [
     // pages
     "/",
-    "/search",
+    "/search/(.*)",
+    "/movie/(.*)",
+    "/person/(.*)",
     "/u/(.*)",
 
-    "/test1",
-    "/test2",
-    "/test3",
-
     // endopoints
-    "/api/trpc/example.hello",
-    "/api/trpc/example.getAll",
     "/api/new-user",
+    "/api/trpc(.*)",
   ],
 });
 
