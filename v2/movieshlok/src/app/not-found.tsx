@@ -15,7 +15,7 @@ export default function NotFound() {
           className="w-full"
         />
         <div className="text-invertedfg font-Audiowide absolute bottom-4 w-full text-center text-xl sm:text-3xl md:text-5xl">
-          <h2>I think you're lost</h2>
+          <h2>I think you&apos;re lost</h2>
         </div>
       </div>
     </main>

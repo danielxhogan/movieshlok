@@ -23,7 +23,7 @@ export default async function SearchPage({
   }
 
   async function makeMoviesSearchResults() {
-    let moviesResults: MoviesResults = await api.tmdbSearch.getMovies({
+    const moviesResults: MoviesResults = await api.tmdbSearch.getMovies({
       query: params.query,
     });
 
@@ -38,7 +38,7 @@ export default async function SearchPage({
   }
 
   async function makePeopleSearchResults() {
-    let peopleResults: PeopleResults = await api.tmdbSearch.getPeople({
+    const peopleResults: PeopleResults = await api.tmdbSearch.getPeople({
       query: params.query,
     });
 
