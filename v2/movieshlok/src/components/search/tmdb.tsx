@@ -30,15 +30,19 @@ function KnownFor({ movie }: { movie: KnownFor }) {
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <div>{title}</div>
+      <Link href={`/movie/${movie.id}`}>
+        <div className="hover:underline">{title}</div>
+      </Link>
 
-      <Image
-        src={`${env.NEXT_PUBLIC_TMDB_IMG_URL}/w92${movie.poster_path}`}
-        alt={`poster for ${movie.title}`}
-        width={92}
-        height={138}
-        className="rounded"
-      />
+      <Link href={`/movie/${movie.id}`}>
+        <Image
+          src={`${env.NEXT_PUBLIC_TMDB_IMG_URL}/w92${movie.poster_path}`}
+          alt={`poster for ${movie.title}`}
+          width={92}
+          height={138}
+          className="border-primarybg hover:border-shadow rounded border transition-all"
+        />
+      </Link>
       <div>{year}</div>
     </div>
   );
@@ -47,18 +51,24 @@ function KnownFor({ movie }: { movie: KnownFor }) {
 function PersonResult(result: PeopleResult) {
   return (
     <section className="border-b-shadow border-b">
-      <h2 className="my-4 text-center text-2xl sm:text-left">{result.name}</h2>
+      <Link href={`/person/${result.id}`}>
+        <h2 className="my-4 text-center text-2xl hover:underline sm:text-left">
+          {result.name}
+        </h2>
+      </Link>
 
       <div className="mb-6 sm:grid sm:grid-cols-6 sm:gap-2 lg:grid-cols-9">
         <div className="mb-6 sm:col-span-2 sm:mb-0">
           {result.profile_path && (
-            <Image
-              src={`${env.NEXT_PUBLIC_TMDB_IMG_URL}/w185${result.profile_path}`}
-              alt={`profile img for ${result.name}`}
-              width={150}
-              height={225}
-              className="mx-auto rounded sm:mx-0"
-            />
+            <Link href={`/person/${result.id}`}>
+              <Image
+                src={`${env.NEXT_PUBLIC_TMDB_IMG_URL}/w185${result.profile_path}`}
+                alt={`profile img for ${result.name}`}
+                width={150}
+                height={225}
+                className="border-primarybg hover:border-shadow mx-auto rounded border-2 transition-all sm:mx-0"
+              />
+            </Link>
           )}
         </div>
 
