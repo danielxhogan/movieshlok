@@ -1,4 +1,6 @@
+import Trailer from "@/components/movie/trailer";
 import api from "@/api/server";
+import type { Video } from "@/tmdb/details";
 
 export default async function MovieDetailsPage({
   params,
@@ -9,9 +11,18 @@ export default async function MovieDetailsPage({
     movieId: params.movieId,
   });
 
+  let trailer: Video | undefined = undefined;
+
+  for (const video of movieDetails.videos.results) {
+    if (video.type === "Trailer" && video.site === "YouTube") {
+      trailer = video;
+      break;
+    }
+  }
+
   return (
-    <main>
-      <h1>{movieDetails.title}</h1>
+    <main className="container mx-auto px-6">
+      {trailer && <Trailer trailer={trailer} />}
     </main>
   );
 }
