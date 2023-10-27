@@ -1,5 +1,5 @@
 import { userRouter } from "@/server/routers/user";
-import { tmdbSearchRouter } from "./routers/tmdb";
+import { tmdbSearchRouter, tmdbDetailsRouter } from "./routers/tmdb";
 import { createTRPCRouter } from "@/server/trpc";
 
 /**
@@ -10,6 +10,7 @@ import { createTRPCRouter } from "@/server/trpc";
 export const appRouter = createTRPCRouter({
   user: userRouter,
   tmdbSearch: tmdbSearchRouter,
+  tmdbDetails: tmdbDetailsRouter,
 });
 
 // export type definition of API

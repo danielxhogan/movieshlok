@@ -14,6 +14,7 @@ import type {
 } from "@/tmdb/search";
 
 import Image from "next/image";
+import Link from "next/link";
 
 function KnownFor({ movie }: { movie: KnownFor }) {
   let title = movie.title;
@@ -77,18 +78,24 @@ function MovieResult(result: MoviesResult) {
 
   return (
     <section className="border-b-shadow border-b">
-      <h2 className="my-4 text-center text-2xl sm:text-left">{result.title}</h2>
+      <Link href={`/movie/${result.id}`}>
+        <h2 className="my-4 text-center text-2xl hover:underline sm:text-left">
+          {result.title}
+        </h2>
+      </Link>
 
       <div className="mb-6 gap-2 sm:grid sm:grid-cols-5 lg:grid-cols-12">
         <div className="mb-6 sm:mb-0 md:col-span-1 lg:col-span-2">
           {result.poster_path && (
-            <Image
-              src={`${env.NEXT_PUBLIC_TMDB_IMG_URL}/w154${result.poster_path}`}
-              alt={`poster for ${result.title}`}
-              width={150}
-              height={138}
-              className="mx-auto rounded sm:mx-0"
-            />
+            <Link href={`/movie/${result.id}`}>
+              <Image
+                src={`${env.NEXT_PUBLIC_TMDB_IMG_URL}/w154${result.poster_path}`}
+                alt={`poster for ${result.title}`}
+                width={150}
+                height={138}
+                className="border-primarybg hover:border-shadow mx-auto rounded border-2 transition-all sm:mx-0"
+              />
+            </Link>
           )}
         </div>
 
@@ -158,8 +165,7 @@ export function PeopleSearchResults({
         )),
       )}
 
-      {data &&
-        data.pages[0] &&
+      {data?.pages[0] &&
         data.pages.length < data.pages[0].results.total_pages - 1 && (
           <button
             onClick={() => fetchNextPage()}
@@ -217,8 +223,7 @@ export function MoviesSearchResults({
         )),
       )}
 
-      {data &&
-        data.pages[0] &&
+      {data?.pages[0] &&
         data.pages.length < data.pages[0].results.total_pages - 1 && (
           <button
             onClick={() => fetchNextPage()}

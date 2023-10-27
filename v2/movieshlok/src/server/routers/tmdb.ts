@@ -1,6 +1,7 @@
 import { type RouterOutputs } from "@/api/types";
 import { createTRPCRouter, publicProcedure } from "@/server/trpc";
 import { getMovies, getPeople } from "@/tmdb/search";
+import { getMovie } from "@/tmdb/details";
 import { z } from "zod";
 
 export type MoviesResults = RouterOutputs["tmdbSearch"]["getMovies"];
@@ -38,5 +39,13 @@ export const tmdbSearchRouter = createTRPCRouter({
         results,
         nextPage,
       };
+    }),
+});
+
+export const tmdbDetailsRouter = createTRPCRouter({
+  getMovie: publicProcedure
+    .input(z.object({ movieId: z.string() }))
+    .query(async ({ input }) => {
+      return await getMovie(input.movieId);
     }),
 });
